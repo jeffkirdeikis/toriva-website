@@ -277,7 +277,7 @@ footer{border-top:1px solid var(--border);padding:5rem 4vw 3rem;background:var(-
 .career-desc{font-family:var(--body-font);font-size:1rem;font-weight:400;color:var(--body-text-color);line-height:1.7;}
 @media(max-width:900px){
   /* HERO */
-  .hero{padding:5rem 5vw 3rem;min-height:100vh;justify-content:flex-start;padding-top:clamp(5rem,18vw,8rem);}
+  .hero{padding:6rem 5vw 3rem;min-height:100vh;justify-content:center;margin-top:-3rem;}
   .hero-eyebrow{font-size:.52rem;letter-spacing:.25em;margin-bottom:1.25rem;flex-wrap:nowrap;white-space:nowrap;overflow:hidden;}
   .hero-logo{width:clamp(200px,60vw,300px);}
   .hero-desc{font-size:1.1rem;line-height:1.7;max-width:100%;}
