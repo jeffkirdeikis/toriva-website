@@ -52,12 +52,11 @@ nav.scrolled{background:rgba(5,5,5,.95);border-bottom:1px solid var(--border);ba
 
 /* HERO */
 #page-home{position:relative;overflow:hidden;}
-.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:80px 4vw 3rem;overflow:hidden;}
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 4vw 3rem;overflow:hidden;}
 .hero-canvas{position:absolute;inset:0;z-index:0;}
 .hero-eyebrow{font-size:.93rem;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;position:relative;z-index:2;opacity:0;animation:fadeUp 1s .2s forwards;display:flex;align-items:center;gap:.75rem;}
 .hero-eyebrow::before{content:'';display:block;width:28px;height:1px;background:var(--gold);}
 .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(5rem,12vw,14rem);line-height:.88;letter-spacing:-.01em;position:relative;z-index:2;opacity:0;animation:fadeUp 1s .35s forwards;}
-.hero-title .line-the{display:block;color:transparent;-webkit-text-stroke:1.5px rgba(242,237,230,0.2);}
 .hero-title .accent{color:var(--gold);}
 .hero-bottom{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;align-items:end;gap:3rem;margin-top:2rem;opacity:0;animation:fadeUp 1s .55s forwards;}
 .hero-desc{font-family:var(--body-font);font-size:1.125rem;font-weight:400;line-height:1.7;color:var(--body-text-color);font-style:normal;max-width:500px;}
@@ -271,7 +270,6 @@ footer{border-top:1px solid var(--border);padding:5rem 4vw 3rem;background:var(-
   .hero{padding:8rem 5vw 4rem;min-height:auto;justify-content:flex-start;}
   .hero-eyebrow{font-size:.52rem;letter-spacing:.25em;margin-bottom:1.25rem;flex-wrap:nowrap;white-space:nowrap;overflow:hidden;}
   .hero-title{font-size:clamp(3.5rem,20vw,6rem);line-height:.88;}
-  .hero-title .line-the{-webkit-text-stroke:1px rgba(242,237,230,0.15);}
   .hero-bottom{grid-template-columns:1fr;gap:1.5rem;margin-top:2rem;}
   .hero-desc{font-size:1.0625rem;line-height:1.7;max-width:100%;}
   .hero-tagline{font-size:.85rem;margin-top:1.25rem;}
