@@ -39,7 +39,7 @@ nav.scrolled{background:rgba(5,5,5,.95);border-bottom:1px solid var(--border);ba
 .nav-dropdown{position:relative;}
 .dropdown-toggle{display:inline-flex;align-items:center;gap:.25em;}
 .dropdown-arrow{font-size:.45em;line-height:1;transition:transform .3s;}
-.nav-dropdown:hover .dropdown-arrow{transform:rotate(180deg);}
+.nav-dropdown:hover .dropdown-arrow,.dropdown-arrow.open{transform:rotate(180deg);}
 .dropdown-menu{display:none;position:absolute;top:100%;left:0;background:rgba(5,5,5,.97);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:4px;padding:.5rem 0;min-width:140px;list-style:none;padding-top:.75rem;z-index:1001;}
 .nav-dropdown::after{content:'';position:absolute;top:100%;left:0;right:0;height:.75rem;}
 .nav-dropdown:hover .dropdown-menu{display:block;}
@@ -277,7 +277,7 @@ footer{border-top:1px solid var(--border);padding:5rem 4vw 3rem;background:var(-
 .career-desc{font-family:var(--body-font);font-size:1rem;font-weight:400;color:var(--body-text-color);line-height:1.7;}
 @media(max-width:900px){
   /* HERO */
-  .hero{padding:6rem 5vw 3rem;min-height:100vh;justify-content:center;}
+  .hero{padding:5rem 5vw 3rem;min-height:100vh;justify-content:flex-start;padding-top:clamp(5rem,18vw,8rem);}
   .hero-eyebrow{font-size:.52rem;letter-spacing:.25em;margin-bottom:1.25rem;flex-wrap:nowrap;white-space:nowrap;overflow:hidden;}
   .hero-logo{width:clamp(200px,60vw,300px);}
   .hero-desc{font-size:1.1rem;line-height:1.7;max-width:100%;}
@@ -290,8 +290,8 @@ footer{border-top:1px solid var(--border);padding:5rem 4vw 3rem;background:var(-
   .nav-links li{padding:.75rem 0;border-bottom:1px solid var(--border);}
   .nav-links li:last-child{border-bottom:none;}
   .nav-links a{font-size:.75rem;letter-spacing:.18em;}
-  .dropdown-menu{position:static;transform:none;background:none;border:none;backdrop-filter:none;padding:0;margin:0;padding-left:1rem;}
-  .nav-dropdown:hover .dropdown-menu,.dropdown-menu{display:block;}
+  .dropdown-menu{position:static;transform:none;background:none;border:none;backdrop-filter:none;padding:0;margin:0;padding-left:1rem;display:none !important;}
+  .dropdown-menu.open{display:block !important;}
   .dropdown-menu a{font-size:.7rem;padding:.4rem 0;}
   .dropdown-tba{font-size:.7rem;padding:.4rem 0;}
   /* GLOBAL */

@@ -21,9 +21,14 @@ hamburger.addEventListener('click', () => {
   navLinks.classList.toggle('open');
 });
 
-// PRODUCT DROPDOWN (mobile tap support)
+// PRODUCT DROPDOWN (mobile tap to expand)
 document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-  toggle.addEventListener('click', e => { e.preventDefault(); });
+  toggle.addEventListener('click', e => {
+    e.preventDefault();
+    const menu = toggle.nextElementSibling;
+    menu.classList.toggle('open');
+    toggle.querySelector('.dropdown-arrow').classList.toggle('open');
+  });
 });
 
 // PAGE SYSTEM
