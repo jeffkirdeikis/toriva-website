@@ -21,6 +21,11 @@ hamburger.addEventListener('click', () => {
   navLinks.classList.toggle('open');
 });
 
+// PRODUCT DROPDOWN (mobile tap support)
+document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+  toggle.addEventListener('click', e => { e.preventDefault(); });
+});
+
 // PAGE SYSTEM
 function goPage(id, pushState) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
