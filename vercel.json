@@ -1,6 +1,6 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(how|pledge|token|projections|roadmap|founder|marketplace|deck|privacy|terms)", "destination": "/index.html" }
+    { "source": "/(how|pledge|token|projections|roadmap|team|founder|marketplace|deck|privacy|terms)", "destination": "/index.html" }
   ]
 }

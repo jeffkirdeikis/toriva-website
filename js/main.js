@@ -43,7 +43,9 @@ function loadFromHash() {
   const path = location.pathname.replace(/^\//, '').replace(/\/$/, '');
   const hash = location.hash.replace('#', '');
   const page = path || hash || 'home';
-  const valid = ['home','how','pledge','token','projections','roadmap','founder','marketplace','deck','privacy','terms'];
+  const valid = ['home','how','pledge','token','projections','roadmap','team','marketplace','deck','privacy','terms'];
+  // Backward compatibility: redirect /founder to /team
+  if (page === 'founder') { goPage('team', true); return; }
   goPage(valid.includes(page) ? page : 'home', false);
 }
 window.addEventListener('popstate', loadFromHash);
