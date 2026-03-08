@@ -49,6 +49,7 @@ nav.scrolled{background:rgba(5,5,5,.95);border-bottom:1px solid var(--border);ba
 .dropdown-tba{display:block;padding:.5rem 1rem;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);cursor:default;white-space:nowrap;}
 .nav-pill{background:transparent;border:1px solid var(--border-mid);color:var(--gold);padding:.5rem 1.4rem;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:all .3s;}
 .nav-pill:hover{background:var(--gold);color:var(--black);border-color:var(--gold);}
+.nav-socials{display:flex;align-items:center;gap:.75rem;}
 .nav-social{color:var(--cream-muted);transition:color .2s;display:flex;align-items:center;text-decoration:none;cursor:pointer;}
 .nav-social:hover{color:var(--gold);}
 .hamburger{display:none;background:none;border:none;padding:.5rem;cursor:pointer;flex-direction:column;gap:5px;z-index:1001;}
