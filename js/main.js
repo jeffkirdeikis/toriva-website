@@ -330,6 +330,121 @@ function initHiwCanvas() {
 }
 initHiwCanvas();
 
+// FLYWHEEL CANVAS
+function initFlywheelCanvas() {
+  const canvas = document.getElementById('flywheelCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  let S = 420, active = false, af;
+
+  const stages = 5, stageAngle = (Math.PI * 2) / stages;
+  const labels = ['CUSTOMERS', 'REVENUE', 'PAYOUTS', 'CONTRIBUTORS', 'COMPUTE'];
+  const icons = ['◆', '$', '↗', '◎', '⬡'];
+
+  const particles = [];
+  for (let i = 0; i < 35; i++) particles.push({ angle: Math.random() * Math.PI * 2, speed: 0.003 + Math.random() * 0.004, size: 1.2 + Math.random() * 1.8, radOffset: (Math.random() - 0.5) * 18, opacity: 0.3 + Math.random() * 0.5 });
+  const bursts = [];
+  let t = 0, fadeIn = 0;
+
+  function resize() {
+    const maxW = canvas.parentElement ? canvas.parentElement.getBoundingClientRect().width : 420;
+    S = Math.min(420, maxW - 16);
+    canvas.width = S * dpr; canvas.height = S * dpr;
+    canvas.style.width = S + 'px'; canvas.style.height = S + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  const obs = new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !active) { active = true; resize(); loop(); }
+    else if (!e.isIntersecting && active) { active = false; cancelAnimationFrame(af); }
+  }, { threshold: 0.2 });
+  obs.observe(canvas.parentElement);
+
+  function loop() {
+    if (!active) return;
+    t += 0.016; fadeIn = Math.min(1, fadeIn + 0.012);
+    const cx = S / 2, cy = S / 2, R = S * 0.37;
+    ctx.clearRect(0, 0, S, S); ctx.globalAlpha = fadeIn;
+
+    // Rings
+    [R + 24, R, R - 24].forEach((r, i) => {
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(201,168,76,' + (i === 1 ? 0.08 : 0.03) + ')';
+      ctx.lineWidth = i === 1 ? 1.5 : 0.8; ctx.stroke();
+    });
+
+    // Arrows
+    for (let i = 0; i < stages; i++) {
+      const midAngle = -Math.PI / 2 + stageAngle * i + stageAngle / 2;
+      const ax = cx + Math.cos(midAngle) * R, ay = cy + Math.sin(midAngle) * R;
+      const tang = midAngle + Math.PI / 2, as = 5;
+      ctx.beginPath();
+      ctx.moveTo(ax + Math.cos(tang) * as, ay + Math.sin(tang) * as);
+      ctx.lineTo(ax + Math.cos(tang + 2.6) * as, ay + Math.sin(tang + 2.6) * as);
+      ctx.lineTo(ax + Math.cos(tang - 2.6) * as, ay + Math.sin(tang - 2.6) * as);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(201,168,76,' + (0.1 + 0.05 * Math.sin(t * 2 + i)) + ')'; ctx.fill();
+    }
+
+    // Particles
+    particles.forEach(p => {
+      p.angle += p.speed; if (p.angle > Math.PI * 2) p.angle -= Math.PI * 2;
+      const pr = R + p.radOffset;
+      const px = cx + Math.cos(p.angle - Math.PI / 2) * pr, py = cy + Math.sin(p.angle - Math.PI / 2) * pr;
+      for (let i = 0; i < stages; i++) {
+        const na = stageAngle * i;
+        if (Math.abs(p.angle - na) < 0.03 && Math.random() < 0.12)
+          bursts.push({ x: cx + Math.cos(na - Math.PI / 2) * R, y: cy + Math.sin(na - Math.PI / 2) * R, life: 1, size: 2.5 + Math.random() * 3.5 });
+      }
+      const glow = ctx.createRadialGradient(px, py, 0, px, py, p.size * 3.5);
+      glow.addColorStop(0, 'rgba(201,168,76,' + (p.opacity * 0.25) + ')'); glow.addColorStop(1, 'rgba(201,168,76,0)');
+      ctx.beginPath(); ctx.arc(px, py, p.size * 3.5, 0, Math.PI * 2); ctx.fillStyle = glow; ctx.fill();
+      ctx.beginPath(); ctx.arc(px, py, p.size, 0, Math.PI * 2); ctx.fillStyle = 'rgba(232,212,139,' + p.opacity + ')'; ctx.fill();
+    });
+
+    // Bursts
+    for (let i = bursts.length - 1; i >= 0; i--) {
+      const b = bursts[i]; b.life -= 0.025;
+      if (b.life <= 0) { bursts.splice(i, 1); continue; }
+      ctx.beginPath(); ctx.arc(b.x, b.y, b.size * (1 - b.life) * 3, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(201,168,76,' + (b.life * 0.25) + ')'; ctx.lineWidth = 0.8; ctx.stroke();
+    }
+
+    // Nodes
+    const fontSize = Math.max(8, S * 0.018);
+    for (let i = 0; i < stages; i++) {
+      const angle = -Math.PI / 2 + stageAngle * i;
+      const nx = cx + Math.cos(angle) * R, ny = cy + Math.sin(angle) * R;
+      const pulse = 0.7 + 0.3 * Math.sin(t * 1.5 + i * 1.2);
+      const ng = ctx.createRadialGradient(nx, ny, 0, nx, ny, 28);
+      ng.addColorStop(0, 'rgba(201,168,76,' + (0.1 * pulse) + ')'); ng.addColorStop(1, 'rgba(201,168,76,0)');
+      ctx.beginPath(); ctx.arc(nx, ny, 28, 0, Math.PI * 2); ctx.fillStyle = ng; ctx.fill();
+      ctx.beginPath(); ctx.arc(nx, ny, 14, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(10,10,8,0.92)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(201,168,76,' + (0.25 + 0.15 * pulse) + ')'; ctx.lineWidth = 1.2; ctx.stroke();
+      ctx.font = '10px sans-serif'; ctx.fillStyle = 'rgba(201,168,76,' + (0.45 + 0.25 * pulse) + ')';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(icons[i], nx, ny + 0.5);
+      const lR = R + 44, lx = cx + Math.cos(angle) * lR, ly = cy + Math.sin(angle) * lR;
+      ctx.font = '600 ' + fontSize + 'px monospace'; ctx.fillStyle = 'rgba(201,168,76,' + (0.3 + 0.12 * pulse) + ')';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(labels[i], lx, ly);
+    }
+
+    // Center text
+    const cFont = Math.max(14, S * 0.035);
+    ctx.font = 'italic ' + cFont + 'px serif';
+    ctx.fillStyle = 'rgba(201,168,76,' + (0.13 + 0.04 * Math.sin(t)) + ')';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('the cycle', cx, cy - cFont * 0.5);
+    ctx.fillText('compounds', cx, cy + cFont * 0.6);
+
+    ctx.globalAlpha = 1;
+    af = requestAnimationFrame(loop);
+  }
+  window.addEventListener('resize', () => { if (active) { resize(); } });
+}
+initFlywheelCanvas();
+
 // NETWORK CANVAS
 function initNetworkCanvas() {
   const canvas = document.getElementById('networkCanvas');

@@ -155,38 +155,64 @@
     </div>
   </section>
 
-  <!-- ═══ THE FLYWHEEL ═══ -->
-  <section class="section" style="border-top:1px solid var(--border);max-width:1400px;margin:0 auto;">
-    <p class="section-label reveal">The Economic Loop</p>
-    <h2 class="display-heading reveal">THE<br><span class="italic">FLYWHEEL</span></h2>
-    <p class="body-text reveal" style="margin-top:1.5rem;margin-bottom:4rem;max-width:620px;">A self-reinforcing cycle where product revenue drives network growth. Every subscription and task fee strengthens the entire ecosystem.</p>
+  <!-- ═══ THE FLYWHEEL v2 ═══ -->
+  <section class="fw-v2" id="flywheelV2">
+    <div class="fw-v2-inner">
 
-    <div class="reveal" style="display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);">
-      <div style="background:var(--black);padding:2.5rem;text-align:center;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--gold);line-height:1;margin-bottom:.75rem;">01</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.08em;color:var(--cream);margin-bottom:.6rem;">More Product Customers</div>
-        <p style="font-family:var(--body-font);font-size:.85rem;color:rgba(242,237,230,0.55);line-height:1.5;">Subscriptions and task fees across Toriva's product lines</p>
+      <div class="fw-v2-label reveal">The Economic Loop</div>
+      <h2 class="fw-v2-hl reveal">Growth that feeds<br><em>itself</em></h2>
+      <p class="fw-v2-body reveal">Most networks need constant fundraising to grow. Toriva doesn't. Every dollar a Toriva product earns strengthens the network that powers it. More revenue means more contributors, more capacity, better products, more customers.</p>
+      <p class="fw-v2-body reveal" style="margin-top:18px;color:rgba(250,250,245,0.33);">It's a flywheel. And once it starts spinning, the economics only get better.</p>
+
+      <div class="fw-v2-grid">
+        <!-- Viz -->
+        <div class="reveal" style="display:flex;justify-content:center;align-items:center;width:100%;">
+          <canvas id="flywheelCanvas"></canvas>
+        </div>
+
+        <!-- Steps -->
+        <div>
+          <div class="fw-v2-step reveal">
+            <div class="fw-v2-step-num">01</div>
+            <div>
+              <h3 class="fw-v2-step-title">Customers pay for real products</h3>
+              <p class="fw-v2-step-body">People subscribe to Toriva products like RunMyBiz. They pay with their credit card for a service that solves a real problem. This is real revenue.</p>
+            </div>
+          </div>
+          <div class="fw-v2-step reveal">
+            <div class="fw-v2-step-num">02</div>
+            <div>
+              <h3 class="fw-v2-step-title">Revenue flows back into the network</h3>
+              <p class="fw-v2-step-body">A share of every dollar earned goes directly to the people powering the compute. The more a product earns, the more contributors get paid.</p>
+            </div>
+          </div>
+          <div class="fw-v2-step reveal">
+            <div class="fw-v2-step-num">03</div>
+            <div>
+              <h3 class="fw-v2-step-title">Contributors earn by doing the work</h3>
+              <p class="fw-v2-step-body">Anyone with an eligible Mac can connect to the network. Your machine processes real AI tasks, and you earn a share of the revenue those tasks generate.</p>
+            </div>
+          </div>
+          <div class="fw-v2-step reveal">
+            <div class="fw-v2-step-num">04</div>
+            <div>
+              <h3 class="fw-v2-step-title">A $100 pledge keeps the bar high</h3>
+              <p class="fw-v2-step-body">To join the network, contributors pledge $100 in Toriva tokens. This ensures everyone has skin in the game and keeps the network reliable and committed.</p>
+            </div>
+          </div>
+          <div class="fw-v2-step reveal">
+            <div class="fw-v2-step-num">05</div>
+            <div>
+              <h3 class="fw-v2-step-title">More capacity, better products, repeat</h3>
+              <p class="fw-v2-step-body">As the network grows, Toriva can serve more customers, launch more products, and handle more demand. Each new product adds revenue. The cycle starts again.</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div style="background:var(--black);padding:2.5rem;text-align:center;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--gold);line-height:1;margin-bottom:.75rem;">02</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.08em;color:var(--cream);margin-bottom:.6rem;">More Fiat Revenue</div>
-        <p style="font-family:var(--body-font);font-size:.85rem;color:rgba(242,237,230,0.55);line-height:1.5;">Stripe payments from real customers using real products</p>
-      </div>
-      <div style="background:var(--black);padding:2.5rem;text-align:center;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--gold);line-height:1;margin-bottom:.75rem;">03</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.08em;color:var(--cream);margin-bottom:.6rem;">More Token Buybacks</div>
-        <p style="font-family:var(--body-font);font-size:.85rem;color:rgba(242,237,230,0.55);line-height:1.5;">Revenue acquires $TORIVA to pay contributors</p>
-      </div>
-      <div style="background:var(--black);padding:2.5rem;text-align:center;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--gold);line-height:1;margin-bottom:.75rem;">04</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.08em;color:var(--cream);margin-bottom:.6rem;">More Contributors</div>
-        <p style="font-family:var(--body-font);font-size:.85rem;color:rgba(242,237,230,0.55);line-height:1.5;">Higher earnings attract more hardware to the network</p>
-      </div>
-      <div style="background:var(--gold-subtle);padding:2.5rem;text-align:center;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--gold);line-height:1;margin-bottom:.75rem;">05</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.08em;color:var(--cream);margin-bottom:.6rem;">More Compute Capacity</div>
-        <p style="font-family:var(--body-font);font-size:.85rem;color:rgba(242,237,230,0.55);line-height:1.5;">Which enables more customers, and the cycle repeats</p>
-      </div>
+
+      <div class="fw-v2-divider"></div>
+      <p class="fw-v2-closing reveal">The network doesn't need investors to grow. It just needs customers.</p>
+
     </div>
   </section>
 
