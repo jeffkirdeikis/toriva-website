@@ -10,4 +10,13 @@
 | #8371 | 9:26 PM | 🔵 | Identified Swarm Branding Throughout Toriva Codebase | ~378 |
 | #8370 | " | 🔵 | Identified 143 Swarm Brand References Requiring Rebranding | ~410 |
 | #8362 | 9:22 PM | 🟣 | Initialized Git Repository for Toriva Website | ~275 |
+
+### Mar 8, 2026
+
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #8943 | 8:40 PM | 🔄 | Refined scroll indicator animation timing and easing | ~260 |
+| #8939 | 8:35 PM | ✅ | Added hero section typography styles for headline and subtitle | ~328 |
+| #8913 | 6:34 PM | ✅ | Logo link styled to remove underline | ~232 |
+| #8912 | 6:33 PM | 🔴 | Mobile navigation positioning corrected | ~240 |
 </claude-mem-context>
