@@ -153,7 +153,7 @@ function initHeroCanvas() {
   }
 
   function spawnPulse(x, y, color, maxR) {
-    sim.pulses.push({ x, y, radius: 0, maxRadius: (maxR || 10) * 0.25, opacity: 0.6, color });
+    sim.pulses.push({ x, y, radius: 0, maxRadius: (maxR || 10) * 0.125, opacity: 0.6, color });
   }
 
   function update() {
