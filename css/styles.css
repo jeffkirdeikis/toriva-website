@@ -251,6 +251,7 @@ nav.scrolled{background:rgba(5,5,5,.95);border-bottom:1px solid var(--border);ba
 }
 @media(max-width:600px){
   .hw-v2-tier-grid{grid-template-columns:1fr;}
+  .hw-v2-tier--featured{border-left:none;}
   .hw-v2-steps{grid-template-columns:1fr;}
 }
 @media(max-width:500px){

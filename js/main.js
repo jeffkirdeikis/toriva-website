@@ -393,7 +393,7 @@ function initFlywheelCanvas() {
     // Rings
     [R + 24, R, R - 24].forEach((r, i) => {
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(201,168,76,' + (i === 1 ? 0.08 : 0.03) + ')';
+      ctx.strokeStyle = 'rgba(201,168,76,' + (i === 1 ? 0.104 : 0.039) + ')';
       ctx.lineWidth = i === 1 ? 1.5 : 0.8; ctx.stroke();
     });
 
@@ -407,7 +407,7 @@ function initFlywheelCanvas() {
       ctx.lineTo(ax + Math.cos(tang + 2.6) * as, ay + Math.sin(tang + 2.6) * as);
       ctx.lineTo(ax + Math.cos(tang - 2.6) * as, ay + Math.sin(tang - 2.6) * as);
       ctx.closePath();
-      ctx.fillStyle = 'rgba(201,168,76,' + (0.1 + 0.05 * Math.sin(t * 2 + i)) + ')'; ctx.fill();
+      ctx.fillStyle = 'rgba(201,168,76,' + (0.13 + 0.065 * Math.sin(t * 2 + i)) + ')'; ctx.fill();
     }
 
     // Particles
@@ -421,9 +421,9 @@ function initFlywheelCanvas() {
           bursts.push({ x: cx + Math.cos(na - Math.PI / 2) * R, y: cy + Math.sin(na - Math.PI / 2) * R, life: 1, size: 2.5 + Math.random() * 3.5 });
       }
       const glow = ctx.createRadialGradient(px, py, 0, px, py, p.size * 3.5);
-      glow.addColorStop(0, 'rgba(201,168,76,' + (p.opacity * 0.25) + ')'); glow.addColorStop(1, 'rgba(201,168,76,0)');
+      glow.addColorStop(0, 'rgba(201,168,76,' + (p.opacity * 0.325) + ')'); glow.addColorStop(1, 'rgba(201,168,76,0)');
       ctx.beginPath(); ctx.arc(px, py, p.size * 3.5, 0, Math.PI * 2); ctx.fillStyle = glow; ctx.fill();
-      ctx.beginPath(); ctx.arc(px, py, p.size, 0, Math.PI * 2); ctx.fillStyle = 'rgba(232,212,139,' + p.opacity + ')'; ctx.fill();
+      ctx.beginPath(); ctx.arc(px, py, p.size, 0, Math.PI * 2); ctx.fillStyle = 'rgba(232,212,139,' + Math.min(1, p.opacity * 1.3) + ')'; ctx.fill();
     });
 
     // Bursts
@@ -431,7 +431,7 @@ function initFlywheelCanvas() {
       const b = bursts[i]; b.life -= 0.025;
       if (b.life <= 0) { bursts.splice(i, 1); continue; }
       ctx.beginPath(); ctx.arc(b.x, b.y, b.size * (1 - b.life) * 3, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(201,168,76,' + (b.life * 0.25) + ')'; ctx.lineWidth = 0.8; ctx.stroke();
+      ctx.strokeStyle = 'rgba(201,168,76,' + (b.life * 0.325) + ')'; ctx.lineWidth = 0.8; ctx.stroke();
     }
 
     // Nodes
@@ -441,22 +441,22 @@ function initFlywheelCanvas() {
       const nx = cx + Math.cos(angle) * R, ny = cy + Math.sin(angle) * R;
       const pulse = 0.7 + 0.3 * Math.sin(t * 1.5 + i * 1.2);
       const ng = ctx.createRadialGradient(nx, ny, 0, nx, ny, 28);
-      ng.addColorStop(0, 'rgba(201,168,76,' + (0.1 * pulse) + ')'); ng.addColorStop(1, 'rgba(201,168,76,0)');
+      ng.addColorStop(0, 'rgba(201,168,76,' + (0.13 * pulse) + ')'); ng.addColorStop(1, 'rgba(201,168,76,0)');
       ctx.beginPath(); ctx.arc(nx, ny, 28, 0, Math.PI * 2); ctx.fillStyle = ng; ctx.fill();
       ctx.beginPath(); ctx.arc(nx, ny, 14, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(10,10,8,0.92)'; ctx.fill();
-      ctx.strokeStyle = 'rgba(201,168,76,' + (0.25 + 0.15 * pulse) + ')'; ctx.lineWidth = 1.2; ctx.stroke();
-      ctx.font = '10px sans-serif'; ctx.fillStyle = 'rgba(201,168,76,' + (0.45 + 0.25 * pulse) + ')';
+      ctx.strokeStyle = 'rgba(201,168,76,' + (0.325 + 0.195 * pulse) + ')'; ctx.lineWidth = 1.2; ctx.stroke();
+      ctx.font = '10px sans-serif'; ctx.fillStyle = 'rgba(201,168,76,' + (0.585 + 0.325 * pulse) + ')';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(icons[i], nx, ny + 0.5);
-      const lR = R + 44, lx = cx + Math.cos(angle) * lR, ly = cy + Math.sin(angle) * lR;
-      ctx.font = '600 ' + fontSize + 'px monospace'; ctx.fillStyle = 'rgba(201,168,76,' + (0.3 + 0.12 * pulse) + ')';
+      const lR = R + S * 0.085, lx = cx + Math.cos(angle) * lR, ly = cy + Math.sin(angle) * lR;
+      ctx.font = '600 ' + fontSize + 'px monospace'; ctx.fillStyle = 'rgba(201,168,76,' + (0.39 + 0.156 * pulse) + ')';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(labels[i], lx, ly);
     }
 
     // Center text
     const cFont = Math.max(14, S * 0.035);
     ctx.font = 'italic ' + cFont + 'px serif';
-    ctx.fillStyle = 'rgba(201,168,76,' + (0.13 + 0.04 * Math.sin(t)) + ')';
+    ctx.fillStyle = 'rgba(201,168,76,' + (0.169 + 0.052 * Math.sin(t)) + ')';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('the cycle', cx, cy - cFont * 0.5);
     ctx.fillText('compounds', cx, cy + cFont * 0.6);
