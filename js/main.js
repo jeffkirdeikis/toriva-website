@@ -669,3 +669,227 @@ if (track) track.innerHTML += track.innerHTML;
     }
   });
 })();
+
+// ═══ PLEDGE PAGE: TASK PIPELINE ANIMATION ═══
+(function() {
+  var canvas = document.getElementById('pledgePipelineCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var wrap = document.getElementById('pledgePipelineWrap');
+  var animId = null;
+  var visible = false;
+  var CYAN = '#4CC9C9';
+  var GREEN = '#4CCA6E';
+  var GOLD = '#C9A84C';
+  var BG = '#050505';
+
+  var obs = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting && !visible) { visible = true; startPipeline(); }
+  }, { threshold: 0.2 });
+  obs.observe(wrap);
+
+  function startPipeline() {
+    var dpr = window.devicePixelRatio || 1;
+    var t = 0, fadeIn = 0;
+    var packets = [];
+    var stages = [
+      { label: 'REQUEST', sub: 'Customer task', color: CYAN },
+      { label: 'ROUTED', sub: 'To your Mac', color: CYAN },
+      { label: 'COMPUTED', sub: 'AI model runs', color: GREEN },
+      { label: 'DELIVERED', sub: 'Result sent', color: GREEN },
+      { label: 'EARNED', sub: 'Revenue shared', color: GOLD }
+    ];
+
+    function resize() {
+      var w = Math.min(wrap.getBoundingClientRect().width, 900);
+      var h = 280;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+
+    function rgb(c) {
+      return c === CYAN ? '76,201,201' : c === GREEN ? '76,202,110' : '201,168,76';
+    }
+
+    function loop() {
+      t += 0.016;
+      fadeIn = Math.min(1, fadeIn + 0.008);
+      var W = canvas.width / dpr;
+      var H = canvas.height / dpr;
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalAlpha = fadeIn;
+      var cy = H / 2;
+      var padX = 50;
+      var stageW = (W - padX * 2) / (stages.length - 1);
+
+      if (Math.random() < 0.025) {
+        packets.push({ progress: 0, speed: 0.003 + Math.random() * 0.003, size: 3 + Math.random() * 2, yOff: (Math.random() - 0.5) * 12, trail: [] });
+      }
+
+      // Track
+      ctx.beginPath(); ctx.moveTo(padX, cy); ctx.lineTo(W - padX, cy);
+      ctx.strokeStyle = 'rgba(201,168,76,0.06)'; ctx.lineWidth = 2; ctx.stroke();
+
+      // Glow segments
+      for (var i = 0; i < stages.length - 1; i++) {
+        var x1 = padX + i * stageW, x2 = padX + (i + 1) * stageW;
+        var grad = ctx.createLinearGradient(x1, cy, x2, cy);
+        grad.addColorStop(0, 'rgba(' + rgb(stages[i].color) + ',0.06)');
+        grad.addColorStop(1, 'rgba(' + rgb(stages[i + 1].color) + ',0.06)');
+        ctx.beginPath(); ctx.moveTo(x1 + 20, cy); ctx.lineTo(x2 - 20, cy);
+        ctx.strokeStyle = grad; ctx.lineWidth = 8; ctx.stroke();
+      }
+
+      // Packets
+      for (var j = packets.length - 1; j >= 0; j--) {
+        var p = packets[j];
+        p.progress += p.speed;
+        var px = padX + p.progress * (W - padX * 2);
+        var py = cy + p.yOff + Math.sin(p.progress * Math.PI * 4) * 3;
+        var si = Math.min(stages.length - 1, Math.floor(p.progress * stages.length));
+        var r = rgb(stages[si].color);
+        p.trail.push({ x: px, y: py, age: 0 });
+        if (p.trail.length > 18) p.trail.shift();
+        for (var k = 0; k < p.trail.length; k++) p.trail[k].age += 0.04;
+        for (var k = 0; k < p.trail.length; k++) {
+          var tr = p.trail[k];
+          var a = (1 - tr.age) * (k / p.trail.length) * 0.5;
+          if (a <= 0) continue;
+          ctx.beginPath(); ctx.arc(tr.x, tr.y, p.size * (k / p.trail.length) * 0.6, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + r + ',' + a + ')'; ctx.fill();
+        }
+        if (px > 0 && px < W) {
+          ctx.beginPath(); ctx.arc(px, py, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + r + ',0.85)'; ctx.fill();
+          var g = ctx.createRadialGradient(px, py, 0, px, py, p.size * 4);
+          g.addColorStop(0, 'rgba(' + r + ',0.1)'); g.addColorStop(1, 'rgba(' + r + ',0)');
+          ctx.beginPath(); ctx.arc(px, py, p.size * 4, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+        }
+        if (p.progress > 1.1) packets.splice(j, 1);
+      }
+
+      // Stage nodes
+      stages.forEach(function(s, i) {
+        var x = padX + i * stageW;
+        var pulse = 0.7 + 0.3 * Math.sin(t * 2 + i * 1.2);
+        var r = rgb(s.color);
+        var g = ctx.createRadialGradient(x, cy, 0, x, cy, 32);
+        g.addColorStop(0, 'rgba(' + r + ',' + (0.08 * pulse) + ')');
+        g.addColorStop(1, 'rgba(' + r + ',0)');
+        ctx.beginPath(); ctx.arc(x, cy, 32, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+        ctx.beginPath(); ctx.arc(x, cy, 14, 0, Math.PI * 2);
+        ctx.fillStyle = BG; ctx.fill();
+        ctx.strokeStyle = 'rgba(' + r + ',' + (0.3 + 0.2 * pulse) + ')';
+        ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, cy, 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + r + ',' + (0.5 + 0.3 * pulse) + ')'; ctx.fill();
+        ctx.font = '600 9px monospace'; ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(' + r + ',' + (0.4 + 0.15 * pulse) + ')';
+        ctx.fillText(s.label, x, cy - 28);
+        ctx.font = '300 10px sans-serif';
+        ctx.fillStyle = 'rgba(250,250,245,0.22)';
+        ctx.fillText(s.sub, x, cy + 36);
+      });
+
+      ctx.globalAlpha = 1;
+      animId = requestAnimationFrame(loop);
+    }
+    loop();
+  }
+})();
+
+// ═══ PLEDGE PAGE: LIVE TASK FEED ═══
+(function() {
+  var container = document.getElementById('pledgeTaskFeed');
+  if (!container) return;
+  var visible = false;
+  var idCounter = 0;
+  var interval = null;
+
+  var obs = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting && !visible) { visible = true; startFeed(); }
+  }, { threshold: 0.15 });
+  obs.observe(container);
+
+  var taskTypes = [
+    'Draft follow-up email for client onboarding',
+    'Generate quarterly financial summary',
+    'Analyze competitor pricing data',
+    'Create three Instagram ad variations',
+    'Write customer support response',
+    'Build weekly performance report',
+    'Summarize meeting notes into action items',
+    'Generate product description for new listing',
+    'Create employee onboarding checklist',
+    'Analyze website traffic and recommend changes',
+    'Draft blog post outline on industry trends',
+    'Generate invoice and send to client',
+    'Research vendor options for Q2 procurement',
+    'Write job posting for marketing coordinator',
+    'Create social media content calendar',
+    'Analyze customer feedback sentiment',
+    'Generate A/B test variants for landing page',
+    'Draft partnership outreach email'
+  ];
+
+  function genTime() {
+    var h = Math.floor(Math.random() * 24);
+    var m = Math.floor(Math.random() * 60);
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    var h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return h12 + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+  }
+
+  function makeRow(task, time, fresh) {
+    var div = document.createElement('div');
+    div.className = 'pledge-feed-row' + (fresh ? ' pledge-feed-row--enter' : '');
+    div.innerHTML = '<span class="pledge-feed-time">' + time + '</span>' +
+      '<span class="pledge-feed-task">' + task + '</span>' +
+      '<span class="pledge-feed-status"><span class="pledge-feed-dot"></span>Completed</span>';
+    return div;
+  }
+
+  function startFeed() {
+    for (var i = 0; i < 6; i++) {
+      container.appendChild(makeRow(
+        taskTypes[Math.floor(Math.random() * taskTypes.length)],
+        genTime(), false
+      ));
+    }
+    interval = setInterval(function() {
+      var row = makeRow(
+        taskTypes[Math.floor(Math.random() * taskTypes.length)],
+        genTime(), true
+      );
+      container.insertBefore(row, container.firstChild);
+      if (container.children.length > 8) container.removeChild(container.lastChild);
+    }, 3000);
+  }
+})();
+
+// ═══ PLEDGE PAGE: COMPARISON BAR ANIMATION ═══
+(function() {
+  var wrap = document.getElementById('pledgeCompBars');
+  if (!wrap) return;
+  var rows = wrap.querySelectorAll('.comp-bar-row');
+  var animated = false;
+
+  var obs = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting && !animated) {
+      animated = true;
+      rows.forEach(function(row, i) {
+        var tPct = row.getAttribute('data-t-pct');
+        var oPct = row.getAttribute('data-o-pct');
+        if (!tPct) return;
+        var fills = row.querySelectorAll('.comp-bar-fill');
+        setTimeout(function() {
+          if (fills[0]) fills[0].style.width = tPct + '%';
+          if (fills[1]) fills[1].style.width = oPct + '%';
+        }, 300 + i * 100);
+      });
+    }
+  }, { threshold: 0.2 });
+  obs.observe(wrap);
+})();

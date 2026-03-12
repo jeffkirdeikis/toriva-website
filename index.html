@@ -34,7 +34,7 @@
     <li class="nav-dropdown">
       <a href="#" class="dropdown-toggle">Product <span class="dropdown-arrow">&#9662;</span></a>
       <ul class="dropdown-menu">
-        <li><a href="https://runmybiz.online/" target="_blank" rel="noopener">Build My Biz <span style="opacity:0.5;font-size:0.75em;">(Phase One)</span></a></li>
+        <li><a href="https://runmybiz.online/" target="_blank" rel="noopener">RunMyBiz <span style="opacity:0.5;font-size:0.75em;">(Phase One)</span></a></li>
         <li><span class="dropdown-tba">TBA</span></li>
       </ul>
     </li>
@@ -686,38 +686,73 @@
 
 <!-- ═══ PLEDGE ═══ -->
 <div id="page-pledge" class="page">
+  <!-- HERO -->
   <div class="page-header" data-bg-text="PLEDGE">
     <div style="max-width:1400px;margin:0 auto;">
       <p class="section-label">Contribute Hardware. Earn Revenue.</p>
-      <h1 class="display-heading" style="font-size:clamp(3rem,8vw,8rem);">PLEDGE<br>YOUR<br><span class="italic">HARDWARE</span></h1>
-      <p class="body-text" style="margin-top:2rem;">A new model for distributed compute contribution. Any Apple Silicon Mac can join the network. Mac minis, MacBooks, iMacs, Mac Studios. Your machine runs agent tasks as a background process, generating revenue and delivering a proportional daily return. Mac minis are the ideal dedicated setup: silent, low-power, always-on. Windows and Linux support coming soon.</p>
+      <h1 class="display-heading" style="font-size:clamp(3rem,8vw,8rem);">PUT YOUR<br>IDLE MAC<br><span class="italic">TO WORK</span></h1>
+      <p class="body-text" style="margin-top:2rem;margin-bottom:1rem;">Right now, thousands of AI tasks need to get done. Customer support emails, financial reports, marketing campaigns, data analysis. Real work for real paying customers. Your Mac has the power to handle it.</p>
+      <p class="body-text" style="color:var(--cream-muted);">Install one app, pledge $100 to join the network, and your machine starts processing tasks whenever it has spare capacity. Every completed task earns you a share of the revenue it generates.</p>
     </div>
   </div>
 
-  <!-- WHAT HAPPENS WHILE YOU SLEEP -->
+  <!-- TASK LIFECYCLE -->
   <section class="section" style="max-width:1400px;margin:0 auto;border-bottom:1px solid var(--border);">
     <p class="section-label">What Actually Happens</p>
-    <h2 class="display-heading" style="margin-bottom:2rem;">A NIGHT IN<br><span class="italic">THE NETWORK</span></h2>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);">
-      <div style="background:var(--black);padding:2.5rem;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);margin-bottom:.75rem;">10:00 PM</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.1em;color:var(--cream);margin-bottom:.6rem;">You close your laptop</div>
-        <p style="font-family:var(--body-font);font-size:.95rem;color:rgba(242,237,230,0.7);line-height:1.55;">The Toriva daemon already running in the background detects idle state. It signals the orchestrator that your machine is available for marketplace task assignment.</p>
+    <h2 class="display-heading" style="margin-bottom:1.5rem;">EVERY TASK IS A<br><span class="italic">TRANSACTION</span></h2>
+    <p class="body-text" style="margin-bottom:2rem;">Your Mac doesn't sit in a queue waiting for a batch job. It receives individual tasks, completes them, and gets credited. One after another. All day, all night.</p>
+
+    <!-- Animated pipeline canvas -->
+    <div id="pledgePipelineWrap" style="width:100%;display:flex;justify-content:center;margin-bottom:2rem;">
+      <canvas id="pledgePipelineCanvas" style="max-width:100%;"></canvas>
+    </div>
+
+    <div style="height:1px;margin:clamp(40px,5vw,60px) 0;background:linear-gradient(90deg,rgba(201,168,76,0.1),transparent);"></div>
+
+    <h2 class="display-heading" style="margin-bottom:1.5rem;">THIS DOESN'T<br>STOP AT <span class="italic">5 PM</span></h2>
+    <p class="body-text" style="margin-bottom:2rem;">Toriva's customers are everywhere. Different time zones, different schedules. Tasks come in around the clock. Here's what that actually looks like:</p>
+
+    <!-- Live task feed -->
+    <div id="pledgeTaskFeed" style="border:1px solid rgba(201,168,76,0.07);overflow:hidden;"></div>
+  </section>
+
+  <!-- TORIVA vs GPU NETWORKS -->
+  <section class="section" style="max-width:1400px;margin:0 auto;border-bottom:1px solid var(--border);">
+    <p class="section-label">The Comparison</p>
+    <h2 class="display-heading" style="margin-bottom:1.5rem;">NOT A MINING RIG.<br><span class="italic">YOUR MAC.</span></h2>
+    <p class="body-text" style="margin-bottom:2.5rem;">Most compute networks need dedicated GPU hardware that costs thousands, runs hot, and sounds like a jet engine. Toriva runs on the machine you already own.</p>
+
+    <!-- Comparison bars -->
+    <div id="pledgeCompBars">
+      <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:16px;padding:0 0 14px;margin-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.1);">
+        <span></span>
+        <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;">Toriva</span>
+        <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.15em;color:rgba(242,237,230,0.45);text-transform:uppercase;">Typical GPU Network</span>
       </div>
-      <div style="background:var(--black);padding:2.5rem;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);margin-bottom:.75rem;">10:02 PM</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.1em;color:var(--cream);margin-bottom:.6rem;">Work begins</div>
-        <p style="font-family:var(--body-font);font-size:.95rem;color:rgba(242,237,230,0.7);line-height:1.55;">The orchestrator assigns your machine work. Either a marketplace task (e.g. "extract competitor pricing data for this client") running in a sandboxed container, or mining on a Bittensor subnet (SN13 data scraping, SN21 storage). Your files are completely inaccessible from inside the container.</p>
+      <div class="comp-bar-row" data-t-pct="18" data-o-pct="85">
+        <span class="comp-bar-attr">Hardware cost</span>
+        <div class="comp-bar-cell"><div class="comp-bar-track"><div class="comp-bar-fill comp-bar-fill--gold" style="width:0%;"></div></div><span class="comp-bar-val comp-bar-val--gold">$599</span></div>
+        <div class="comp-bar-cell"><div class="comp-bar-track"><div class="comp-bar-fill comp-bar-fill--dim" style="width:0%;"></div></div><span class="comp-bar-val comp-bar-val--dim">$3,000+</span></div>
       </div>
-      <div style="background:var(--black);padding:2.5rem;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);margin-bottom:.75rem;">2:00 AM</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.1em;color:var(--cream);margin-bottom:.6rem;">Revenue earned, work rotates</div>
-        <p style="font-family:var(--body-font);font-size:.95rem;color:rgba(242,237,230,0.7);line-height:1.55;">Tasks complete and revenue is deposited to the agent wallet. Containers terminate and new ones spin up. Between tasks, the machine mines Bittensor subnets. This cycle repeats continuously through the night.</p>
+      <div class="comp-bar-row" data-t-pct="8" data-o-pct="90">
+        <span class="comp-bar-attr">Power usage</span>
+        <div class="comp-bar-cell"><div class="comp-bar-track"><div class="comp-bar-fill comp-bar-fill--gold" style="width:0%;"></div></div><span class="comp-bar-val comp-bar-val--gold">10-25W</span></div>
+        <div class="comp-bar-cell"><div class="comp-bar-track"><div class="comp-bar-fill comp-bar-fill--dim" style="width:0%;"></div></div><span class="comp-bar-val comp-bar-val--dim">200-500W</span></div>
       </div>
-      <div style="background:var(--gold-subtle);padding:2.5rem;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);margin-bottom:.75rem;">8:00 AM</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.1em;color:var(--cream);margin-bottom:.6rem;">You wake up. Check balance.</div>
-        <p style="font-family:var(--body-font);font-size:.95rem;color:rgba(242,237,230,0.7);line-height:1.55;">Your 60% share of net agent revenue from the previous session has been recorded on-chain. It is claimable at any time. Your machine has been running as configured, with no impact on normal usage.</p>
+      <div class="comp-bar-row" data-t-pct="5" data-o-pct="60">
+        <span class="comp-bar-attr">Setup time</span>
+        <div class="comp-bar-cell"><div class="comp-bar-track"><div class="comp-bar-fill comp-bar-fill--gold" style="width:0%;"></div></div><span class="comp-bar-val comp-bar-val--gold">Minutes</span></div>
+        <div class="comp-bar-cell"><div class="comp-bar-track"><div class="comp-bar-fill comp-bar-fill--dim" style="width:0%;"></div></div><span class="comp-bar-val comp-bar-val--dim">Hours to days</span></div>
+      </div>
+      <div class="comp-bar-row" data-t-pct="3" data-o-pct="75">
+        <span class="comp-bar-attr">Noise level</span>
+        <div class="comp-bar-cell"><div class="comp-bar-track"><div class="comp-bar-fill comp-bar-fill--gold" style="width:0%;"></div></div><span class="comp-bar-val comp-bar-val--gold">Silent</span></div>
+        <div class="comp-bar-cell"><div class="comp-bar-track"><div class="comp-bar-fill comp-bar-fill--dim" style="width:0%;"></div></div><span class="comp-bar-val comp-bar-val--dim">Loud</span></div>
+      </div>
+      <div class="comp-bar-row" style="border-bottom:none;">
+        <span class="comp-bar-attr">Revenue source</span>
+        <div class="comp-bar-cell"><span class="comp-bar-val comp-bar-val--gold" style="font-weight:500;">Products</span></div>
+        <div class="comp-bar-cell"><span class="comp-bar-val comp-bar-val--dim">Token inflation</span></div>
       </div>
     </div>
   </section>
@@ -725,48 +760,50 @@
   <!-- INSTALL + SPECS -->
   <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
     <div style="padding:7rem 4vw;border-right:1px solid var(--border);">
-      <p class="section-label">Exact Setup Steps</p>
+      <p class="section-label">Getting Started</p>
+      <h2 class="display-heading" style="font-size:clamp(2rem,4vw,4rem);margin-bottom:1rem;">SIX STEPS.<br><span class="italic">TEN MINUTES.</span></h2>
+      <p class="body-text" style="margin-bottom:1.5rem;">You don't need to be technical. If you can install an app, you can do this.</p>
       <div class="pledge-steps" style="margin-top:1rem;">
         <div class="pledge-step">
           <div class="pledge-step-num">01</div>
           <div>
             <div class="pledge-step-title">Get an Apple Silicon Mac</div>
-            <p class="pledge-step-desc">Any Apple Silicon Mac works. Mac mini, MacBook, iMac, or Mac Studio. Mac minis are the ideal dedicated setup: silent, low-power, always-on, starting at $2,500. 16GB RAM recommended. Already own one? You're ready. Windows and Linux support is on the roadmap.</p>
+            <p class="pledge-step-desc">Any Mac with an M-series chip works. Mac Mini, MacBook, iMac, Mac Studio. Already own one? Skip to step two. Mac Minis are the ideal dedicated setup: silent, low-power, always on.</p>
           </div>
         </div>
         <div class="pledge-step">
           <div class="pledge-step-num">02</div>
           <div>
-            <div class="pledge-step-title">Install Docker Desktop for macOS</div>
-            <p class="pledge-step-desc">Free download from docker.com. This is what isolates agent tasks in secure containers. Standard install no configuration needed. Takes about 3 minutes. This is the only prerequisite before the Toriva client.</p>
+            <div class="pledge-step-title">Install Docker Desktop</div>
+            <p class="pledge-step-desc">Free download from docker.com. This keeps all network tasks safely isolated from your files. Standard install, no configuration. Takes about three minutes.</p>
           </div>
         </div>
         <div class="pledge-step">
           <div class="pledge-step-num">03</div>
           <div>
-            <div class="pledge-step-title">Download & run the Toriva Client</div>
-            <p class="pledge-step-desc">A lightweight macOS daemon (background service). Install takes under 2 minutes. It connects your machine to the Toriva orchestrator, manages container lifecycles, monitors uptime, and handles reward accounting. macOS Ventura 13+ required.</p>
+            <div class="pledge-step-title">Download the Toriva app</div>
+            <p class="pledge-step-desc">A lightweight background app that connects your machine to the network. Install takes under two minutes. It handles everything: task routing, security, and reward tracking.</p>
           </div>
         </div>
         <div class="pledge-step">
           <div class="pledge-step-num">04</div>
           <div>
-            <div class="pledge-step-title">Connect your wallet & stake $100 TORIVA</div>
-            <p class="pledge-step-desc">Link a Base-compatible wallet (MetaMask, Coinbase Wallet, or Rainbow). Stake $100 worth of TORIVA tokens via the smart contract this is your collateral and network access pass. Stake more to earn a reward multiplier. Unstake anytime with zero penalty if you exit cleanly.</p>
+            <div class="pledge-step-title">Connect your wallet and pledge $100</div>
+            <p class="pledge-step-desc">Link a wallet like MetaMask, Coinbase Wallet, or Rainbow. Pledge $100 in Toriva tokens. This is your commitment to the network. You can unstake anytime with zero penalty.</p>
           </div>
         </div>
         <div class="pledge-step">
           <div class="pledge-step-num">05</div>
           <div>
-            <div class="pledge-step-title">Choose Shared or Dedicated mode</div>
-            <p class="pledge-step-desc"><strong style="color:var(--cream);">Shared:</strong> Toriva uses CPU/RAM headroom while you work normally. Lower throughput, lower rewards, no disruption to your day. <strong style="color:var(--cream);">Dedicated:</strong> Full machine allocated to agents. Maximum rewards. Ideal for a spare machine or overnight operation.</p>
+            <div class="pledge-step-title">Choose shared or dedicated mode</div>
+            <p class="pledge-step-desc"><strong style="color:var(--cream);">Shared mode</strong> uses your Mac's spare capacity while you work normally. Lower earnings, zero disruption. <strong style="color:var(--cream);">Dedicated mode</strong> gives your machine fully to the network. Maximum earnings. Great for a spare Mac.</p>
           </div>
         </div>
         <div class="pledge-step" style="border-bottom:none;">
           <div class="pledge-step-num">06</div>
           <div>
-            <div class="pledge-step-title">Claim rewards daily, add more machines</div>
-            <p class="pledge-step-desc">Rewards accumulate on-chain and are claimable any time. There is no limit on machines per pledger. Many early participants are expected to pledge 3–10 machines. Each additional machine multiplies your earnings proportionally.</p>
+            <div class="pledge-step-title">Earn daily. Add more machines.</div>
+            <p class="pledge-step-desc">Rewards accumulate every day and are claimable anytime. There's no limit on how many machines you can pledge. Each one multiplies your earnings.</p>
           </div>
         </div>
       </div>
@@ -774,47 +811,49 @@
     <div style="padding:7rem 4vw;background:var(--gold-subtle);">
       <p class="section-label">System Requirements</p>
       <div class="spec-box" style="margin-top:1rem;margin-bottom:2.5rem;">
-        <div class="spec-row"><span class="spec-label">Hardware</span><span class="spec-value">Any Apple Silicon Mac (mini recommended)</span></div>
+        <div class="spec-row"><span class="spec-label">Hardware</span><span class="spec-value">Any Apple Silicon Mac (Mini recommended)</span></div>
         <div class="spec-row"><span class="spec-label">OS</span><span class="spec-value">macOS 13 Ventura or later</span></div>
-        <div class="spec-row"><span class="spec-label">RAM</span><span class="spec-value">8GB minimum · 16GB recommended</span></div>
+        <div class="spec-row"><span class="spec-label">RAM</span><span class="spec-value">8GB minimum &middot; <span class="gold">16GB recommended</span></span></div>
         <div class="spec-row"><span class="spec-label">Storage</span><span class="spec-value">50GB free for containers + logs</span></div>
         <div class="spec-row"><span class="spec-label">Internet</span><span class="spec-value">10Mbps+ broadband, stable connection</span></div>
         <div class="spec-row"><span class="spec-label">Prerequisites</span><span class="spec-value gold">Docker Desktop (free) + Toriva Client</span></div>
         <div class="spec-row"><span class="spec-label">Wallet</span><span class="spec-value">Base-compatible (MetaMask, Coinbase, Rainbow)</span></div>
-        <div class="spec-row"><span class="spec-label">TORIVA Stake</span><span class="spec-value gold">$100 minimum (adjusts with price)</span></div>
+        <div class="spec-row"><span class="spec-label">Pledge</span><span class="spec-value gold">$100 minimum (adjusts with price)</span></div>
         <div class="spec-row"><span class="spec-label">Max Machines</span><span class="spec-value gold">Unlimited per pledger</span></div>
         <div class="spec-row"><span class="spec-label">Container Security</span><span class="spec-value">Fully sandboxed, no file access</span></div>
         <div class="spec-row"><span class="spec-label">Kill Switch</span><span class="spec-value">Instant container terminate, one click</span></div>
-        <div class="spec-row" style="border-bottom:none;"><span class="spec-label">Exit Policy</span><span class="spec-value">Graceful exit zero slash, full stake back</span></div>
+        <div class="spec-row" style="border-bottom:none;"><span class="spec-label">Exit Policy</span><span class="spec-value">Graceful exit, zero slash, full stake back</span></div>
       </div>
-      <p class="section-label" style="margin-bottom:1.5rem;">Join the Beta Waitlist</p>
-      <p style="font-family:var(--body-font);font-size:1.0625rem;color:var(--body-text-color);line-height:1.55;margin-bottom:1rem;">Pledge beta is invite-only. Early pledgers receive priority spot allocation and enhanced initial reward weighting. Waitlist closes when beta capacity is reached.</p>
-      <form id="waitlistForm" class="waitlist"><input id="waitlistEmail" type="email" placeholder="your@email.com" required><button type="submit">Pledge Waitlist</button></form>
-      <div id="waitlistMsg" class="waitlist-msg"></div>
-      <p style="font-size:.58rem;letter-spacing:.1em;color:var(--cream-faint);margin-top:.75rem;text-transform:uppercase;">Launch notification only. No spam. Unsubscribe any time.</p>
-      <div style="margin-top:1.5rem;padding:1rem 1.25rem;border:1px solid rgba(201,168,76,0.1);background:rgba(201,168,76,0.03);">
-        <p style="font-size:.62rem;letter-spacing:.06em;color:var(--cream-dim);line-height:1.6;font-family:'DM Mono',monospace;">Participating in the TORIVA pledge network involves significant financial risk including potential total loss of staked tokens and hardware value. Agent revenue is experimental and unproven. This is not financial advice. Projections are hypothetical. Conduct your own independent research before participating.</p>
+
+      <!-- EXIT & SLASHING -->
+      <p class="section-label" style="margin-bottom:1.5rem;">Exit &amp; Slashing Rules</p>
+      <p class="body-text" style="margin-bottom:1.25rem;">We want this to be fair. Leave whenever you want. The only penalties are for actions that hurt the network.</p>
+      <div style="overflow-x:auto;border:1px solid var(--border);">
+        <table class="data-table" style="min-width:500px;">
+          <thead><tr><th>Scenario</th><th>What Happens</th></tr></thead>
+          <tbody>
+            <tr><td>Brief disconnect (under 15 min)</td><td class="hi">Grace period. No penalty.</td></tr>
+            <tr><td>Graceful exit (tasks migrated first)</td><td class="hi">Full stake returned instantly.</td></tr>
+            <tr><td>Offline during an active task</td><td>1&ndash;5% stake slash, proportional to task value.</td></tr>
+            <tr><td>Going offline mid-task</td><td>Rewards paused immediately.</td></tr>
+            <tr><td>Tampering with containers or data</td><td style="color:rgba(220,80,80,0.7);">Up to 100% slash. Permanent ban.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WAITLIST -->
+      <div style="margin-top:2.5rem;">
+        <p class="section-label" style="margin-bottom:1.5rem;">Join the Beta Waitlist</p>
+        <p style="font-family:var(--body-font);font-size:1.0625rem;color:var(--body-text-color);line-height:1.55;margin-bottom:1rem;">Pledge beta is invite-only. Early pledgers receive priority spot allocation and enhanced initial reward weighting. Waitlist closes when beta capacity is reached.</p>
+        <form id="waitlistForm" class="waitlist"><input id="waitlistEmail" type="email" placeholder="your@email.com" required><button type="submit">Pledge Waitlist</button></form>
+        <div id="waitlistMsg" class="waitlist-msg"></div>
+        <p style="font-size:.58rem;letter-spacing:.1em;color:var(--cream-faint);margin-top:.75rem;text-transform:uppercase;">Launch notification only. No spam. Unsubscribe any time.</p>
+        <div style="margin-top:1.5rem;padding:1rem 1.25rem;border:1px solid rgba(201,168,76,0.1);background:rgba(201,168,76,0.03);">
+          <p style="font-size:.62rem;letter-spacing:.06em;color:var(--cream-dim);line-height:1.6;font-family:'DM Mono',monospace;">Participating in the TORIVA pledge network involves significant financial risk including potential total loss of staked tokens and hardware value. Agent revenue is experimental and unproven. This is not financial advice. Projections are hypothetical. Conduct your own independent research before participating.</p>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- SLASHING RULES -->
-  <section class="section" style="max-width:1400px;margin:0 auto;">
-    <p class="section-label">Exit &amp; Slashing Rules</p>
-    <h2 class="display-heading" style="font-size:clamp(1.5rem,3vw,3rem);margin-bottom:2rem;">FAIR BY<br><span class="italic">DESIGN</span></h2>
-    <div style="overflow-x:auto;border:1px solid var(--border);">
-    <table class="data-table" style="min-width:600px;">
-      <thead><tr><th>Scenario</th><th>Consequence</th></tr></thead>
-      <tbody>
-        <tr><td>Brief disconnection under 15 min</td><td class="hi">Grace period zero penalty</td></tr>
-        <tr><td>Offline during active revenue task</td><td>1–5% stake slash (proportional to task value lost)</td></tr>
-        <tr><td>Going offline mid-task</td><td>Rewards paused immediately on disconnect</td></tr>
-        <tr><td>Graceful exit tasks migrated before shutdown</td><td class="hi">Zero penalty full stake returned instantly</td></tr>
-        <tr><td>Tampering with container or intercepting data</td><td>Up to 100% stake slash permanent ban</td></tr>
-      </tbody>
-    </table>
-    </div>
-  </section>
 </div>
 
 <!-- ═══ TOKENOMICS ═══ -->
