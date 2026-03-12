@@ -158,7 +158,7 @@ function initHeroCanvas() {
 
   function update() {
     sim.time += 0.016;
-    if (Math.random() < 0.045) spawnTask();
+    if (Math.random() < 0.0045) spawnTask();
     sim.nodes.forEach(n => {
       n.pulse += 0.015;
       n.x = n.baseX + Math.sin(sim.time * 0.075 + n.pulse) * 1.5;
