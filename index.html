@@ -858,273 +858,688 @@
 
 <!-- ═══ TOKENOMICS ═══ -->
 <div id="page-token" class="page">
-  <div class="page-header" data-bg-text="TOKEN">
-    <div style="max-width:1400px;margin:0 auto;">
-      <p class="section-label">Token Architecture</p>
-      <h1 class="display-heading" style="font-size:clamp(3rem,8vw,8rem);">TOKENOMICS</h1>
+<style>
+:root{
+  --gold:#C9A84C;--gold-bright:#E8C46A;--gold-dim:#8a6e2f;
+  --gold-glow:rgba(201,168,76,0.18);--gold-subtle:rgba(201,168,76,0.07);
+  --cream:rgba(242,237,230,0.90);--cream-muted:rgba(242,237,230,0.55);
+  --cream-dim:rgba(242,237,230,0.75);--cream-faint:rgba(242,237,230,0.08);
+  --border:rgba(201,168,76,0.12);--border-mid:rgba(201,168,76,0.25);
+  --bg:#0A0A08;--bg2:#111110;--body-text:rgba(250,250,245,0.74);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--cream);font-family:'Outfit',sans-serif;font-weight:300;overflow-x:hidden;line-height:1.6;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9997;opacity:.15;}
+
+/* ── SECTION FRAMEWORK (matching homepage v2 sections) ── */
+.tk-section{position:relative;width:100%;background:var(--bg);overflow:hidden;font-family:'Outfit',sans-serif;padding:clamp(64px,10vw,140px) 0;}
+.tk-section--alt{background:var(--bg2);}
+.tk-section--alt::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.1),transparent);}
+.tk-inner{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 clamp(20px,6vw,80px);}
+
+/* ── LABELS ── */
+.tk-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.3em;color:rgba(201,168,76,0.78);text-transform:uppercase;display:flex;align-items:center;gap:16px;margin-bottom:28px;}
+.tk-label::before{content:'';width:32px;height:1px;background:rgba(201,168,76,0.3);}
+
+/* ── HEADLINES ── */
+.tk-hl{font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(2.2rem,5.5vw,4.2rem);line-height:1.1;color:#FAFAF5;margin:0 0 20px 0;letter-spacing:-.01em;}
+.tk-hl em{font-style:italic;color:#C9A84C;}
+
+/* ── BODY ── */
+.tk-body{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.95rem,1.4vw,1.15rem);line-height:1.75;color:var(--body-text);max-width:560px;}
+.tk-body--wide{max-width:700px;}
+.tk-body--bright{color:rgba(250,250,245,0.85);}
+.tk-body--dim{color:rgba(250,250,245,0.58);}
+
+/* ── DIVIDER ── */
+.tk-divider{height:1px;background:linear-gradient(90deg,rgba(201,168,76,0.15),rgba(201,168,76,0.08),transparent);margin:clamp(60px,8vw,100px) 0;}
+
+/* ── GRID ── */
+.tk-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,80px);align-items:start;}
+
+/* ── QUOTE ── */
+.tk-quote{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(1.3rem,2.2vw,1.8rem);color:var(--gold);line-height:1.4;max-width:500px;margin:0;padding-left:28px;border-left:2px solid rgba(201,168,76,0.3);}
+
+/* ── CLOSING ── */
+.tk-closing{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(1.15rem,2.2vw,1.65rem);color:rgba(201,168,76,0.78);line-height:1.45;max-width:500px;margin:clamp(28px,4vw,48px) 0 0 0;}
+.tk-closing--center{text-align:center;margin-left:auto;margin-right:auto;}
+
+/* ── DIFF CARDS (thesis-style left/right) ── */
+.tk-diff{display:grid;grid-template-columns:1fr 1.2fr;gap:clamp(24px,4vw,56px);padding:clamp(28px,4vw,44px) 0;border-top:1px solid rgba(201,168,76,0.07);align-items:start;}
+.tk-diff-left{display:flex;align-items:flex-start;gap:clamp(12px,2vw,20px);}
+.tk-diff-num{font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,2.5vw,2.2rem);color:rgba(201,168,76,0.14);flex-shrink:0;line-height:1.2;}
+.tk-diff-title{font-family:'DM Serif Display',serif;font-size:clamp(1.15rem,1.8vw,1.45rem);color:#FAFAF5;margin:0;line-height:1.3;padding-top:4px;}
+.tk-diff-body{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.88rem,1.15vw,.97rem);line-height:1.7;color:rgba(250,250,245,0.68);margin:0;}
+.tk-diff-contrast{font-family:'Space Mono',monospace;font-size:clamp(.72rem,.9vw,.8rem);line-height:1.6;color:rgba(201,168,76,0.82);margin:14px 0 0 0;padding-left:14px;border-left:1px solid rgba(201,168,76,0.35);}
+
+/* ── STEP CARDS (flywheel-style) ── */
+.tk-step{display:flex;align-items:flex-start;gap:18px;padding:24px 0;border-bottom:1px solid rgba(201,168,76,0.06);}
+.tk-step:last-child{border-bottom:none;}
+.tk-step-num{font-family:'DM Serif Display',serif;font-size:1.3rem;color:rgba(201,168,76,0.18);flex-shrink:0;width:32px;line-height:1.4;}
+.tk-step-title{font-family:'DM Serif Display',serif;font-size:clamp(1.05rem,1.5vw,1.25rem);color:#FAFAF5;margin:0 0 7px 0;line-height:1.3;}
+.tk-step-body{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.85rem,1.1vw,.93rem);line-height:1.65;color:rgba(250,250,245,0.65);margin:0;}
+
+/* ── HOVER CARDS (hiw-style) ── */
+.tk-card{position:relative;padding:clamp(28px,4vw,40px) clamp(28px,4vw,44px);border:1px solid rgba(201,168,76,0.1);background:rgba(201,168,76,0.02);transition:all .5s cubic-bezier(.16,1,.3,1);}
+.tk-card:hover{border-color:rgba(201,168,76,0.2);background:rgba(201,168,76,0.04);transform:translateY(-3px);}
+.tk-card-num{font-family:'DM Serif Display',serif;font-size:clamp(2.2rem,3.5vw,3rem);color:rgba(201,168,76,0.12);position:absolute;top:28px;right:36px;line-height:1;}
+.tk-card-title{font-family:'DM Serif Display',serif;font-size:clamp(1.2rem,1.8vw,1.5rem);color:#FAFAF5;margin:0 0 14px 0;line-height:1.2;}
+.tk-card-body{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.88rem,1.15vw,.97rem);line-height:1.7;color:rgba(250,250,245,0.68);margin:0;max-width:400px;}
+
+/* ── SPEC GRID (hardware-style) ── */
+.tk-spec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.08);}
+.tk-spec{background:var(--bg);padding:clamp(18px,2.5vw,28px);}
+.tk-spec-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.78);text-transform:uppercase;margin-bottom:6px;}
+.tk-spec-value{font-family:'DM Serif Display',serif;font-size:clamp(1.1rem,1.6vw,1.35rem);color:#FAFAF5;line-height:1.2;}
+.tk-spec-value--gold{color:#C9A84C;}
+.tk-spec-sub{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.78rem,.95vw,.85rem);color:rgba(250,250,245,0.55);margin-top:4px;}
+
+/* ── BAR CHART ── */
+.tk-bar{margin-bottom:clamp(16px,2vw,24px);}
+.tk-bar-header{display:flex;justify-content:space-between;margin-bottom:6px;}
+.tk-bar-name{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(201,168,76,0.82);}
+.tk-bar-pct{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);}
+.tk-bar-track{height:24px;background:rgba(201,168,76,0.04);position:relative;overflow:hidden;}
+.tk-bar-fill{height:100%;width:0;transition:width 1.5s cubic-bezier(.25,.46,.45,.94);}
+.tk-bar-note{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.78rem,.9vw,.84rem);color:rgba(250,250,245,0.55);margin-top:5px;line-height:1.5;}
+
+/* ── DATA TABLE ── */
+.tk-table{width:100%;border-collapse:collapse;}
+.tk-table th{padding:12px 16px;text-align:left;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(201,168,76,0.50);border-bottom:1px solid rgba(201,168,76,0.08);background:rgba(201,168,76,0.02);}
+.tk-table td{padding:12px 16px;font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.85rem,1vw,.93rem);color:rgba(250,250,245,0.55);border-bottom:1px solid rgba(201,168,76,0.04);}
+.tk-table tr:last-child td{border-bottom:none;}
+.tk-table .gold{color:#C9A84C;font-weight:400;}
+
+/* ── DONUT ── */
+.tk-donut-wrap{display:flex;flex-direction:column;align-items:center;}
+.tk-donut-legend{display:flex;flex-direction:column;gap:10px;margin-top:20px;width:100%;max-width:320px;}
+.tk-donut-leg{display:flex;align-items:center;gap:10px;}
+.tk-donut-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.tk-donut-text{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.82rem,1vw,.9rem);color:rgba(250,250,245,0.55);}
+.tk-donut-val{font-family:'Space Mono',monospace;font-size:11px;color:rgba(201,168,76,0.5);margin-left:auto;}
+
+/* ── DISCLAIMER ── */
+.tk-disclaimer{border-top:1px solid rgba(201,168,76,0.06);padding-top:clamp(24px,4vw,40px);margin-top:clamp(40px,6vw,64px);}
+.tk-disclaimer p{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.78rem,.9vw,.84rem);line-height:1.8;color:rgba(250,250,245,0.22);}
+
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1);}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .tk-grid{grid-template-columns:1fr;}
+  .tk-diff{grid-template-columns:1fr;gap:16px;}
+  .tk-spec-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+<!-- ═══════════════════════════════════════════════════════
+     1. THE OPENING.START WITH WHY
+     ═══════════════════════════════════════════════════════ -->
+<section class="tk-section" style="padding-top:clamp(100px,15vh,180px);">
+  <div class="tk-inner">
+    <div class="tk-label reveal">The Token</div>
+    <h1 class="tk-hl reveal" style="font-size:clamp(2.8rem,6vw,5rem);">A token powered by<br>real <em>revenue.</em></h1>
+    <p class="tk-body reveal" style="margin-bottom:20px;">Real businesses pay real money for AI services. That money flows through the token. Customers create the demand. The 2% LP fee funds the network. Every trade strengthens the ecosystem.</p>
+    <p class="tk-body reveal">If no one ever speculated on $TORIVA, the mechanics would still work, because the demand comes from customers paying for products like RunMyBiz through Stripe.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     2. THE SUBSIDIARIES.WHERE REVENUE COMES FROM
+     ═══════════════════════════════════════════════════════ -->
+<section class="tk-section tk-section--alt">
+  <div class="tk-inner">
+    <div class="tk-label reveal">The Revenue Source</div>
+    <h2 class="tk-hl reveal">Toriva builds<br><em>companies.</em></h2>
+    <p class="tk-body reveal" style="margin-bottom:20px;">Toriva builds and owns subsidiary businesses. The first is RunMyBiz, an autonomous AI platform where agents run entire companies on autopilot. Customers pay monthly through Stripe with a credit card.</p>
+    <p class="tk-body reveal" style="margin-bottom:20px;">Every subsidiary reinvests 100% of its profits back into growth. No profit extraction, no dividends. Just compounding value inside the ecosystem.</p>
+    <p class="tk-body tk-body--dim reveal">And if a subsidiary is ever sold? That capital flows directly to Toriva, not to outside investors, not to a separate entity. The ecosystem captures the full upside.</p>
+
+    <div class="tk-divider"></div>
+
+    <div class="tk-grid">
+      <div>
+        <p class="tk-quote reveal">"To the customer, it looks like any other SaaS product. They've never heard of crypto. They just know the AI saves them time and money."</p>
+      </div>
+      <div>
+        <div class="tk-step reveal">
+          <div class="tk-step-num">01</div>
+          <div><h3 class="tk-step-title">Customer pays for a Toriva product</h3><p class="tk-step-body">RunMyBiz subscription or any future subsidiary product. Real revenue enters the system via Stripe.</p></div>
+        </div>
+        <div class="tk-step reveal">
+          <div class="tk-step-num">02</div>
+          <div><h3 class="tk-step-title">Net revenue is calculated</h3><p class="tk-step-body">Gross revenue minus API and tool costs. What's left is the real profit that gets distributed across the network.</p></div>
+        </div>
+        <div class="tk-step reveal">
+          <div class="tk-step-num">03</div>
+          <div><h3 class="tk-step-title">Contributors get paid for doing the work</h3><p class="tk-step-body">60% of net revenue flows to the people who powered the compute. Paid daily in $TORIVA, proportional to what their machine actually did.</p></div>
+        </div>
+        <div class="tk-step reveal">
+          <div class="tk-step-num">04</div>
+          <div><h3 class="tk-step-title">The rest grows the network</h3><p class="tk-step-body">40% goes to the treasury and is reinvested into hardware, operations, and ecosystem growth. Every dollar reinvested makes the next dollar easier to earn.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="tk-closing reveal">Revenue comes from building.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     3. THE 2% LP FEE.EVERY TRADE STRENGTHENS THE NETWORK
+     ═══════════════════════════════════════════════════════ -->
+<section class="tk-section">
+  <div class="tk-inner">
+    <div class="tk-label reveal">The 2% Pool Fee</div>
+    <h2 class="tk-hl reveal">Every trade fuels<br>the <em>ecosystem.</em></h2>
+    <p class="tk-body reveal" style="margin-bottom:20px;">The TORIVA/USDC pool on Uniswap V3 charges a 2% fee on every swap. Most projects keep LP fees for themselves. Toriva channels them back into the machine.</p>
+    <p class="tk-body reveal">The fee comes in two forms: USDC and TORIVA tokens. Each side serves a different purpose.</p>
+
+    <div style="margin-top:clamp(40px,6vw,64px);">
+      <div class="tk-diff reveal">
+        <div class="tk-diff-left">
+          <span class="tk-diff-num">01</span>
+          <h3 class="tk-diff-title">USDC goes to business growth</h3>
+        </div>
+        <div>
+          <p class="tk-diff-body">The USDC side of the fee funds subsidiary growth: investing in products like RunMyBiz, expanding the network, and discretionary buybacks. Every dollar of trading volume puts capital to work growing real businesses.</p>
+          <p class="tk-diff-contrast">More business growth means more revenue. More revenue means more demand for the token. The cycle compounds.</p>
+        </div>
+      </div>
+      <div class="tk-diff reveal">
+        <div class="tk-diff-left">
+          <span class="tk-diff-num">02</span>
+          <h3 class="tk-diff-title">TORIVA tokens supplement miner pay</h3>
+        </div>
+        <div>
+          <p class="tk-diff-body">The TORIVA side of the fee flows to compute contributors as supplemental earnings. This additional revenue stream on top of task-based pay means Toriva can offer lower prices to customers while still rewarding the people doing the work.</p>
+          <p class="tk-diff-contrast">Lower prices attract more customers. More customers generate more volume. More volume generates more fees. Another cycle.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tk-divider"></div>
+
+    <div class="tk-grid" style="align-items:center;">
+      <div>
+        <canvas id="lpFeeDonut" width="400" height="400" style="max-width:200px;display:block;margin:0 auto;"></canvas>
+        <div class="tk-donut-legend" style="margin:24px auto 0;">
+          <div class="tk-donut-leg"><div class="tk-donut-dot" style="background:#3b82f6;"></div><span class="tk-donut-text">USDC: Business growth & buybacks</span></div>
+          <div class="tk-donut-leg"><div class="tk-donut-dot" style="background:#C9A84C;"></div><span class="tk-donut-text">TORIVA: Miner payment supplement</span></div>
+        </div>
+      </div>
+      <div>
+        <p class="tk-body reveal" style="margin-bottom:16px;">Both sides of the fee strengthen the same flywheel. USDC grows the business. TORIVA rewards the network. Neither side is extracted. It all goes back in.</p>
+        <p class="tk-body tk-body--bright reveal">The net effect: every trade in the pool makes the ecosystem more competitive. More competitive pricing attracts more customers. More customers generate more volume. More volume generates more fees.</p>
+      </div>
     </div>
   </div>
+</section>
 
-  <!-- CORE PARAMS -->
-  <section class="section" style="max-width:1400px;margin:0 auto;">
-    <div class="token-grid">
-      <div class="token-cell"><div class="token-cell-label">Token Name</div><div class="token-cell-value accent">TORIVA</div></div>
-      <div class="token-cell"><div class="token-cell-label">Standard</div><div class="token-cell-value">ERC-20</div></div>
-      <div class="token-cell"><div class="token-cell-label">Chain</div><div class="token-cell-value">Base (L2)</div></div>
-      <div class="token-cell"><div class="token-cell-label">Total Supply</div><div class="token-cell-value accent">1,000,000,000</div><div class="token-cell-sub">Fixed non-inflationary</div></div>
-      <div class="token-cell"><div class="token-cell-label">Buy / Sell Tax</div><div class="token-cell-value" style="color:#4dff91;">0%</div><div class="token-cell-sub">Zero tax on trades</div></div>
-      <div class="token-cell"><div class="token-cell-label">Pool</div><div class="token-cell-value">TORIVA/USDC</div><div class="token-cell-sub">Uniswap V3 on Base</div></div>
-      <div class="token-cell"><div class="token-cell-label">Seed Liquidity</div><div class="token-cell-value">TBA</div><div class="token-cell-sub">Funded by presale proceeds</div></div>
-      <div class="token-cell"><div class="token-cell-label">Launch Price</div><div class="token-cell-value">TBA</div><div class="token-cell-sub">Set at launch based on LP pairing</div></div>
-      <div class="token-cell"><div class="token-cell-label">Team Revenue Take</div><div class="token-cell-value" style="color:#4dff91;">0%</div><div class="token-cell-sub">Toriva earns, not the team</div></div>
-      <div class="token-cell"><div class="token-cell-label">Treasury Security</div><div class="token-cell-value">Ledger</div><div class="token-cell-sub">Hardware wallet from day one</div></div>
-      <div class="token-cell"><div class="token-cell-label">LP Lock</div><div class="token-cell-value">No</div><div class="token-cell-sub">Retained for treasury flexibility</div></div>
-      <div class="token-cell"><div class="token-cell-label">Presale</div><div class="token-cell-value accent">25%</div><div class="token-cell-sub">Liquidity funding presale</div></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     4. TOKEN UTILITY.WHAT IT ACTUALLY DOES
+     ═══════════════════════════════════════════════════════ -->
+<section class="tk-section tk-section--alt">
+  <div class="tk-inner">
+    <div class="tk-label reveal">Token Utility</div>
+    <h2 class="tk-hl reveal">Four reasons $TORIVA<br>has to <em>exist.</em></h2>
+    <p class="tk-body reveal" style="margin-bottom:clamp(40px,6vw,64px);">If you can remove the token and the system still works the same way, the token has no utility. Here's why $TORIVA can't be removed.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+      <div class="tk-card reveal">
+        <div class="tk-card-num">01</div>
+        <h3 class="tk-card-title">Compute staking</h3>
+        <p class="tk-card-body">You can't contribute hardware without staking $TORIVA. It's your commitment to the network. Higher stakes unlock higher earning tiers and priority job routing. Want to earn more? Stake more.</p>
+      </div>
+      <div class="tk-card reveal">
+        <div class="tk-card-num">02</div>
+        <h3 class="tk-card-title">LP fee funds the network</h3>
+        <p class="tk-card-body">Every trade in the liquidity pool generates TORIVA tokens through the 2% fee. Those tokens go directly toward supplementing miner payouts, keeping consumer pricing competitive while rewarding the people powering the hardware. More trading volume means better compensation.</p>
+      </div>
+      <div class="tk-card reveal">
+        <div class="tk-card-num">03</div>
+        <h3 class="tk-card-title">Subsidiary growth flywheel</h3>
+        <p class="tk-card-body">The USDC side of the LP fee flows back into growing subsidiaries like RunMyBiz. Stronger businesses attract more customers. More customers create more compute demand. More demand generates more fees. The token is the engine that turns trading activity into real business growth.</p>
+      </div>
+      <div class="tk-card reveal">
+        <div class="tk-card-num">04</div>
+        <h3 class="tk-card-title">Aligned incentives</h3>
+        <p class="tk-card-body">Pledgers stake tokens and contribute hardware. When the businesses grow, compute demand grows, and their rewards grow with it. The token ensures that everyone who builds the network is directly invested in its success. Growth benefits builders first.</p>
+      </div>
     </div>
-  </section>
 
-  <!-- ALLOCATION BREAKDOWN -->
-  <section class="section" style="border-top:1px solid var(--border);max-width:1400px;margin:0 auto;">
-    <p class="section-label">Supply Allocation</p>
-    <h2 class="display-heading" style="font-size:clamp(2rem,4vw,4rem);margin-bottom:2.5rem;">WHERE THE<br><span class="italic">BILLION TOKENS GO</span></h2>
+    <p class="tk-closing reveal">The token works because the business works.</p>
+  </div>
+</section>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;">
-      <!-- BAR CHART -->
+
+<!-- ═══════════════════════════════════════════════════════
+     5. REVENUE SPLIT.WHERE THE MONEY GOES
+     ═══════════════════════════════════════════════════════ -->
+<section class="tk-section">
+  <div class="tk-inner">
+    <div class="tk-label reveal">Revenue Distribution</div>
+    <h2 class="tk-hl reveal">60% to the people<br>who do the <em>work.</em></h2>
+    <p class="tk-body reveal" style="margin-bottom:20px;">All agent revenue, regardless of what currency it's earned in, is converted to $TORIVA before distribution. Net revenue is gross revenue minus API and tool costs. Then it splits.</p>
+
+    <div class="tk-grid" style="margin-top:clamp(40px,6vw,64px);">
+      <!-- 60% Pledgers -->
       <div>
-        <div style="display:flex;flex-direction:column;gap:.75rem;">
-          <!-- Liquidity Funding Presale 25% -->
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:.35rem;">
-              <span style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-muted);">Liquidity Funding Presale</span>
-              <span style="font-size:.62rem;letter-spacing:.1em;font-family:'DM Mono',monospace;color:var(--gold);">250M · 25%</span>
-            </div>
-            <div style="height:28px;background:var(--black4);position:relative;">
-              <div style="height:100%;width:25%;background:var(--gold);"></div>
-            </div>
-            <div style="font-size:.62rem;color:var(--cream-dim);font-style:italic;font-family:var(--body-font);margin-top:.3rem;">Presale funds seed the LP and initial treasury operations.</div>
+        <div class="tk-spec-grid reveal" style="margin-bottom:24px;">
+          <div class="tk-spec" style="grid-column:1/-1;">
+            <div class="tk-spec-label">Pledger Share</div>
+            <div class="tk-spec-value tk-spec-value--gold" style="font-size:clamp(2.2rem,4vw,3.5rem);">60%</div>
+            <div class="tk-spec-sub">of net revenue, converted to $TORIVA, paid daily</div>
           </div>
-          <!-- LP 15% -->
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:.35rem;">
-              <span style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-muted);">Liquidity Pool</span>
-              <span style="font-size:.62rem;letter-spacing:.1em;font-family:'DM Mono',monospace;color:var(--gold);">150M · 15%</span>
-            </div>
-            <div style="height:28px;background:var(--black4);">
-              <div style="height:100%;width:15%;background:var(--gold-bright);"></div>
-            </div>
-            <div style="font-size:.62rem;color:var(--cream-dim);font-style:italic;font-family:var(--body-font);margin-top:.3rem;">Paired with USDC at launch. Exact amount and launch price TBA.</div>
+        </div>
+        <p class="tk-body reveal">Proportional to each node's compute contribution. Claimable anytime via the Toriva dashboard. No lock-ups, no vesting. You did the work, you get paid.</p>
+      </div>
+
+      <!-- 40% Treasury -->
+      <div>
+        <div class="tk-spec-grid reveal" style="margin-bottom:24px;">
+          <div class="tk-spec" style="grid-column:1/-1;">
+            <div class="tk-spec-label">Treasury Share</div>
+            <div class="tk-spec-value tk-spec-value--gold" style="font-size:clamp(2.2rem,4vw,3.5rem);">40%</div>
+            <div class="tk-spec-sub">reinvested into the ecosystem</div>
           </div>
-          <!-- Ecosystem 15% -->
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:.35rem;">
-              <span style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-muted);">Ecosystem Incentives</span>
-              <span style="font-size:.62rem;letter-spacing:.1em;font-family:'DM Mono',monospace;color:var(--gold);">150M · 15%</span>
-            </div>
-            <div style="height:28px;background:var(--black4);">
-              <div style="height:100%;width:15%;background:var(--gold-dim);"></div>
-            </div>
-            <div style="font-size:.62rem;color:var(--cream-dim);font-style:italic;font-family:var(--body-font);margin-top:.3rem;">Pledger onboarding rewards, early network incentives, partner integrations.</div>
-          </div>
-          <!-- Founder 15% -->
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:.35rem;">
-              <span style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-muted);">Founder</span>
-              <span style="font-size:.62rem;letter-spacing:.1em;font-family:'DM Mono',monospace;color:var(--gold);">150M · 15%</span>
-            </div>
-            <div style="height:28px;background:var(--black4);">
-              <div style="height:100%;width:15%;background:var(--gold-dim);"></div>
-            </div>
-            <div style="font-size:.62rem;color:var(--cream-dim);font-style:italic;font-family:var(--body-font);margin-top:.3rem;">Fully unlocked. Wallet public and doxxed. No vesting cliff aligned through long-term build.</div>
-          </div>
-          <!-- Marketing 15% -->
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:.35rem;">
-              <span style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-muted);">Marketing</span>
-              <span style="font-size:.62rem;letter-spacing:.1em;font-family:'DM Mono',monospace;color:var(--gold);">150M · 15%</span>
-            </div>
-            <div style="height:28px;background:var(--black4);">
-              <div style="height:100%;width:15%;background:var(--gold-dim);"></div>
-            </div>
-            <div style="font-size:.62rem;color:var(--cream-dim);font-style:italic;font-family:var(--body-font);margin-top:.3rem;">KOL partnerships, campaigns, exchange listings, community growth.</div>
-          </div>
-          <!-- Team 15% -->
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:.35rem;">
-              <span style="font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-muted);">Team Onboarding</span>
-              <span style="font-size:.62rem;letter-spacing:.1em;font-family:'DM Mono',monospace;color:var(--gold);">150M · 15%</span>
-            </div>
-            <div style="height:28px;background:var(--black4);">
-              <div style="height:100%;width:15%;background:var(--gold-dim);"></div>
-            </div>
-            <div style="font-size:.62rem;color:var(--cream-dim);font-style:italic;font-family:var(--body-font);margin-top:.3rem;">Reserved for future contributors, developers, and operators brought into Toriva.</div>
-          </div>
+        </div>
+        <p class="tk-body reveal">Hardware expansion, API infrastructure, operations, and discretionary buybacks. Allocation is flexible and adapts to what the network needs most at any given stage.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+
+<!-- ═══════════════════════════════════════════════════════
+     7. SUPPLY ALLOCATION.WHERE THE BILLION GOES
+     ═══════════════════════════════════════════════════════ -->
+<section class="tk-section">
+  <div class="tk-inner">
+    <div class="tk-label reveal">Supply Allocation</div>
+    <h2 class="tk-hl reveal">One billion tokens.<br>Here's where they <em>go.</em></h2>
+    <p class="tk-body reveal" style="margin-bottom:clamp(40px,6vw,64px);">Fixed supply, non-inflationary, no minting function. What you see is what exists.</p>
+
+    <div class="tk-grid">
+      <div>
+        <div class="tk-bar reveal">
+          <div class="tk-bar-header"><span class="tk-bar-name">Liquidity Funding Presale</span><span class="tk-bar-pct">250M · 25%</span></div>
+          <div class="tk-bar-track"><div class="tk-bar-fill" data-width="25" style="background:linear-gradient(90deg,#C9A84C,#E8C46A);"></div></div>
+          <div class="tk-bar-note">Seeds the LP and initial treasury.</div>
+        </div>
+        <div class="tk-bar reveal">
+          <div class="tk-bar-header"><span class="tk-bar-name">Liquidity Pool</span><span class="tk-bar-pct">150M · 15%</span></div>
+          <div class="tk-bar-track"><div class="tk-bar-fill" data-width="15" style="background:#E8C46A;"></div></div>
+          <div class="tk-bar-note">Paired with USDC at launch. LP tokens locked. Verifiable on-chain.</div>
+        </div>
+        <div class="tk-bar reveal">
+          <div class="tk-bar-header"><span class="tk-bar-name">Ecosystem Incentives</span><span class="tk-bar-pct">150M · 15%</span></div>
+          <div class="tk-bar-track"><div class="tk-bar-fill" data-width="15" style="background:#8a6e2f;"></div></div>
+          <div class="tk-bar-note">Pledger onboarding, partner integrations. 5M/month cap. Unused burned after 24 months.</div>
+        </div>
+        <div class="tk-bar reveal">
+          <div class="tk-bar-header"><span class="tk-bar-name">Founder</span><span class="tk-bar-pct">150M · 15%</span></div>
+          <div class="tk-bar-track"><div class="tk-bar-fill" data-width="15" style="background:#6b5825;"></div></div>
+          <div class="tk-bar-note">Fully unlocked. Wallet public. Aligned through building, not vesting.</div>
+        </div>
+        <div class="tk-bar reveal">
+          <div class="tk-bar-header"><span class="tk-bar-name">Marketing</span><span class="tk-bar-pct">150M · 15%</span></div>
+          <div class="tk-bar-track"><div class="tk-bar-fill" data-width="15" style="background:#5a4a20;"></div></div>
+          <div class="tk-bar-note">KOL partnerships, campaigns, listings. 10M/month cap. All distributions logged.</div>
+        </div>
+        <div class="tk-bar reveal">
+          <div class="tk-bar-header"><span class="tk-bar-name">Team Onboarding</span><span class="tk-bar-pct">150M · 15%</span></div>
+          <div class="tk-bar-track"><div class="tk-bar-fill" data-width="15" style="background:#4a3c18;"></div></div>
+          <div class="tk-bar-note">Reserved for future contributors, developers, and operators.</div>
         </div>
       </div>
 
-      <!-- RIGHT: KEY POINTS -->
-      <div style="display:flex;flex-direction:column;gap:1.5rem;">
-        <div style="border:1px solid var(--border);padding:1.75rem;">
-          <div style="font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.6rem;">Zero Token Tax</div>
-          <p style="font-family:var(--body-font);font-size:1.0625rem;color:var(--body-text-color);line-height:1.6;">No buy tax. No sell tax. Trade freely. Toriva generates revenue from AI agent work, not from taxing its own holders. This is a fundamental design choice: revenue comes from external clients, not from extracting value on every swap.</p>
+      <div>
+        <div class="tk-diff reveal" style="border-top:none;padding-top:0;">
+          <div class="tk-diff-left"><span class="tk-diff-num">01</span><h3 class="tk-diff-title">No buy tax. No sell tax.</h3></div>
+          <div><p class="tk-diff-body">Trade freely. Toriva generates revenue from AI agent work. Revenue comes from external clients paying for real services.</p></div>
         </div>
-        <div style="border:1px solid var(--border);padding:1.75rem;">
-          <div style="font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.6rem;">Liquidity Funding Presale</div>
-          <p style="font-family:var(--body-font);font-size:1.0625rem;color:var(--body-text-color);line-height:1.6;">25% of supply sold in a presale to fund the initial LP and treasury operations. Proceeds go directly into liquidity and hardware acquisition. No VC allocation, no private rounds.</p>
+        <div class="tk-diff reveal">
+          <div class="tk-diff-left"><span class="tk-diff-num">02</span><h3 class="tk-diff-title">Liquidity is locked.</h3></div>
+          <div><p class="tk-diff-body">LP tokens sent to a lock contract at launch. This eliminates the most common rug pull vector. Lock duration and contract address are published and verifiable on-chain.</p></div>
         </div>
-        <div style="border:1px solid var(--border);padding:1.75rem;">
-          <div style="font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.6rem;">Launch market cap</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--gold);line-height:1;">TBA</div>
-          <p style="font-family:var(--body-font);font-size:.9rem;color:var(--cream-dim);line-height:1.5;margin-top:.5rem;">150M tokens paired with USDC from presale proceeds. Designed for community access, not whale capture.</p>
+        <div class="tk-diff reveal">
+          <div class="tk-diff-left"><span class="tk-diff-num">03</span><h3 class="tk-diff-title">Standard contract. No tricks.</h3></div>
+          <div><p class="tk-diff-body">Classic OpenZeppelin ERC-20 contract. No hidden functions, no owner-only mint, no backdoors. Verified and readable on BaseScan.</p></div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- SUPPLY LOCK -->
-  <section class="section" style="border-top:1px solid var(--border);max-width:1400px;margin:0 auto;">
-    <p class="section-label">Supply Lock Effect</p>
-    <h2 class="display-heading" style="font-size:clamp(2rem,4vw,4rem);margin-bottom:2rem;">AS PLEDGERS<br><span class="italic">STAKE, SUPPLY SHRINKS</span></h2>
-    <p style="font-family:var(--body-font);font-size:.9rem;color:var(--cream-dim);margin-bottom:1.5rem;font-style:italic;">Each pledger stakes ~$100 of TORIVA as collateral. At early token prices $100 buys a large number of tokens the exact amount depends on price at time of staking. The table below uses a conservative estimate of 100,000 TORIVA per pledger throughout.</p>
-    <div style="overflow-x:auto;border:1px solid var(--border);">
-    <table class="data-table">
-      <thead><tr><th>Month</th><th>Pledgers</th><th>TORIVA Staked (~100K ea.)</th><th>% Supply Locked</th><th>Circulating Supply</th></tr></thead>
-      <tbody>
-        <tr><td>Month 2 (Beta)</td><td>25</td><td>2,500,000</td><td>0.25%</td><td>997,500,000</td></tr>
-        <tr><td>Month 3</td><td>80</td><td>8,000,000</td><td>0.8%</td><td>992,000,000</td></tr>
-        <tr><td>Month 6</td><td>350</td><td>35,000,000</td><td class="hi">3.5%</td><td>965,000,000</td></tr>
-        <tr><td>Month 9</td><td>900</td><td>90,000,000</td><td class="hi">9%</td><td>910,000,000</td></tr>
-        <tr><td>Month 12</td><td>1,800</td><td>180,000,000</td><td class="hi">18%</td><td>820,000,000</td></tr>
-        <tr><td>Month 18</td><td>5,000</td><td>500,000,000</td><td class="hi">50%</td><td>500,000,000</td></tr>
-        <tr><td>Month 24</td><td>12,000</td><td>500,000,000+</td><td class="hi">50%+</td><td>&lt;500,000,000</td></tr>
-      </tbody>
-    </table>
+
+<!-- ═══════════════════════════════════════════════════════
+     8. SUPPLY LOCK.AS PLEDGERS STAKE, SUPPLY SHRINKS
+     ═══════════════════════════════════════════════════════ -->
+<section class="tk-section tk-section--alt">
+  <div class="tk-inner">
+    <div class="tk-label reveal">Supply Lock Effect</div>
+    <h2 class="tk-hl reveal">More pledgers means<br>fewer tokens <em>circulating.</em></h2>
+    <p class="tk-body reveal" style="margin-bottom:20px;">Every pledger stakes ~$100 of $TORIVA as collateral. At early prices, that buys a significant number of tokens. As the network grows, more supply gets locked, and it stays locked as long as they're contributing.</p>
+    <p class="tk-body tk-body--dim reveal" style="margin-bottom:clamp(40px,6vw,64px);">Combined with buyback-and-burn, the supply pressure compounds. Staking locks tokens. Burns remove them permanently. The table below doesn't account for burns, so actual circulating supply will be lower.</p>
+
+    <div style="border:1px solid rgba(201,168,76,0.08);overflow-x:auto;" class="reveal">
+      <table class="tk-table">
+        <thead><tr><th>Month</th><th>Pledgers</th><th>TORIVA Staked</th><th>% Locked</th><th>Circulating</th></tr></thead>
+        <tbody>
+          <tr><td>Month 2 (Beta)</td><td>25</td><td>2,500,000</td><td>0.25%</td><td>997,500,000</td></tr>
+          <tr><td>Month 3</td><td>80</td><td>8,000,000</td><td>0.8%</td><td>992,000,000</td></tr>
+          <tr><td>Month 6</td><td>350</td><td>35,000,000</td><td class="gold">3.5%</td><td>965,000,000</td></tr>
+          <tr><td>Month 9</td><td>900</td><td>90,000,000</td><td class="gold">9%</td><td>910,000,000</td></tr>
+          <tr><td>Month 12</td><td>1,800</td><td>180,000,000</td><td class="gold">18%</td><td>820,000,000</td></tr>
+          <tr><td>Month 18</td><td>5,000</td><td>500,000,000</td><td class="gold">50%</td><td>500,000,000</td></tr>
+          <tr><td>Month 24</td><td>12,000</td><td>500,000,000+</td><td class="gold">50%+</td><td>&lt;500,000,000</td></tr>
+        </tbody>
+      </table>
     </div>
-  </section>
+
+    <p class="tk-closing reveal">Every new pledger tightens the supply. Every burn makes it permanent.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     9. CORE PARAMETERS.THE REFERENCE
+     ═══════════════════════════════════════════════════════ -->
+<section class="tk-section">
+  <div class="tk-inner">
+    <div class="tk-label reveal">Core Parameters</div>
+    <h2 class="tk-hl reveal">The <em>specs.</em></h2>
+
+    <div class="tk-spec-grid reveal" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+      <div class="tk-spec"><div class="tk-spec-label">Token</div><div class="tk-spec-value tk-spec-value--gold">$TORIVA</div><div class="tk-spec-sub">ERC-20 on Base (L2)</div></div>
+      <div class="tk-spec"><div class="tk-spec-label">Total Supply</div><div class="tk-spec-value tk-spec-value--gold">1,000,000,000</div><div class="tk-spec-sub">Fixed. Non-inflationary.</div></div>
+      <div class="tk-spec"><div class="tk-spec-label">Buy / Sell Tax</div><div class="tk-spec-value" style="color:#4dff91;">0%</div><div class="tk-spec-sub">Trade freely.</div></div>
+      <div class="tk-spec"><div class="tk-spec-label">LP Fee</div><div class="tk-spec-value tk-spec-value--gold">2%</div><div class="tk-spec-sub">Distributed to growth + miners</div></div>
+      <div class="tk-spec"><div class="tk-spec-label">Pool</div><div class="tk-spec-value">TORIVA / USDC</div><div class="tk-spec-sub">Uniswap V3 on Base</div></div>
+      <div class="tk-spec"><div class="tk-spec-label">Liquidity</div><div class="tk-spec-value" style="color:#4dff91;">Locked</div><div class="tk-spec-sub">On-chain verifiable</div></div>
+      <div class="tk-spec"><div class="tk-spec-label">Contract</div><div class="tk-spec-value">OpenZeppelin</div><div class="tk-spec-sub">Classic ERC-20. No hidden functions.</div></div>
+      <div class="tk-spec"><div class="tk-spec-label">Team Take</div><div class="tk-spec-value" style="color:#4dff91;">0%</div><div class="tk-spec-sub">Toriva earns. Not the team.</div></div>
+      <div class="tk-spec"><div class="tk-spec-label">Treasury</div><div class="tk-spec-value">Ledger</div><div class="tk-spec-sub">Hardware wallet. Public address.</div></div>
+      <div class="tk-spec"><div class="tk-spec-label">Presale</div><div class="tk-spec-value tk-spec-value--gold">25%</div><div class="tk-spec-sub">Seeds the LP and initial treasury.</div></div>
+      <div class="tk-spec"><div class="tk-spec-label">Chain</div><div class="tk-spec-value">Base</div><div class="tk-spec-sub">Low fees. Coinbase ecosystem. EVM compatible.</div></div>
+      <div class="tk-spec"><div class="tk-spec-label">Pledger Share</div><div class="tk-spec-value tk-spec-value--gold">60%</div><div class="tk-spec-sub">of net revenue, paid daily</div></div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="tk-disclaimer reveal">
+      <p>The $TORIVA token confers no rights, ownership, governance power, or obligations to holders. It is a utility token used for network participation: staking and compute contributor payments. The liquidity pool is locked. The token has no guaranteed value and may fluctuate based on market conditions. This is not an offer of securities, investment advice, or a solicitation of any kind. Revenue projections are hypothetical and based on target growth rates. Actual results may vary significantly. Participating in the TORIVA pledge network involves significant financial risk including potential total loss of staked tokens and hardware value. Conduct your own independent research before participating.</p>
+    </div>
+  </div>
+</section>
 </div>
 
 <!-- Projections page removed - backup at projections-backup.html -->
 
 <!-- ═══ TEAM ═══ -->
 <div id="page-team" class="page">
-  <div class="page-header" data-bg-text="TEAM">
-    <div style="max-width:1400px;margin:0 auto;">
-      <p class="section-label">Leadership</p>
-      <h1 class="display-heading" style="font-size:clamp(3rem,8vw,8rem);">THE<br><span class="italic">TEAM</span></h1>
-      <p class="body-text" style="margin-top:2rem;max-width:700px;">The people building Toriva. Experienced operators across AI, web3 infrastructure, and scalable technology ventures.</p>
+<style>
+
+
+/* ── Section primitives (matching homepage) ── */
+#page-team .section{position:relative;width:100%;overflow:hidden;font-family:'Outfit',sans-serif;padding:clamp(64px,12vw,160px) 0;}
+#page-team .inner{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 clamp(20px,6vw,80px);}
+#page-team .label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.3em;color:rgba(201,168,76,0.72);text-transform:uppercase;display:flex;align-items:center;gap:16px;margin-bottom:28px;}
+#page-team .label::before{content:'';width:32px;height:1px;background:rgba(201,168,76,0.5);}
+#page-team .hl{font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(2.2rem,5.5vw,4.2rem);line-height:1.08;color:#FAFAF5;margin:0 0 20px 0;}
+#page-team .hl em{font-style:italic;color:#C9A84C;}
+#page-team .body-text{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.95rem,1.4vw,1.15rem);line-height:1.75;color:rgba(250,250,245,0.72);max-width:560px;}
+#page-team .body-text--bright{color:rgba(250,250,245,0.82);}
+#page-team .divider{height:1px;background:linear-gradient(90deg,rgba(201,168,76,0.15),rgba(201,168,76,0.08),transparent);margin:clamp(60px,8vw,100px) 0;}
+#page-team .quote{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(1.2rem,2.2vw,1.8rem);color:var(--gold-bright);line-height:1.4;max-width:500px;margin:0;padding-left:28px;border-left:2px solid rgba(201,168,76,0.5);}
+#page-team .closing{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(1.15rem,2.2vw,1.65rem);color:#C9A84C;line-height:1.45;max-width:460px;margin:clamp(28px,4vw,48px) 0 0 0;}
+
+/* ── Grid layouts ── */
+#page-team .two-col{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,80px);align-items:center;}
+#page-team .two-col--top{align-items:start;}
+
+/* ── Profile card (homepage diff-card style) ── */
+#page-team .profile{display:grid;grid-template-columns:1fr 1.2fr;gap:clamp(24px,4vw,56px);padding:clamp(28px,4vw,44px) 0;border-top:1px solid rgba(201,168,76,0.15);align-items:start;}
+#page-team .profile-left{display:flex;align-items:flex-start;gap:clamp(12px,2vw,20px);}
+#page-team .profile-num{font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,2.5vw,2.2rem);color:rgba(201,168,76,0.3);flex-shrink:0;line-height:1.2;}
+#page-team .profile-name{font-family:'DM Serif Display',serif;font-size:clamp(1.15rem,1.8vw,1.45rem);color:#FAFAF5;margin:0;line-height:1.3;padding-top:4px;}
+#page-team .profile-role{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.72);text-transform:uppercase;margin-top:8px;}
+#page-team .profile-bio{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.88rem,1.15vw,.97rem);line-height:1.7;color:rgba(250,250,245,0.68);margin:0;}
+#page-team .profile-detail{font-family:'Space Mono',monospace;font-size:clamp(.72rem,.9vw,.8rem);line-height:1.6;color:rgba(201,168,76,0.72);margin:14px 0 0 0;padding-left:14px;border-left:1px solid rgba(201,168,76,0.25);}
+#page-team .profile-linkedin{display:inline-flex;align-items:center;gap:.5rem;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;color:rgba(201,168,76,0.72);text-decoration:none;margin-top:16px;transition:color .3s;}
+#page-team .profile-linkedin:hover{color:#E8D48B;}
+#page-team .profile-linkedin svg{width:14px;height:14px;fill:currentColor;}
+
+/* ── Stat strip ── */
+#page-team .stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.08);margin-top:clamp(48px,6vw,72px);}
+#page-team .stat{background:#0A0A08;padding:clamp(20px,3vw,32px);display:flex;flex-direction:column;gap:6px;}
+#page-team .stat-val{font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,2.5vw,2.2rem);color:#C9A84C;line-height:1.2;}
+#page-team .stat-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.65);text-transform:uppercase;}
+
+/* ── Expertise tags ── */
+#page-team .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+#page-team .tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;color:rgba(201,168,76,0.7);border:1px solid rgba(201,168,76,0.2);padding:6px 14px;text-transform:uppercase;transition:all .4s;}
+#page-team .tag:hover{border-color:rgba(201,168,76,0.5);color:rgba(201,168,76,0.9);background:rgba(201,168,76,0.05);}
+
+/* ── Verify CTA (from thesis section) ── */
+#page-team .verify{margin-top:clamp(48px,7vw,80px);padding:clamp(32px,5vw,56px);border:1px solid rgba(201,168,76,0.1);background:rgba(201,168,76,0.02);display:grid;grid-template-columns:1fr auto;gap:clamp(24px,4vw,48px);align-items:center;}
+#page-team .verify-hl{font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#FAFAF5;margin:0 0 12px 0;line-height:1.15;}
+#page-team .verify-hl em{font-style:italic;color:#C9A84C;}
+#page-team .verify-body{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.85rem,1.1vw,.95rem);line-height:1.7;color:rgba(250,250,245,0.65);margin:0;max-width:440px;}
+#page-team .verify-links{display:flex;flex-direction:column;gap:12px;}
+#page-team .verify-btn{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;text-align:center;padding:16px 36px;border:1px solid rgba(201,168,76,0.3);color:rgba(201,168,76,0.78);background:transparent;transition:all .4s cubic-bezier(.16,1,.3,1);cursor:pointer;display:block;}
+#page-team .verify-btn:hover{border-color:rgba(201,168,76,0.5);color:#E8D48B;background:rgba(201,168,76,0.04);transform:translateY(-2px);}
+#page-team .verify-btn--primary{background:linear-gradient(135deg,#C9A84C,#E8D48B);color:#0A0A08;border-color:transparent;}
+#page-team .verify-btn--primary:hover{background:linear-gradient(135deg,#E8D48B,#C9A84C);color:#0A0A08;border-color:transparent;box-shadow:0 8px 32px rgba(201,168,76,0.2);}
+
+/* ── Reveal animation ── */
+#page-team .reveal{opacity:0;transform:translateY(20px);transition:opacity .8s cubic-bezier(.25,.46,.45,.94),transform .8s cubic-bezier(.25,.46,.45,.94);}
+#page-team .reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+#page-team .two-col,#page-team .profile,#page-team .verify{grid-template-columns:1fr;}
+#page-team .profile{gap:14px;}
+#page-team .stat-strip{grid-template-columns:1fr 1fr;}
+#page-team .verify{gap:28px;}
+}
+</style>
+<!-- ═══ INTRO — The Why ═══ -->
+<div class="section" style="padding-top:clamp(120px,16vw,200px);">
+  <div class="inner">
+    <div class="label reveal">The Team</div>
+    <h2 class="hl reveal">The people who've done<br>this <em>before</em></h2>
+    <p class="body-text reveal">Toriva is built by operators who have shipped products, scaled infrastructure, and generated real revenue across AI and web3. In production. With paying customers.</p>
+    <p class="body-text reveal" style="margin-top:18px;color:rgba(250,250,245,0.5);">A founding team with a combined track record you can verify on-chain, on LinkedIn, and in the products they've already built.</p>
+
+    <div class="divider"></div>
+
+    <!-- ── The People ── -->
+    <div class="label reveal">Leadership</div>
+    <h2 class="hl reveal" style="font-size:clamp(1.8rem,4vw,3rem);">Three operators.<br>One <em>thesis.</em></h2>
+
+    <!-- JEFF -->
+    <div class="profile reveal">
+      <div class="profile-left">
+        <span class="profile-num">01</span>
+        <div>
+          <h3 class="profile-name">Jeff Kirdeikis</h3>
+          <div class="profile-role">Founder & CEO</div>
+          <a href="https://www.linkedin.com/in/jeffkirdeikis/" target="_blank" rel="noopener" class="profile-linkedin">
+            <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            LinkedIn
+          </a>
+        </div>
+      </div>
+      <div>
+        <p class="profile-bio">Previous founder of TrustSwap, which he built to a $500 million market cap. Eight years building in web3, spanning infrastructure, community, and autonomous AI systems. Built TrustSwap into a protocol securing over $3 billion in transactions, scaled The Crypto App to 5 million downloads, and raised over $100 million for 50+ startups through the TrustSwap launchpad.</p>
+        <div class="tags">
+          <span class="tag">Web3 Infrastructure</span>
+          <span class="tag">Token Architecture</span>
+          <span class="tag">Community Building</span>
+          <span class="tag">Autonomous AI Systems</span>
+          <span class="tag">Fundraising & Launchpads</span>
+        </div>
+      </div>
     </div>
+
+    <!-- IVAN -->
+    <div class="profile reveal">
+      <div class="profile-left">
+        <span class="profile-num">02</span>
+        <div>
+          <h3 class="profile-name">Ivan R</h3>
+          <div class="profile-role">Chief Technology Officer</div>
+          <a href="https://www.linkedin.com/in/ivan-reif" target="_blank" rel="noopener" class="profile-linkedin">
+            <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            LinkedIn
+          </a>
+        </div>
+      </div>
+      <div>
+        <p class="profile-bio">CTO and technology entrepreneur with a strong track record of building and scaling digital products. Previously architected and launched an AI-driven automation platform, leading the technical vision from concept to production and driving real-world adoption. Brings significant experience in crypto and digital assets, with hands-on involvement in blockchain-based systems and token-driven ecosystems.</p>
+        <div class="tags">
+          <span class="tag">AI & Automation</span>
+          <span class="tag">Blockchain Systems</span>
+          <span class="tag">Product Architecture</span>
+          <span class="tag">Token Ecosystems</span>
+          <span class="tag">Scalable Infrastructure</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALEX -->
+    <div class="profile reveal">
+      <div class="profile-left">
+        <span class="profile-num">03</span>
+        <div>
+          <h3 class="profile-name">Alex Hrankin</h3>
+          <div class="profile-role">Chief AI Officer</div>
+          <a href="https://www.linkedin.com/in/alex-hrankin/" target="_blank" rel="noopener" class="profile-linkedin">
+            <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            LinkedIn
+          </a>
+        </div>
+      </div>
+      <div>
+        <p class="profile-bio">AI product leader with 8+ years across AI, enterprise technology, and Web3. Ex-McKinsey, where he led advanced analytics and transformation initiatives driving $65M+ in measurable impact. Has built and scaled AI-powered automation platforms, designed agentic frameworks, and shipped products used by thousands of businesses.</p>
+        <p class="profile-detail">Deep hands-on expertise in LLM ecosystems, AI agent design, and workflow automation, from natural language orchestration to MCP integrations.</p>
+        <div class="tags">
+          <span class="tag">AI Agents & Automation</span>
+          <span class="tag">LLM Integration</span>
+          <span class="tag">Product Strategy</span>
+          <span class="tag">Workflow Orchestration</span>
+          <span class="tag">Web3 & Token Systems</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── The Numbers ── -->
+    <div class="two-col two-col--top reveal">
+      <div>
+        <div class="label">Combined Track Record</div>
+        <h2 class="hl" style="font-size:clamp(1.8rem,4vw,3rem);">Proven across<br><em>all three.</em></h2>
+        <p class="body-text">Toriva sits at the intersection of AI, automation, and decentralized infrastructure. The founding team brings direct experience across all three: shipped products, scaled systems, and real revenue generated in production environments.</p>
+      </div>
+      <div>
+
+      </div>
+    </div>
+
+    <div class="stat-strip reveal">
+      <div class="stat">
+        <div class="stat-val">$500M</div>
+        <div class="stat-label">TrustSwap peak market cap</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">$3B+</div>
+        <div class="stat-label">Secured on-chain</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">$100M+</div>
+        <div class="stat-label">Raised for 50+ startups</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">5M</div>
+        <div class="stat-label">App downloads</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">$65M+</div>
+        <div class="stat-label">Measurable impact (McKinsey)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">330K</div>
+        <div class="stat-label">Community built organically</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── The Domains ── -->
+    <div class="label reveal">Where It All Intersects</div>
+    <h2 class="hl reveal" style="font-size:clamp(1.8rem,4vw,3rem);">Three domains.<br>One <em>team.</em></h2>
+
+    <div class="profile reveal">
+      <div class="profile-left">
+        <span class="profile-num">01</span>
+        <div>
+          <h3 class="profile-name">Web3 Infrastructure</h3>
+        </div>
+      </div>
+      <div>
+        <p class="profile-bio">$3B+ secured on-chain through TrustSwap. Multi-chain protocol deployment across Ethereum, BNB Chain, Polygon, and Avalanche. Deep experience in token architecture and DeFi infrastructure.</p>
+      </div>
+    </div>
+
+    <div class="profile reveal">
+      <div class="profile-left">
+        <span class="profile-num">02</span>
+        <div>
+          <h3 class="profile-name">AI & Automation</h3>
+        </div>
+      </div>
+      <div>
+        <p class="profile-bio">Production AI platform architecture and deployment. Hands-on experience building automation systems that generate real-world revenue. Applied AI infrastructure tested at community and enterprise scale.</p>
+      </div>
+    </div>
+
+    <div class="profile reveal">
+      <div class="profile-left">
+        <span class="profile-num">03</span>
+        <div>
+          <h3 class="profile-name">Scaling Products</h3>
+        </div>
+      </div>
+      <div>
+        <p class="profile-bio">5M app downloads. 330K community members built organically. $100M+ raised for 50+ projects. Proven ability to take products from concept through production to real adoption at scale.</p>
+      </div>
+    </div>
+
+    <!-- ── Verify CTA ── -->
+    <div class="verify reveal">
+      <div>
+        <h3 class="verify-hl">Don't take our word<br>for <em>any of this.</em></h3>
+        <p class="verify-body">The founder is public. The treasury is on a public Ledger wallet. The revenue model is documented. Look us up. That's the whole point.</p>
+      </div>
+      <div class="verify-links">
+        <a href="/token" class="verify-btn verify-btn--primary">Read the Tokenomics</a>
+      </div>
+    </div>
+
+    <p class="closing reveal" style="margin-top:clamp(60px,8vw,100px);text-align:center;max-width:100%;">Built to execute.</p>
+
   </div>
-
-  <!-- TEAM PROFILES -->
-  <section class="section" style="max-width:1400px;margin:0 auto;">
-    <div class="founder-grid">
-      <!-- JEFF -->
-      <div>
-        <p class="section-label">Founder & CEO</p>
-        <h2 class="display-heading" style="font-size:clamp(2rem,4vw,3.5rem);margin-bottom:1rem;">JEFF<br><span class="italic">KIRDEIKIS</span></h2>
-        <a href="https://www.linkedin.com/in/jeffkirdeikis/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.5rem;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.4rem .8rem;text-decoration:none;margin-bottom:1.5rem;transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.1)'" onmouseout="this.style.background='transparent'">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          LinkedIn
-        </a>
-        <p style="font-family:var(--body-font);font-size:1.0625rem;color:var(--body-text-color);line-height:1.7;margin-bottom:2rem;">Founder of TrustSwap. Squamish, BC. Eight years building in web3, from infrastructure to community to autonomous AI systems. Built TrustSwap into a protocol securing over $3 billion in transactions, scaled The Crypto App to 5 million downloads, and raised over $100 million for 50+ startups through the TrustSwap launchpad.</p>
-
-        <div class="founder-stat-grid">
-          <div class="founder-stat">
-            <div class="founder-stat-val">$3B+</div>
-            <div class="founder-stat-label">Secured through Team Finance</div>
-          </div>
-          <div class="founder-stat">
-            <div class="founder-stat-val">$100M+</div>
-            <div class="founder-stat-label">Raised for 50+ startups</div>
-          </div>
-          <div class="founder-stat">
-            <div class="founder-stat-val">5M</div>
-            <div class="founder-stat-label">App downloads on The Crypto App</div>
-          </div>
-          <div class="founder-stat">
-            <div class="founder-stat-val">$500M</div>
-            <div class="founder-stat-label">TrustSwap peak valuation</div>
-          </div>
-          <div class="founder-stat">
-            <div class="founder-stat-val">330K</div>
-            <div class="founder-stat-label">Community built organically</div>
-          </div>
-          <div class="founder-stat">
-            <div class="founder-stat-val">2016</div>
-            <div class="founder-stat-label">Year entered web3</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- IVAN -->
-      <div>
-        <p class="section-label">Chief Technology Officer</p>
-        <h2 class="display-heading" style="font-size:clamp(2rem,4vw,3.5rem);margin-bottom:1rem;">IVAN<br><span class="italic">R</span></h2>
-        <a href="https://www.linkedin.com/in/ivan-reif" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.5rem;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.4rem .8rem;text-decoration:none;margin-bottom:1.5rem;transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.1)'" onmouseout="this.style.background='transparent'">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          LinkedIn
-        </a>
-        <p style="font-family:var(--body-font);font-size:1.0625rem;color:var(--body-text-color);line-height:1.7;margin-bottom:2rem;">CTO and technology entrepreneur with a strong track record of building and scaling digital products. Previously architected and launched an AI-driven automation platform, leading the technical vision from concept to production and driving real-world adoption.</p>
-        <p style="font-family:var(--body-font);font-size:1.0625rem;color:var(--body-text-color);line-height:1.7;margin-bottom:2rem;">Brings significant experience in crypto and digital assets, with hands-on involvement in blockchain-based systems and token-driven ecosystems. Combines deep technical expertise with strong business acumen, building scalable, revenue-generating technology ventures at the intersection of AI, automation, and decentralized technologies.</p>
-
-        <div style="margin-top:1rem;border:1px solid var(--border);padding:2.5rem;background:var(--gold-subtle);">
-          <div style="font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:1rem;">Core Expertise</div>
-          <div style="display:flex;flex-wrap:wrap;gap:.75rem;">
-            <span style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.5rem 1rem;">AI & Automation</span>
-            <span style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.5rem 1rem;">Blockchain Systems</span>
-            <span style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.5rem 1rem;">Product Architecture</span>
-            <span style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.5rem 1rem;">Token Ecosystems</span>
-            <span style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.5rem 1rem;">Scalable Infrastructure</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ALEX -->
-      <div>
-        <p class="section-label">Chief AI Officer</p>
-        <h2 class="display-heading" style="font-size:clamp(2rem,4vw,3.5rem);margin-bottom:1rem;">ALEX<br><span class="italic">HRANKIN</span></h2>
-        <a href="https://www.linkedin.com/in/alex-hrankin/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.5rem;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.4rem .8rem;text-decoration:none;margin-bottom:1.5rem;transition:background .2s;" onmouseover="this.style.background='rgba(201,168,76,.1)'" onmouseout="this.style.background='transparent'">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          LinkedIn
-        </a>
-        <p style="font-family:var(--body-font);font-size:1.0625rem;color:var(--body-text-color);line-height:1.7;margin-bottom:2rem;">AI product leader with 8+ years across AI, enterprise technology, and Web3. Ex-McKinsey, where he led advanced analytics and transformation initiatives driving $65M+ in measurable impact. Has built and scaled AI-powered automation platforms, designed agentic frameworks, and shipped products used by thousands of businesses.</p>
-        <p style="font-family:var(--body-font);font-size:1.0625rem;color:var(--body-text-color);line-height:1.7;margin-bottom:2rem;">Brings deep hands-on expertise in LLM ecosystems, AI agent design, and workflow automation — from natural language orchestration to MCP integrations. Active AI educator and consultant, helping professionals and organizations bridge the gap between AI awareness and real-world adoption.</p>
-
-        <div style="margin-top:1rem;border:1px solid var(--border);padding:2.5rem;background:var(--gold-subtle);">
-          <div style="font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:1rem;">Core Expertise</div>
-          <div style="display:flex;flex-wrap:wrap;gap:.75rem;">
-            <span style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.5rem 1rem;">AI Agents & Automation</span>
-            <span style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.5rem 1rem;">LLM Integration</span>
-            <span style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.5rem 1rem;">Product Strategy</span>
-            <span style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.5rem 1rem;">Workflow Orchestration</span>
-            <span style="font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;color:var(--gold);border:1px solid var(--border);padding:.5rem 1rem;">Web3 & Token Systems</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY THIS TEAM -->
-  <section class="section" style="border-top:1px solid var(--border);max-width:1400px;margin:0 auto;">
-    <p class="section-label">Combined Experience</p>
-    <h2 class="display-heading" style="font-size:clamp(2rem,4vw,4rem);margin-bottom:2rem;">BUILT TO<br><span class="italic">EXECUTE</span></h2>
-    <p style="font-family:var(--body-font);font-size:1.125rem;color:var(--body-text-color);line-height:1.7;max-width:800px;margin-bottom:3rem;">Toriva sits at the intersection of AI, automation, and decentralized infrastructure. The founding team brings direct, proven experience across all three, not theoretical knowledge but shipped products, scaled systems, and real revenue generated in production environments.</p>
-
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);">
-      <div style="background:var(--black);padding:2.5rem;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.12em;color:var(--gold);margin-bottom:.75rem;">Web3 Infrastructure</div>
-        <p style="font-family:var(--body-font);font-size:1rem;color:var(--body-text-color);line-height:1.6;">$3B+ secured on-chain through TrustSwap. Multi-chain protocol deployment across Ethereum, BNB Chain, Polygon, and Avalanche. Deep experience in token architecture and DeFi infrastructure.</p>
-      </div>
-      <div style="background:var(--black);padding:2.5rem;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.12em;color:var(--gold);margin-bottom:.75rem;">AI & Automation</div>
-        <p style="font-family:var(--body-font);font-size:1rem;color:var(--body-text-color);line-height:1.6;">Production AI platform architecture and deployment. Hands-on experience building automation systems that generate real-world revenue. Applied AI infrastructure tested at community and enterprise scale.</p>
-      </div>
-      <div style="background:var(--black);padding:2.5rem;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.12em;color:var(--gold);margin-bottom:.75rem;">Scaling Products</div>
-        <p style="font-family:var(--body-font);font-size:1rem;color:var(--body-text-color);line-height:1.6;">5M app downloads. 330K community members built organically. $100M+ raised for 50+ projects. Proven ability to take products from concept through production to real adoption at scale.</p>
-      </div>
-    </div>
-  </section>
-
+</div>
 </div>
 
 <!-- ═══ INVESTOR DECK ═══ -->

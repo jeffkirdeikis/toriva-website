@@ -44,7 +44,7 @@ function goPage(id, pushState) {
   document.querySelector('footer').style.display = isFullscreen ? 'none' : '';
   if (id === 'home') initHeroCanvas();
   if (id === 'how') setTimeout(initNetworkCanvas, 100);
-  if (id === 'token') setTimeout(animateBars, 300);
+  if (id === 'token') { setTimeout(animateBars, 300); setTimeout(initLpDonut, 100); }
   observeReveals();
 }
 // Handle hash on load and back/forward
@@ -91,8 +91,31 @@ observeReveals();
 // BARS
 function animateBars() {
   document.querySelectorAll('.bar-fill').forEach(f => { f.style.width = f.dataset.width || '0%'; });
+  document.querySelectorAll('.tk-bar-fill').forEach(f => { if(f.dataset.width) f.style.width = f.dataset.width + '%'; });
 }
 setTimeout(animateBars, 400);
+
+// LP DONUT CHART
+function initLpDonut() {
+  const c = document.getElementById('lpFeeDonut'); if (!c) return;
+  const ctx = c.getContext('2d'), W = c.width, H = c.height, cx = W/2, cy = H/2;
+  const oR = Math.min(W,H)/2-8, iR = oR*0.58, gap = 0.04;
+  const slices = [{pct:50,color:'#3b82f6'},{pct:50,color:'#C9A84C'}];
+  ctx.clearRect(0, 0, W, H);
+  let a = -Math.PI/2;
+  slices.forEach(s => {
+    const sw = (s.pct/100)*Math.PI*2 - gap;
+    ctx.beginPath();
+    ctx.arc(cx,cy,oR,a+gap/2,a+sw+gap/2);
+    ctx.arc(cx,cy,iR,a+sw+gap/2,a+gap/2,true);
+    ctx.closePath(); ctx.fillStyle = s.color; ctx.fill();
+    a += sw + gap;
+  });
+  ctx.fillStyle = '#FAFAF5'; ctx.font = '700 48px "Bebas Neue",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('2%',cx,cy-8);
+  ctx.fillStyle = 'rgba(250,250,245,0.35)'; ctx.font = '300 14px "Space Mono",monospace';
+  ctx.fillText('LP FEE',cx,cy+22);
+}
 
 // HERO CANVAS — NetworkSim v2
 function initHeroCanvas() {
