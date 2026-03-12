@@ -143,17 +143,17 @@ function initHeroCanvas() {
     if (!sim.edges.length) return;
     const e = sim.edges[Math.floor(Math.random() * sim.edges.length)];
     const f = sim.nodes[e.from], t = sim.nodes[e.to];
-    sim.taskPackets.push({ x: f.x, y: f.y, tx: t.x, ty: t.y, progress: 0, speed: 0.008 + Math.random() * 0.012, fromIdx: e.from, toIdx: e.to, size: 2.5 + Math.random() * 2, trail: [] });
+    sim.taskPackets.push({ x: f.x, y: f.y, tx: t.x, ty: t.y, progress: 0, speed: 0.002 + Math.random() * 0.003, fromIdx: e.from, toIdx: e.to, size: 2.5 + Math.random() * 2, trail: [] });
     e.active = true; e.flow = 1;
   }
 
   function spawnPayment(fi, ti) {
     const f = sim.nodes[fi], t = sim.nodes[ti];
-    sim.paymentPackets.push({ x: f.x, y: f.y, tx: t.x, ty: t.y, progress: 0, speed: 0.015 + Math.random() * 0.01, size: 2 + Math.random() * 1.5, trail: [] });
+    sim.paymentPackets.push({ x: f.x, y: f.y, tx: t.x, ty: t.y, progress: 0, speed: 0.00375 + Math.random() * 0.0025, size: 2 + Math.random() * 1.5, trail: [] });
   }
 
   function spawnPulse(x, y, color, maxR) {
-    sim.pulses.push({ x, y, radius: 0, maxRadius: maxR || 40, opacity: 0.6, color });
+    sim.pulses.push({ x, y, radius: 0, maxRadius: (maxR || 10) * 0.25, opacity: 0.6, color });
   }
 
   function update() {
@@ -161,13 +161,13 @@ function initHeroCanvas() {
     if (Math.random() < 0.045) spawnTask();
     sim.nodes.forEach(n => {
       n.pulse += 0.015;
-      n.x = n.baseX + Math.sin(sim.time * 0.3 + n.pulse) * 6;
-      n.y = n.baseY + Math.cos(sim.time * 0.25 + n.pulse * 1.3) * 5;
+      n.x = n.baseX + Math.sin(sim.time * 0.075 + n.pulse) * 1.5;
+      n.y = n.baseY + Math.cos(sim.time * 0.0625 + n.pulse * 1.3) * 1.25;
       const dx = n.x - sim.mouse.x, dy = n.y - sim.mouse.y, md = Math.sqrt(dx * dx + dy * dy);
       if (md < 160 && md > 0) { n.x += (dx / md) * ((160 - md) / 160) * 3; n.y += (dy / md) * ((160 - md) / 160) * 3; }
       if (n.processing) {
         n.processTimer -= 0.016; n.activity = Math.min(1, n.activity + 0.05);
-        if (n.processTimer <= 0) { n.processing = false; n.earning = true; n.earnTimer = 0.5; spawnPulse(n.x, n.y, GREEN, 35); }
+        if (n.processTimer <= 0) { n.processing = false; n.earning = true; n.earnTimer = 0.5; spawnPulse(n.x, n.y, GREEN, 9); }
       } else if (n.earning) { n.earnTimer -= 0.016; if (n.earnTimer <= 0) n.earning = false; }
       else { n.activity = Math.max(0, n.activity - 0.01); }
     });
@@ -181,7 +181,7 @@ function initHeroCanvas() {
       p.trail.forEach(tr => tr.age += 0.05);
       if (p.progress >= 1) {
         const node = sim.nodes[p.toIdx]; node.processing = true; node.processTimer = 0.3 + Math.random() * 0.5;
-        spawnPulse(node.x, node.y, CYAN, 25);
+        spawnPulse(node.x, node.y, CYAN, 6);
         const fi = p.toIdx, ti = p.fromIdx;
         setTimeout(() => spawnPayment(fi, ti), 300 + Math.random() * 500);
         return false;
@@ -193,10 +193,10 @@ function initHeroCanvas() {
       p.cx = p.x + (p.tx - p.x) * p.progress; p.cy = p.y + (p.ty - p.y) * p.progress;
       p.trail.push({ x: p.cx, y: p.cy, age: 0 }); if (p.trail.length > 15) p.trail.shift();
       p.trail.forEach(tr => tr.age += 0.06);
-      if (p.progress >= 1) { spawnPulse(p.tx, p.ty, GOLD, 30); return false; }
+      if (p.progress >= 1) { spawnPulse(p.tx, p.ty, GOLD, 8); return false; }
       return true;
     });
-    sim.pulses = sim.pulses.filter(p => { p.radius += 1.5; p.opacity -= 0.015; return p.opacity > 0; });
+    sim.pulses = sim.pulses.filter(p => { p.radius += 0.375; p.opacity -= 0.00375; return p.opacity > 0; });
     sim.edges.forEach(e => { e.flow = Math.max(0, e.flow - 0.008); if (e.flow <= 0) e.active = false; });
   }
 
