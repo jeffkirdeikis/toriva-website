@@ -548,9 +548,9 @@ function initChipCanvas() {
       c.pulse += 0.02;
       if (c.active) { c.activeTimer -= 0.016; if (c.activeTimer <= 0) c.active = false; }
       var pf = 0.6 + 0.4 * Math.sin(c.pulse), sz = cellSize * 0.35;
-      ctx.fillStyle = c.active ? 'rgba(76,201,201,' + (0.12 * pf) + ')' : 'rgba(201,168,76,' + (0.03 * pf) + ')';
+      ctx.fillStyle = c.active ? 'rgba(76,201,201,' + (0.12 * pf) + ')' : 'rgba(201,168,76,' + (0.042 * pf) + ')';
       ctx.fillRect(c.x - sz, c.y - sz, sz * 2, sz * 2);
-      ctx.strokeStyle = c.active ? 'rgba(76,201,201,' + (0.3 * pf) + ')' : 'rgba(201,168,76,' + (0.08 * pf) + ')';
+      ctx.strokeStyle = c.active ? 'rgba(76,201,201,' + (0.3 * pf) + ')' : 'rgba(201,168,76,' + (0.112 * pf) + ')';
       ctx.lineWidth = 0.5;
       ctx.strokeRect(c.x - sz, c.y - sz, sz * 2, sz * 2);
       if (c.active) {
@@ -561,7 +561,7 @@ function initChipCanvas() {
     });
 
     ctx.font = '600 7px monospace'; ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(201,168,76,0.15)';
+    ctx.fillStyle = 'rgba(201,168,76,0.21)';
     ctx.fillText('NEURAL ENGINE', cx, cy - gridOffset + cellSize - 4);
     ctx.fillText('CPU CORES', cx, cy - gridOffset + cellSize * 3 - 4);
     ctx.fillText('GPU CORES', cx, cy - gridOffset + cellSize * 5 - 4);
@@ -594,12 +594,12 @@ function initNetworkCanvas() {
   let t = 0;
   function drawNet() {
     ctx.clearRect(0, 0, W, H); t += .015;
-    mids.forEach(m => { ctx.beginPath(); ctx.moveTo(hub.x, hub.y); ctx.lineTo(m.x, m.y); ctx.strokeStyle = 'rgba(201,168,76,.2)'; ctx.lineWidth = 1; ctx.stroke(); });
-    leaves.forEach(l => { if (!l.active) return; ctx.beginPath(); ctx.moveTo(mids[l.pi].x, mids[l.pi].y); ctx.lineTo(l.x, l.y); ctx.strokeStyle = 'rgba(201,168,76,.08)'; ctx.lineWidth = .5; ctx.stroke(); });
-    leaves.forEach((l, i) => { if (!l.active) return; const pr = (t * .7 + i * .3) % 1, px = mids[l.pi].x + (hub.x - mids[l.pi].x) * (1 - pr) * .5, py = mids[l.pi].y + (hub.y - mids[l.pi].y) * (1 - pr) * .5; ctx.beginPath(); ctx.arc(px, py, 1.5, 0, Math.PI * 2); ctx.fillStyle = `rgba(201,168,76,${.4 * Math.sin(pr * Math.PI)})`; ctx.fill(); });
-    leaves.forEach(l => { l.p += .04; const g = (Math.sin(l.p) + 1) * .5; ctx.beginPath(); ctx.arc(l.x, l.y, l.r + g * .5, 0, Math.PI * 2); ctx.fillStyle = l.active ? `rgba(201,168,76,${.35 + g * .3})` : 'rgba(242,237,230,.06)'; ctx.fill(); });
-    mids.forEach(m => { ctx.beginPath(); ctx.arc(m.x, m.y, 4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(201,168,76,.75)'; ctx.fill(); });
-    const hg = (Math.sin(t) + 1) * .5; ctx.beginPath(); ctx.arc(hub.x, hub.y, 8 + hg * 2, 0, Math.PI * 2); ctx.fillStyle = 'rgba(201,168,76,.12)'; ctx.fill(); ctx.beginPath(); ctx.arc(hub.x, hub.y, 8, 0, Math.PI * 2); ctx.fillStyle = 'rgba(201,168,76,.9)'; ctx.fill();
+    mids.forEach(m => { ctx.beginPath(); ctx.moveTo(hub.x, hub.y); ctx.lineTo(m.x, m.y); ctx.strokeStyle = 'rgba(201,168,76,0.28)'; ctx.lineWidth = 1; ctx.stroke(); });
+    leaves.forEach(l => { if (!l.active) return; ctx.beginPath(); ctx.moveTo(mids[l.pi].x, mids[l.pi].y); ctx.lineTo(l.x, l.y); ctx.strokeStyle = 'rgba(201,168,76,0.112)'; ctx.lineWidth = .5; ctx.stroke(); });
+    leaves.forEach((l, i) => { if (!l.active) return; const pr = (t * .7 + i * .3) % 1, px = mids[l.pi].x + (hub.x - mids[l.pi].x) * (1 - pr) * .5, py = mids[l.pi].y + (hub.y - mids[l.pi].y) * (1 - pr) * .5; ctx.beginPath(); ctx.arc(px, py, 1.5, 0, Math.PI * 2); ctx.fillStyle = `rgba(201,168,76,${.56 * Math.sin(pr * Math.PI)})`; ctx.fill(); });
+    leaves.forEach(l => { l.p += .04; const g = (Math.sin(l.p) + 1) * .5; ctx.beginPath(); ctx.arc(l.x, l.y, l.r + g * .5, 0, Math.PI * 2); ctx.fillStyle = l.active ? `rgba(201,168,76,${0.49 + g * 0.42})` : 'rgba(242,237,230,0.084)'; ctx.fill(); });
+    mids.forEach(m => { ctx.beginPath(); ctx.arc(m.x, m.y, 4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(201,168,76,1.0)'; ctx.fill(); });
+    const hg = (Math.sin(t) + 1) * .5; ctx.beginPath(); ctx.arc(hub.x, hub.y, 8 + hg * 2, 0, Math.PI * 2); ctx.fillStyle = 'rgba(201,168,76,0.168)'; ctx.fill(); ctx.beginPath(); ctx.arc(hub.x, hub.y, 8, 0, Math.PI * 2); ctx.fillStyle = 'rgba(201,168,76,1)'; ctx.fill();
     requestAnimationFrame(drawNet);
   }
   drawNet();
@@ -809,10 +809,10 @@ if (track) track.innerHTML += track.innerHTML;
         ctx.beginPath(); ctx.arc(x, cy, 4, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(' + r + ',' + (0.5 + 0.3 * pulse) + ')'; ctx.fill();
         ctx.font = '600 9px monospace'; ctx.textAlign = 'center';
-        ctx.fillStyle = 'rgba(' + r + ',' + (0.4 + 0.15 * pulse) + ')';
+        ctx.fillStyle = 'rgba(' + r + ',' + (0.56 + 0.21 * pulse) + ')';
         ctx.fillText(s.label, x, cy - 28);
         ctx.font = '300 10px sans-serif';
-        ctx.fillStyle = 'rgba(250,250,245,0.22)';
+        ctx.fillStyle = 'rgba(250,250,245,0.308)';
         ctx.fillText(s.sub, x, cy + 36);
       });
 
