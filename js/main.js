@@ -94,26 +94,191 @@ function animateBars() {
 }
 setTimeout(animateBars, 400);
 
-// HERO CANVAS
+// HERO CANVAS — NetworkSim v2
 function initHeroCanvas() {
   const canvas = document.getElementById('heroCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-  const nodes = [];
-  for (let i = 0; i < 80; i++) nodes.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - .5) * .5, vy: (Math.random() - .5) * .5, r: Math.random() * 1.5 + .5, p: Math.random() * Math.PI * 2 });
-  if (window._hf) cancelAnimationFrame(window._hf);
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
-      const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y, d = Math.sqrt(dx * dx + dy * dy);
-      if (d < 160) { ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.strokeStyle = `rgba(201,168,76,${(1 - d / 160) * .1})`; ctx.lineWidth = .5; ctx.stroke(); }
+  const dpr = window.devicePixelRatio || 1;
+  const GOLD = '#C9A84C', CYAN = '#4CC9C9', GREEN = '#4CCA6E';
+
+  const sim = { w: 0, h: 0, nodes: [], edges: [], taskPackets: [], paymentPackets: [], pulses: [], time: 0, mouse: { x: -999, y: -999 } };
+
+  function dist(a, b) { return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2); }
+
+  function initSim(w, h) {
+    sim.w = w; sim.h = h; sim.nodes = []; sim.edges = []; sim.taskPackets = []; sim.paymentPackets = []; sim.pulses = []; sim.time = 0;
+    const count = Math.min(Math.floor((w * h) / 16000), 55);
+    const cx = w / 2, cy = h / 2;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = Math.random() * Math.min(w, h) * 0.44;
+      const x = cx + Math.cos(angle) * radius * (0.5 + Math.random() * 0.9);
+      const y = cy + Math.sin(angle) * radius * (0.5 + Math.random() * 0.7);
+      sim.nodes.push({
+        x: Math.max(60, Math.min(w - 60, x)), y: Math.max(60, Math.min(h - 60, y)),
+        baseX: 0, baseY: 0, size: 2.5 + Math.random() * 4,
+        processing: false, processTimer: 0, earning: false, earnTimer: 0,
+        pulse: Math.random() * Math.PI * 2, activity: 0,
+        type: Math.random() > 0.75 ? 'hub' : 'node',
+      });
     }
-    nodes.forEach(n => { n.x += n.vx; n.y += n.vy; n.p += .02; if (n.x < 0 || n.x > canvas.width) n.vx *= -1; if (n.y < 0 || n.y > canvas.height) n.vy *= -1; const g = (Math.sin(n.p) + 1) * .5; ctx.beginPath(); ctx.arc(n.x, n.y, n.r + g * .8, 0, Math.PI * 2); ctx.fillStyle = `rgba(201,168,76,${.25 + g * .35})`; ctx.fill(); });
-    window._hf = requestAnimationFrame(draw);
+    sim.nodes.forEach(n => { n.baseX = n.x; n.baseY = n.y; });
+    const added = new Set();
+    for (let i = 0; i < sim.nodes.length; i++) {
+      const dists = [];
+      for (let j = 0; j < sim.nodes.length; j++) { if (i !== j) dists.push({ j, d: dist(sim.nodes[i], sim.nodes[j]) }); }
+      dists.sort((a, b) => a.d - b.d);
+      const maxC = sim.nodes[i].type === 'hub' ? 5 : 3;
+      for (let k = 0; k < Math.min(maxC, dists.length); k++) {
+        if (dists[k].d < 280) {
+          const key = Math.min(i, dists[k].j) + '-' + Math.max(i, dists[k].j);
+          if (!added.has(key)) { added.add(key); sim.edges.push({ from: i, to: dists[k].j, active: false, flow: 0 }); }
+        }
+      }
+    }
   }
-  draw();
-  window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+  function spawnTask() {
+    if (!sim.edges.length) return;
+    const e = sim.edges[Math.floor(Math.random() * sim.edges.length)];
+    const f = sim.nodes[e.from], t = sim.nodes[e.to];
+    sim.taskPackets.push({ x: f.x, y: f.y, tx: t.x, ty: t.y, progress: 0, speed: 0.008 + Math.random() * 0.012, fromIdx: e.from, toIdx: e.to, size: 2.5 + Math.random() * 2, trail: [] });
+    e.active = true; e.flow = 1;
+  }
+
+  function spawnPayment(fi, ti) {
+    const f = sim.nodes[fi], t = sim.nodes[ti];
+    sim.paymentPackets.push({ x: f.x, y: f.y, tx: t.x, ty: t.y, progress: 0, speed: 0.015 + Math.random() * 0.01, size: 2 + Math.random() * 1.5, trail: [] });
+  }
+
+  function spawnPulse(x, y, color, maxR) {
+    sim.pulses.push({ x, y, radius: 0, maxRadius: maxR || 40, opacity: 0.6, color });
+  }
+
+  function update() {
+    sim.time += 0.016;
+    if (Math.random() < 0.045) spawnTask();
+    sim.nodes.forEach(n => {
+      n.pulse += 0.015;
+      n.x = n.baseX + Math.sin(sim.time * 0.3 + n.pulse) * 6;
+      n.y = n.baseY + Math.cos(sim.time * 0.25 + n.pulse * 1.3) * 5;
+      const dx = n.x - sim.mouse.x, dy = n.y - sim.mouse.y, md = Math.sqrt(dx * dx + dy * dy);
+      if (md < 160 && md > 0) { n.x += (dx / md) * ((160 - md) / 160) * 3; n.y += (dy / md) * ((160 - md) / 160) * 3; }
+      if (n.processing) {
+        n.processTimer -= 0.016; n.activity = Math.min(1, n.activity + 0.05);
+        if (n.processTimer <= 0) { n.processing = false; n.earning = true; n.earnTimer = 0.5; spawnPulse(n.x, n.y, GREEN, 35); }
+      } else if (n.earning) { n.earnTimer -= 0.016; if (n.earnTimer <= 0) n.earning = false; }
+      else { n.activity = Math.max(0, n.activity - 0.01); }
+    });
+    sim.taskPackets = sim.taskPackets.filter(p => {
+      p.progress += p.speed; const t = p.progress;
+      const mx = (p.x + p.tx) / 2 + (p.ty - p.y) * 0.12 * Math.sin(t * Math.PI);
+      const my = (p.y + p.ty) / 2 - (p.tx - p.x) * 0.12 * Math.sin(t * Math.PI);
+      p.cx = (1 - t) ** 2 * p.x + 2 * (1 - t) * t * mx + t * t * p.tx;
+      p.cy = (1 - t) ** 2 * p.y + 2 * (1 - t) * t * my + t * t * p.ty;
+      p.trail.push({ x: p.cx, y: p.cy, age: 0 }); if (p.trail.length > 22) p.trail.shift();
+      p.trail.forEach(tr => tr.age += 0.05);
+      if (p.progress >= 1) {
+        const node = sim.nodes[p.toIdx]; node.processing = true; node.processTimer = 0.3 + Math.random() * 0.5;
+        spawnPulse(node.x, node.y, CYAN, 25);
+        const fi = p.toIdx, ti = p.fromIdx;
+        setTimeout(() => spawnPayment(fi, ti), 300 + Math.random() * 500);
+        return false;
+      }
+      return true;
+    });
+    sim.paymentPackets = sim.paymentPackets.filter(p => {
+      p.progress += p.speed;
+      p.cx = p.x + (p.tx - p.x) * p.progress; p.cy = p.y + (p.ty - p.y) * p.progress;
+      p.trail.push({ x: p.cx, y: p.cy, age: 0 }); if (p.trail.length > 15) p.trail.shift();
+      p.trail.forEach(tr => tr.age += 0.06);
+      if (p.progress >= 1) { spawnPulse(p.tx, p.ty, GOLD, 30); return false; }
+      return true;
+    });
+    sim.pulses = sim.pulses.filter(p => { p.radius += 1.5; p.opacity -= 0.015; return p.opacity > 0; });
+    sim.edges.forEach(e => { e.flow = Math.max(0, e.flow - 0.008); if (e.flow <= 0) e.active = false; });
+  }
+
+  function draw() {
+    const w = sim.w, h = sim.h;
+    ctx.clearRect(0, 0, w, h);
+    // Edges
+    sim.edges.forEach(e => {
+      const f = sim.nodes[e.from], t = sim.nodes[e.to], a = 0.035 + e.flow * 0.14;
+      ctx.beginPath(); ctx.moveTo(f.x, f.y); ctx.lineTo(t.x, t.y);
+      ctx.strokeStyle = e.active ? `rgba(76,201,201,${a})` : `rgba(201,168,76,${a})`;
+      ctx.lineWidth = 0.5 + e.flow * 1.2; ctx.stroke();
+    });
+    // Pulses
+    sim.pulses.forEach(p => {
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      const c = p.color === GOLD ? '201,168,76' : p.color === CYAN ? '76,201,201' : '76,202,110';
+      ctx.strokeStyle = `rgba(${c},${p.opacity})`; ctx.lineWidth = 1.5; ctx.stroke();
+    });
+    // Task trails
+    sim.taskPackets.forEach(p => {
+      for (let i = 0; i < p.trail.length; i++) {
+        const tr = p.trail[i], a = (1 - tr.age) * (i / p.trail.length) * 0.6;
+        if (a <= 0) continue;
+        ctx.beginPath(); ctx.arc(tr.x, tr.y, p.size * (i / p.trail.length) * 0.7, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(76,201,201,${a})`; ctx.fill();
+      }
+      if (p.cx != null) {
+        ctx.beginPath(); ctx.arc(p.cx, p.cy, p.size, 0, Math.PI * 2); ctx.fillStyle = 'rgba(76,201,201,0.9)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(p.cx, p.cy, p.size * 3.5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(76,201,201,0.06)'; ctx.fill();
+      }
+    });
+    // Payment trails
+    sim.paymentPackets.forEach(p => {
+      for (let i = 0; i < p.trail.length; i++) {
+        const tr = p.trail[i], a = (1 - tr.age) * (i / p.trail.length) * 0.7;
+        if (a <= 0) continue;
+        ctx.beginPath(); ctx.arc(tr.x, tr.y, p.size * (i / p.trail.length) * 0.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(201,168,76,${a})`; ctx.fill();
+      }
+      if (p.cx != null) {
+        ctx.beginPath(); ctx.arc(p.cx, p.cy, p.size, 0, Math.PI * 2); ctx.fillStyle = 'rgba(232,212,139,0.95)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(p.cx, p.cy, p.size * 3.5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(201,168,76,0.08)'; ctx.fill();
+      }
+    });
+    // Nodes
+    sim.nodes.forEach(n => {
+      const pf = 0.7 + 0.3 * Math.sin(n.pulse * 2);
+      const sz = n.type === 'hub' ? n.size * 1.5 : n.size;
+      const glow = sz * (3 + n.activity * 5);
+      const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glow);
+      if (n.processing) { grad.addColorStop(0, `rgba(76,201,201,${0.15 * pf})`); grad.addColorStop(1, 'rgba(76,201,201,0)'); }
+      else if (n.earning) { grad.addColorStop(0, `rgba(76,202,110,${0.2 * pf})`); grad.addColorStop(1, 'rgba(76,202,110,0)'); }
+      else { grad.addColorStop(0, `rgba(201,168,76,${(0.05 + n.activity * 0.12) * pf})`); grad.addColorStop(1, 'rgba(201,168,76,0)'); }
+      ctx.beginPath(); ctx.arc(n.x, n.y, glow, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
+      if (n.processing) {
+        ctx.beginPath(); ctx.arc(n.x, n.y, sz * 2.8, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min((1 - n.processTimer / 0.8) * 2, 1));
+        ctx.strokeStyle = 'rgba(76,201,201,0.45)'; ctx.lineWidth = 1.5; ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(n.x, n.y, sz * pf, 0, Math.PI * 2);
+      ctx.fillStyle = n.processing ? `rgba(76,201,201,${0.6 + 0.4 * pf})` : n.earning ? `rgba(76,202,110,${0.6 + 0.4 * pf})` : `rgba(201,168,76,${(0.25 + n.activity * 0.5) * pf})`;
+      ctx.fill();
+      ctx.beginPath(); ctx.arc(n.x, n.y, sz * 0.35 * pf, 0, Math.PI * 2);
+      ctx.fillStyle = n.processing ? 'rgba(160,235,235,0.9)' : n.earning ? 'rgba(160,235,180,0.9)' : `rgba(232,212,139,${0.35 + n.activity * 0.4})`;
+      ctx.fill();
+    });
+  }
+
+  function resize() {
+    const w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    initSim(w, h);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', e => { sim.mouse = { x: e.clientX, y: e.clientY }; });
+
+  if (window._hf) cancelAnimationFrame(window._hf);
+  function loop() { update(); draw(); window._hf = requestAnimationFrame(loop); }
+  loop();
 }
 initHeroCanvas();
 
