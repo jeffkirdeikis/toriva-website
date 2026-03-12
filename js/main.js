@@ -282,6 +282,54 @@ function initHeroCanvas() {
 }
 initHeroCanvas();
 
+// HOW IT WORKS CANVAS — floating dots
+function initHiwCanvas() {
+  const canvas = document.getElementById('hiwCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  let active = false, af;
+
+  const particles = [];
+  for (let i = 0; i < 30; i++) particles.push({ x: 0, y: 0, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.15, size: 1 + Math.random() * 2, pulse: Math.random() * Math.PI * 2 });
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const w = rect.width, h = rect.height;
+    particles.forEach(p => { p.x = Math.random() * w; p.y = Math.random() * h; });
+  }
+
+  const obs = new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !active) { active = true; resize(); loop(); }
+    else if (!e.isIntersecting && active) { active = false; cancelAnimationFrame(af); }
+  }, { threshold: 0.05 });
+  obs.observe(canvas.parentElement);
+
+  function loop() {
+    if (!active) return;
+    const w = canvas.width / dpr, h = canvas.height / dpr;
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => {
+      p.pulse += 0.02; p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+      const a = 0.15 + 0.1 * Math.sin(p.pulse);
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(201,168,76,${a})`; ctx.fill();
+    });
+    for (let i = 0; i < particles.length; i++) for (let j = i + 1; j < particles.length; j++) {
+      const d = Math.sqrt((particles[i].x - particles[j].x) ** 2 + (particles[i].y - particles[j].y) ** 2);
+      if (d < 120) { ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = `rgba(201,168,76,${0.04 * (1 - d / 120)})`; ctx.lineWidth = 0.5; ctx.stroke(); }
+    }
+    af = requestAnimationFrame(loop);
+  }
+  window.addEventListener('resize', () => { if (active) resize(); });
+}
+initHiwCanvas();
+
 // NETWORK CANVAS
 function initNetworkCanvas() {
   const canvas = document.getElementById('networkCanvas');
