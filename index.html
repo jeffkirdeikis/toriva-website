@@ -284,94 +284,69 @@
     </div>
   </section>
 
-  <!-- ═══ APPLE SILICON ═══ -->
-  <section class="section" style="border-top:1px solid var(--border);max-width:1400px;margin:0 auto;">
-    <p class="section-label reveal">The Hardware</p>
-    <h2 class="display-heading reveal">WHY APPLE<br>SILICON IS<br><span class="italic">A BIG DEAL</span></h2>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;margin-top:3rem;">
-      <div class="reveal">
-        <p style="font-family:var(--body-font);font-size:1.2rem;color:var(--body-text-color);line-height:1.7;">Apple Silicon's unified memory architecture makes it uniquely suited for LLM inference. Using MLX, Apple's machine learning framework, the network runs models like Qwen, Llama, and Mistral efficiently on consumer hardware at a fraction of GPU server cost.</p>
-        <p style="font-family:var(--body-font);font-size:1.2rem;color:var(--body-text-color);line-height:1.7;margin-top:1rem;">And because the network grows organically with people contributing their own Macs, Toriva acquires compute for a fraction of what it costs Amazon or Google to build equivalent infrastructure.</p>
-      </div>
-      <div class="reveal">
-        <div style="border:1px solid var(--border);background:var(--black2);">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);">
-            <div style="padding:1.5rem;border-right:1px solid var(--border);text-align:center;">
-              <div style="font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.5rem;">Mac Mini M4</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--cream);">16GB</div>
-              <div style="font-size:.6rem;color:var(--cream-dim);margin-top:.25rem;">7B–13B models</div>
-            </div>
-            <div style="padding:1.5rem;border-right:1px solid var(--border);text-align:center;">
-              <div style="font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.5rem;">M4 Pro</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--cream);">24GB</div>
-              <div style="font-size:.6rem;color:var(--cream-dim);margin-top:.25rem;">13B–30B models</div>
-            </div>
-            <div style="padding:1.5rem;text-align:center;">
-              <div style="font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.5rem;">Mac Studio M4 Max</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--gold);">64GB</div>
-              <div style="font-size:.6rem;color:var(--cream-dim);margin-top:.25rem;">30B–70B models</div>
-            </div>
-          </div>
-          <div style="padding:1.5rem;text-align:center;">
-            <div style="font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.5rem;">Mac Pro M4 Ultra</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);">128GB+</div>
-            <div style="font-size:.6rem;color:var(--cream-dim);margin-top:.25rem;">70B+ models · Multi-model serving</div>
-          </div>
+  <!-- ═══ THE HARDWARE v2 ═══ -->
+  <section class="hw-v2-section">
+    <div class="hw-v2-inner">
+      <div class="hw-v2-label reveal">The Hardware</div>
+      <h2 class="hw-v2-hl reveal">The best AI chip in the<br>world is already <em>in your house</em></h2>
+
+      <div class="hw-v2-grid" style="margin-top:clamp(36px,5vw,56px);">
+        <div>
+          <p class="hw-v2-body reveal">Here's something most people don't realize. The chip inside every modern Mac wasn't just designed for editing photos and browsing the web. Apple Silicon has a unified memory architecture that makes it one of the most efficient chips on the planet for running AI models.</p>
+          <p class="hw-v2-body reveal" style="margin-top:20px;">That means your Mac Mini sitting under your desk can run the same AI models that typically require thousands of dollars in GPU server hardware. Quietly. In the background. For a fraction of the electricity cost.</p>
+          <p class="hw-v2-body hw-v2-body--bright reveal" style="margin-top:20px;">The more memory your Mac has, the larger the models it can run, and the more you can earn. But even a base model with 16GB is enough to start contributing.</p>
         </div>
-        <p style="font-size:.7rem;color:var(--cream-dim);margin-top:1rem;font-family:var(--body-font);line-height:1.5;">Minimum requirement: Any Apple Silicon device with 16GB unified memory. 8GB devices are excluded. Performance is insufficient for production workloads.</p>
+        <div>
+          <div class="reveal" style="display:flex;justify-content:center;">
+            <canvas id="chipCanvas" style="max-width:100%;"></canvas>
+          </div>
+          <div class="hw-v2-tier-grid reveal" style="margin-top:24px;">
+            <div class="hw-v2-tier"><div class="hw-v2-tier-name">Mac Mini M4</div><div class="hw-v2-tier-ram">16GB</div><div class="hw-v2-tier-models">7B to 13B models</div></div>
+            <div class="hw-v2-tier"><div class="hw-v2-tier-name">M4 Pro</div><div class="hw-v2-tier-ram">24GB</div><div class="hw-v2-tier-models">13B to 30B models</div></div>
+            <div class="hw-v2-tier hw-v2-tier--featured"><div class="hw-v2-tier-name">Mac Studio M4 Max</div><div class="hw-v2-tier-ram">64GB</div><div class="hw-v2-tier-models">30B to 70B models</div></div>
+            <div class="hw-v2-tier hw-v2-tier--featured"><div class="hw-v2-tier-name">Mac Pro M4 Ultra</div><div class="hw-v2-tier-ram">128GB+</div><div class="hw-v2-tier-models">70B+ · Multi-model serving</div></div>
+          </div>
+          <p class="hw-v2-tier-note reveal">Minimum: any Apple Silicon device with 16GB unified memory. 8GB devices are excluded.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ CONTRIBUTE CTA ═══ -->
-  <section style="border-top:1px solid var(--border);max-width:1400px;margin:0 auto 0;">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
-      <div style="padding:7rem 4vw;">
-        <h2 class="display-heading reveal" style="font-size:clamp(2.5rem,5vw,5rem);">CONTRIBUTE<br>YOUR MAC.<br><span class="italic">EARN.</span></h2>
-        <p class="body-text reveal" style="margin-top:2rem;">Connect any Apple Silicon Mac to the Toriva network. Stake $TORIVA tokens as collateral. The node software runs as a background process, contributing to AI workloads across Toriva's product lines and generating revenue while your machine remains available for normal use. Contributors are paid in $TORIVA tokens.</p>
-        <button class="btn-gold reveal" style="margin-top:2.5rem;" onclick="goPage('network')">Explore Network Details</button>
+  <!-- ═══ CONTRIBUTE v2 ═══ -->
+  <section class="contrib-v2-section">
+    <div class="hw-v2-inner">
+      <div class="hw-v2-grid">
+        <div>
+          <div class="hw-v2-label reveal">Get Involved</div>
+          <h2 class="hw-v2-hl reveal">Plug in. Earn <em>daily.</em></h2>
+          <p class="hw-v2-body reveal">You don't need to understand AI. You don't need to configure anything. You install one piece of software, pledge $100 in Toriva tokens to join the network, and your Mac starts processing tasks for real businesses.</p>
+          <p class="hw-v2-body reveal" style="margin-top:20px;">Your machine stays usable. The node software runs in the background, using idle resources. When it processes tasks that generate revenue, you earn a share of that revenue. Every day.</p>
+          <p class="hw-v2-body hw-v2-body--bright reveal" style="margin-top:20px;">The $100 pledge isn't a fee. It's skin in the game. It keeps the network serious and committed, and it's returned if you decide to leave.</p>
+        </div>
+        <div>
+          <div class="hw-v2-spec-grid reveal">
+            <div class="hw-v2-spec"><div class="hw-v2-spec-label">Hardware</div><div class="hw-v2-spec-value">Apple Silicon Mac</div></div>
+            <div class="hw-v2-spec"><div class="hw-v2-spec-label">Minimum RAM</div><div class="hw-v2-spec-value hw-v2-spec-value--gold">16GB</div></div>
+            <div class="hw-v2-spec"><div class="hw-v2-spec-label">Power Draw</div><div class="hw-v2-spec-value">10 to 25 watts</div></div>
+            <div class="hw-v2-spec"><div class="hw-v2-spec-label">Pledge to Join</div><div class="hw-v2-spec-value hw-v2-spec-value--gold">$100</div></div>
+          </div>
+          <table class="hw-v2-compare reveal">
+            <thead><tr><th></th><th>Toriva</th><th>Typical GPU Network</th></tr></thead>
+            <tbody>
+              <tr><td>Hardware cost</td><td class="hw-v2-compare-gold">$599 to $3,999</td><td>$3,000 to $15,000</td></tr>
+              <tr><td>Power usage</td><td class="hw-v2-compare-gold">10 to 25 watts</td><td>200 to 500 watts</td></tr>
+              <tr><td>Revenue source</td><td class="hw-v2-compare-gold">Product revenue</td><td>Token inflation</td></tr>
+              <tr><td>Setup time</td><td class="hw-v2-compare-gold">Minutes</td><td>Hours to days</td></tr>
+              <tr><td>Noise level</td><td class="hw-v2-compare-gold">Silent</td><td>Loud</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div style="padding:7rem 4vw;background:var(--gold-subtle);display:flex;flex-direction:column;justify-content:center;">
-        <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);">
-          <div style="background:var(--black);padding:1.5rem;">
-            <div style="font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.5rem;">Hardware</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--cream);">Apple Silicon Mac</div>
-          </div>
-          <div style="background:var(--black);padding:1.5rem;">
-            <div style="font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.5rem;">Minimum RAM</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);">16GB</div>
-          </div>
-          <div style="background:var(--black);padding:1.5rem;">
-            <div style="font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.5rem;">Power Draw</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--cream);">10–25 watts</div>
-          </div>
-          <div style="background:var(--black);padding:1.5rem;">
-            <div style="font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.5rem;">Rewards</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);">$TORIVA daily</div>
-          </div>
-        </div>
-        <div class="reveal" style="margin-top:1.5rem;">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--border);background:var(--black);">
-            <div style="padding:1.2rem;font-size:.6rem;letter-spacing:.08em;color:var(--cream-dim);text-transform:uppercase;border-right:1px solid var(--border);">Attribute</div>
-            <div style="padding:1.2rem;font-size:.6rem;letter-spacing:.08em;color:var(--gold);text-transform:uppercase;border-right:1px solid var(--border);">Toriva</div>
-            <div style="padding:1.2rem;font-size:.6rem;letter-spacing:.08em;color:var(--cream-dim);text-transform:uppercase;">Typical GPU Network</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:1.2rem 0;font-family:var(--body-font);font-size:.95rem;border:1px solid var(--border);border-top:none;">
-            <span style="padding:0 1.2rem;font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cream-dim);">Hardware cost</span>
-            <span style="padding:0 1.2rem;color:var(--gold)">$599–$3,999</span>
-            <span style="padding:0 1.2rem;color:var(--cream-muted)">$3,000–$15,000</span>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:1.2rem 0;font-family:var(--body-font);font-size:.95rem;border:1px solid var(--border);border-top:none;">
-            <span style="padding:0 1.2rem;font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cream-dim);">Power usage</span>
-            <span style="padding:0 1.2rem;color:var(--gold)">10–25 watts</span>
-            <span style="padding:0 1.2rem;color:var(--cream-muted)">200–500 watts</span>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:1.2rem 0;font-family:var(--body-font);font-size:.95rem;border:1px solid var(--border);border-top:none;">
-            <span style="padding:0 1.2rem;font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cream-dim);">Revenue source</span>
-            <span style="padding:0 1.2rem;color:var(--gold)">Product revenue</span>
-            <span style="padding:0 1.2rem;color:var(--cream-muted)">Token inflation</span>
-          </div>
-        </div>
+
+      <div class="hw-v2-steps reveal">
+        <div class="hw-v2-step"><div class="hw-v2-step-num">01</div><h3 class="hw-v2-step-title">Install the software</h3><p class="hw-v2-step-body">Download the Toriva node app. It takes a few minutes. No command line. No technical knowledge required.</p></div>
+        <div class="hw-v2-step"><div class="hw-v2-step-num">02</div><h3 class="hw-v2-step-title">Pledge $100 and connect</h3><p class="hw-v2-step-body">Your pledge locks your spot in the network and signals commitment. Your Mac starts receiving tasks immediately.</p></div>
+        <div class="hw-v2-step"><div class="hw-v2-step-num">03</div><h3 class="hw-v2-step-title">Earn every day</h3><p class="hw-v2-step-body">As Toriva products generate revenue from real customers, contributors who process those tasks earn a daily share.</p></div>
       </div>
     </div>
   </section>
