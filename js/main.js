@@ -522,13 +522,13 @@ function initChipCanvas() {
     }
 
     const chipW = gridSize * cellSize + 40;
-    ctx.strokeStyle = 'rgba(201,168,76,' + (0.08 + 0.02 * Math.sin(t)) + ')';
+    ctx.strokeStyle = 'rgba(201,168,76,' + (0.25 + 0.06 * Math.sin(t)) + ')';
     ctx.lineWidth = 1;
     ctx.strokeRect(cx - chipW / 2, cy - chipW / 2, chipW, chipW);
 
     for (let i = 0; i < gridSize; i++) {
       const pos = cx - gridOffset + i * cellSize + cellSize / 2;
-      ctx.strokeStyle = 'rgba(201,168,76,0.06)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(201,168,76,0.18)'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(pos, cy - chipW / 2); ctx.lineTo(pos, cy - chipW / 2 - 16); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(pos, cy + chipW / 2); ctx.lineTo(pos, cy + chipW / 2 + 16); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(cx - chipW / 2, pos); ctx.lineTo(cx - chipW / 2 - 16, pos); ctx.stroke();
@@ -539,7 +539,7 @@ function initChipCanvas() {
       const s = streams[i]; s.progress += s.speed;
       if (s.progress >= 1) { streams.splice(i, 1); continue; }
       const sx = s.x + (s.tx - s.x) * s.progress, sy = s.y + (s.ty - s.y) * s.progress;
-      const a = Math.sin(s.progress * Math.PI) * 0.6;
+      const a = Math.sin(s.progress * Math.PI) * 0.9;
       ctx.beginPath(); ctx.arc(sx, sy, 2, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(76,201,201,' + a + ')'; ctx.fill();
     }
@@ -548,25 +548,25 @@ function initChipCanvas() {
       c.pulse += 0.02;
       if (c.active) { c.activeTimer -= 0.016; if (c.activeTimer <= 0) c.active = false; }
       var pf = 0.6 + 0.4 * Math.sin(c.pulse), sz = cellSize * 0.35;
-      ctx.fillStyle = c.active ? 'rgba(76,201,201,' + (0.12 * pf) + ')' : 'rgba(201,168,76,' + (0.042 * pf) + ')';
+      ctx.fillStyle = c.active ? 'rgba(76,201,201,' + (0.35 * pf) + ')' : 'rgba(201,168,76,' + (0.14 * pf) + ')';
       ctx.fillRect(c.x - sz, c.y - sz, sz * 2, sz * 2);
-      ctx.strokeStyle = c.active ? 'rgba(76,201,201,' + (0.3 * pf) + ')' : 'rgba(201,168,76,' + (0.112 * pf) + ')';
+      ctx.strokeStyle = c.active ? 'rgba(76,201,201,' + (0.7 * pf) + ')' : 'rgba(201,168,76,' + (0.33 * pf) + ')';
       ctx.lineWidth = 0.5;
       ctx.strokeRect(c.x - sz, c.y - sz, sz * 2, sz * 2);
       if (c.active) {
         var g = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, sz * 3);
-        g.addColorStop(0, 'rgba(76,201,201,' + (0.08 * pf) + ')'); g.addColorStop(1, 'rgba(76,201,201,0)');
+        g.addColorStop(0, 'rgba(76,201,201,' + (0.22 * pf) + ')'); g.addColorStop(1, 'rgba(76,201,201,0)');
         ctx.beginPath(); ctx.arc(c.x, c.y, sz * 3, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
       }
     });
 
     ctx.font = '600 7px monospace'; ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(201,168,76,0.21)';
+    ctx.fillStyle = 'rgba(201,168,76,0.6)';
     ctx.fillText('NEURAL ENGINE', cx, cy - gridOffset + cellSize - 4);
     ctx.fillText('CPU CORES', cx, cy - gridOffset + cellSize * 3 - 4);
     ctx.fillText('GPU CORES', cx, cy - gridOffset + cellSize * 5 - 4);
     ctx.font = '600 8px monospace';
-    ctx.fillStyle = 'rgba(201,168,76,' + (0.2 + 0.05 * Math.sin(t * 0.8)) + ')';
+    ctx.fillStyle = 'rgba(201,168,76,' + (0.55 + 0.12 * Math.sin(t * 0.8)) + ')';
     ctx.fillText('UNIFIED MEMORY', cx, cy + chipW / 2 + 32);
 
     ctx.globalAlpha = 1;
