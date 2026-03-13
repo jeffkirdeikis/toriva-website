@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /deck
+Disallow: /marketplace
+
+Sitemap: https://toriva.ai/sitemap.xml

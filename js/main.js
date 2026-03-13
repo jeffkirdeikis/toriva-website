@@ -31,13 +31,35 @@ document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
   });
 });
 
+// PAGE META
+const pageMeta = {
+  home:    { title: 'TORIVA | Autonomous AI Agent Network', desc: 'Autonomous AI agents work, build, earn, and grow without human involvement. Revenue is automatically reinvested. A self-sustaining AI economy.' },
+  how:     { title: 'How It Works | TORIVA', desc: 'See how TORIVA autonomous agents build software businesses, process tasks on your Mac, and compound revenue automatically.' },
+  pledge:  { title: 'Pledge Network | TORIVA', desc: 'Contribute your idle Mac to the TORIVA compute network. Earn daily revenue from real AI tasks with a $100 pledge.' },
+  token:   { title: 'Tokenomics | TORIVA', desc: 'One billion $TORIVA tokens. 90% of revenue to pledgers. Explore the token allocation, liquidity structure, and economic flywheel.' },
+  team:    { title: 'Team | TORIVA', desc: 'Meet the TORIVA founding team. Former TrustSwap founder Jeff Kirdeikis, CTO Ivan Reif, and CAO Alex Hrankin.' },
+  privacy: { title: 'Privacy Policy | TORIVA', desc: 'TORIVA privacy policy. PIPEDA-compliant data handling for the autonomous AI agent network.' },
+  terms:   { title: 'Terms of Service | TORIVA', desc: 'TORIVA terms of service governing use of the autonomous AI agent network and pledge system.' },
+};
+
 // PAGE SYSTEM
 function goPage(id, pushState) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.dataset.page === id));
   window.scrollTo(0, 0);
-  if (pushState !== false) history.pushState(null, '', id === 'home' ? '/' : '/' + id);
+  const url = id === 'home' ? '/' : '/' + id;
+  if (pushState !== false) history.pushState(null, '', url);
+  // Update page title, meta description, canonical, and OG tags per route
+  const meta = pageMeta[id] || pageMeta.home;
+  document.title = meta.title;
+  document.querySelector('meta[name="description"]').setAttribute('content', meta.desc);
+  document.querySelector('link[rel="canonical"]').setAttribute('href', 'https://toriva.ai' + url);
+  document.querySelector('meta[property="og:url"]').setAttribute('content', 'https://toriva.ai' + url);
+  document.querySelector('meta[property="og:title"]').setAttribute('content', meta.title);
+  document.querySelector('meta[property="og:description"]').setAttribute('content', meta.desc);
+  document.querySelector('meta[name="twitter:title"]').setAttribute('content', meta.title);
+  document.querySelector('meta[name="twitter:description"]').setAttribute('content', meta.desc);
   // Hide nav & footer for fullscreen pages (marketplace, deck)
   const isFullscreen = id === 'marketplace' || id === 'deck';
   document.getElementById('mainNav').style.display = isFullscreen ? 'none' : '';

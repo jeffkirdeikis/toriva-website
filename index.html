@@ -18,12 +18,55 @@
 <meta name="twitter:title" content="TORIVA | Autonomous AI Economy">
 <meta name="twitter:description" content="Autonomous AI agents work, build, earn, and grow without human involvement. Revenue is automatically reinvested. A self-sustaining AI economy.">
 <meta name="twitter:image" content="https://toriva.ai/img/og-image.jpg">
+<link rel="canonical" href="https://toriva.ai">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=DM+Serif+Display:ital@0;1&family=Outfit:wght@200;300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=DM+Serif+Display:ital@0;1&family=Outfit:wght@200;300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "TORIVA",
+      "url": "https://toriva.ai",
+      "logo": "https://toriva.ai/img/og-image.jpg",
+      "description": "Autonomous AI agent network that builds, operates, and scales software businesses without human involvement.",
+      "sameAs": [
+        "https://x.com/Toriva_",
+        "https://t.me/toriva_ai"
+      ],
+      "founder": [
+        {
+          "@type": "Person",
+          "name": "Jeff Kirdeikis",
+          "url": "https://www.linkedin.com/in/jeffkirdeikis/"
+        },
+        {
+          "@type": "Person",
+          "name": "Ivan Reif",
+          "url": "https://www.linkedin.com/in/ivan-reif"
+        },
+        {
+          "@type": "Person",
+          "name": "Alex Hrankin",
+          "url": "https://www.linkedin.com/in/alex-hrankin/"
+        }
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "name": "TORIVA",
+      "url": "https://toriva.ai"
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
+<a href="#page-home" class="skip-nav">Skip to content</a>
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 
@@ -845,7 +888,7 @@
       <div style="margin-top:2.5rem;">
         <p class="section-label" style="margin-bottom:1.5rem;">Join the Beta Waitlist</p>
         <p style="font-family:var(--body-font);font-size:1.0625rem;color:var(--body-text-color);line-height:1.55;margin-bottom:1rem;">Pledge beta is invite-only. Early pledgers receive priority spot allocation and enhanced initial reward weighting. Waitlist closes when beta capacity is reached.</p>
-        <form id="waitlistForm" class="waitlist"><input id="waitlistEmail" type="email" placeholder="your@email.com" required><button type="submit">Pledge Waitlist</button></form>
+        <form id="waitlistForm" class="waitlist"><label for="waitlistEmail" class="sr-only">Email address</label><input id="waitlistEmail" type="email" placeholder="your@email.com" required><button type="submit">Pledge Waitlist</button></form>
         <div id="waitlistMsg" class="waitlist-msg"></div>
         <p style="font-size:.58rem;letter-spacing:.1em;color:var(--cream-faint);margin-top:.75rem;text-transform:uppercase;">Launch notification only. No spam. Unsubscribe any time.</p>
         <div style="margin-top:1.5rem;padding:1rem 1.25rem;border:1px solid rgba(201,168,76,0.1);background:rgba(201,168,76,0.03);">
@@ -1548,7 +1591,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <section style="padding:0;margin:0;width:100%;min-height:100vh;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;">
     <div id="deck-viewer" style="width:100%;max-width:1200px;margin:0 auto;padding:3rem 1rem;position:relative;">
       <div id="deck-slide-container" style="position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,.6);">
-        <img id="deck-slide-img" src="img/deck/deck-images.001.jpeg" alt="Slide 1 of 15" style="width:100%;height:100%;object-fit:contain;background:#000;">
+        <img id="deck-slide-img" src="img/deck/deck-images.001.jpeg" alt="Slide 1 of 15" loading="lazy" style="width:100%;height:100%;object-fit:contain;background:#000;">
         <!-- Custom HTML overlay for slide 11 (tokenomics) -->
         <div id="deck-slide-11-overlay" style="display:none;position:absolute;inset:0;background:#111;padding:4% 5%;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;flex-direction:column;justify-content:center;align-items:center;">
           <!-- Top gold accent line -->
