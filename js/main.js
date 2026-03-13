@@ -472,7 +472,8 @@ function initFlywheelCanvas() {
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(icons[i], nx, ny + 0.5);
       const lR = R + S * 0.085, lx = cx + Math.cos(angle) * lR, ly = cy + Math.sin(angle) * lR;
       ctx.font = '600 ' + fontSize + 'px monospace'; ctx.fillStyle = 'rgba(201,168,76,' + (0.39 + 0.156 * pulse) + ')';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(labels[i], lx, ly);
+      const cosA = Math.cos(angle); ctx.textAlign = Math.abs(cosA) < 0.3 ? 'center' : cosA < 0 ? 'left' : 'right';
+      ctx.textBaseline = 'middle'; ctx.fillText(labels[i], lx, ly);
     }
 
     // Center text
