@@ -458,7 +458,7 @@ function initFlywheelCanvas() {
     }
 
     // Nodes
-    const fontSize = Math.max(8, H * 0.018);
+    const fontSize = Math.max(10, H * 0.026);
     for (let i = 0; i < stages; i++) {
       const angle = -Math.PI / 2 + stageAngle * i;
       const nx = cx + Math.cos(angle) * R, ny = cy + Math.sin(angle) * R;
@@ -473,7 +473,7 @@ function initFlywheelCanvas() {
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(icons[i], nx, ny + 0.5);
       const lR = R + Math.max(H * 0.1, 22);
       let lx = cx + Math.cos(angle) * lR, ly = cy + Math.sin(angle) * lR;
-      ctx.font = '600 ' + fontSize + 'px monospace'; ctx.fillStyle = 'rgba(201,168,76,' + (0.39 + 0.156 * pulse) + ')';
+      ctx.font = '600 ' + fontSize + 'px monospace'; ctx.fillStyle = 'rgba(201,168,76,' + (0.6 + 0.2 * pulse) + ')';
       const cosA = Math.cos(angle); ctx.textAlign = Math.abs(cosA) < 0.3 ? 'center' : cosA < 0 ? 'right' : 'left';
       const tw = ctx.measureText(labels[i]).width;
       if (ctx.textAlign === 'left' && lx + tw > W - 6) lx = W - 6 - tw;
@@ -487,7 +487,7 @@ function initFlywheelCanvas() {
     // Center text
     const cFont = Math.max(14, H * 0.035);
     ctx.font = 'italic ' + cFont + 'px serif';
-    ctx.fillStyle = 'rgba(201,168,76,' + (0.169 + 0.052 * Math.sin(t)) + ')';
+    ctx.fillStyle = 'rgba(201,168,76,' + (0.4 + 0.1 * Math.sin(t)) + ')';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('the cycle', cx, cy - cFont * 0.5);
     ctx.fillText('compounds', cx, cy + cFont * 0.6);
