@@ -381,7 +381,7 @@ function initFlywheelCanvas() {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
-  let S = 420, active = false, af;
+  let W = 480, H = 420, active = false, af;
 
   const stages = 5, stageAngle = (Math.PI * 2) / stages;
   const labels = ['CUSTOMERS', 'REVENUE', 'PAYOUTS', 'CONTRIBUTORS', 'COMPUTE'];
@@ -393,10 +393,11 @@ function initFlywheelCanvas() {
   let t = 0, fadeIn = 0;
 
   function resize() {
-    const maxW = canvas.parentElement ? canvas.parentElement.getBoundingClientRect().width : 420;
-    S = Math.min(420, maxW - 16);
-    canvas.width = S * dpr; canvas.height = S * dpr;
-    canvas.style.width = S + 'px'; canvas.style.height = S + 'px';
+    const maxW = canvas.parentElement ? canvas.parentElement.getBoundingClientRect().width : 480;
+    H = Math.min(420, maxW - 16);
+    W = Math.min(maxW, H + H * 0.3);
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
@@ -409,8 +410,8 @@ function initFlywheelCanvas() {
   function loop() {
     if (!active) return;
     t += 0.016; fadeIn = Math.min(1, fadeIn + 0.012);
-    const cx = S / 2, cy = S / 2, R = S * 0.37;
-    ctx.clearRect(0, 0, S, S); ctx.globalAlpha = fadeIn;
+    const cx = W / 2, cy = H / 2, R = H * 0.37;
+    ctx.clearRect(0, 0, W, H); ctx.globalAlpha = fadeIn;
 
     // Rings
     [R + 24, R, R - 24].forEach((r, i) => {
@@ -457,7 +458,7 @@ function initFlywheelCanvas() {
     }
 
     // Nodes
-    const fontSize = Math.max(8, S * 0.018);
+    const fontSize = Math.max(8, H * 0.018);
     for (let i = 0; i < stages; i++) {
       const angle = -Math.PI / 2 + stageAngle * i;
       const nx = cx + Math.cos(angle) * R, ny = cy + Math.sin(angle) * R;
@@ -470,14 +471,21 @@ function initFlywheelCanvas() {
       ctx.strokeStyle = 'rgba(201,168,76,' + (0.325 + 0.195 * pulse) + ')'; ctx.lineWidth = 1.2; ctx.stroke();
       ctx.font = '10px sans-serif'; ctx.fillStyle = 'rgba(201,168,76,' + (0.585 + 0.325 * pulse) + ')';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(icons[i], nx, ny + 0.5);
-      const lR = R + Math.max(S * 0.1, 22), lx = cx + Math.cos(angle) * lR, ly = cy + Math.sin(angle) * lR;
+      const lR = R + Math.max(H * 0.1, 22);
+      let lx = cx + Math.cos(angle) * lR, ly = cy + Math.sin(angle) * lR;
       ctx.font = '600 ' + fontSize + 'px monospace'; ctx.fillStyle = 'rgba(201,168,76,' + (0.39 + 0.156 * pulse) + ')';
       const cosA = Math.cos(angle); ctx.textAlign = Math.abs(cosA) < 0.3 ? 'center' : cosA < 0 ? 'right' : 'left';
+      const tw = ctx.measureText(labels[i]).width;
+      if (ctx.textAlign === 'left' && lx + tw > W - 6) lx = W - 6 - tw;
+      else if (ctx.textAlign === 'right' && lx - tw < 6) lx = 6 + tw;
+      else if (ctx.textAlign === 'center') { if (lx - tw / 2 < 6) lx = 6 + tw / 2; if (lx + tw / 2 > W - 6) lx = W - 6 - tw / 2; }
+      if (ly - fontSize / 2 < 4) ly = 4 + fontSize / 2;
+      if (ly + fontSize / 2 > H - 4) ly = H - 4 - fontSize / 2;
       ctx.textBaseline = 'middle'; ctx.fillText(labels[i], lx, ly);
     }
 
     // Center text
-    const cFont = Math.max(14, S * 0.035);
+    const cFont = Math.max(14, H * 0.035);
     ctx.font = 'italic ' + cFont + 'px serif';
     ctx.fillStyle = 'rgba(201,168,76,' + (0.169 + 0.052 * Math.sin(t)) + ')';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
