@@ -929,7 +929,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .tk-label::before{content:'';width:32px;height:1px;background:rgba(201,168,76,0.3);}
 
 /* ── HEADLINES ── */
-.tk-hl{font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(2.2rem,5.5vw,4.2rem);line-height:1.1;color:#FAFAF5;margin:0 0 20px 0;letter-spacing:-.01em;}
+.tk-hl{font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(2.2rem,5.5vw,4.2rem);line-height:1.1;color:#FAFAF5;margin:0 0 20px 0;letter-spacing:-.01em;text-wrap:balance;}
 .tk-hl em{font-style:italic;color:#C9A84C;}
 
 /* ── BODY ── */
@@ -1018,6 +1018,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   .tk-grid{grid-template-columns:1fr;}
   .tk-diff{grid-template-columns:1fr;gap:16px;}
   .tk-spec-grid{grid-template-columns:1fr 1fr;}
+  .tk-hl br{display:none;}
 }
 </style>
 <!-- ═══════════════════════════════════════════════════════
@@ -1340,7 +1341,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 #page-team .inner{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 clamp(20px,6vw,80px);}
 #page-team .label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.3em;color:rgba(201,168,76,1);text-transform:uppercase;display:flex;align-items:center;gap:16px;margin-bottom:28px;}
 #page-team .label::before{content:'';width:32px;height:1px;background:rgba(201,168,76,0.5);}
-#page-team .hl{font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(2.2rem,5.5vw,4.2rem);line-height:1.08;color:#FAFAF5;margin:0 0 20px 0;}
+#page-team .hl{font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(2.2rem,5.5vw,4.2rem);line-height:1.08;color:#FAFAF5;margin:0 0 20px 0;text-wrap:balance;}
 #page-team .hl em{font-style:italic;color:#C9A84C;}
 #page-team .body-text{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.95rem,1.4vw,1.15rem);line-height:1.75;color:rgba(250,250,245,1);max-width:560px;}
 #page-team .body-text--bright{color:rgba(250,250,245,1);}
@@ -1396,6 +1397,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 #page-team .profile{gap:14px;}
 #page-team .stat-strip{grid-template-columns:1fr 1fr;}
 #page-team .verify{gap:28px;}
+#page-team .hl br{display:none;}
 }
 </style>
 <!-- ═══ INTRO — The Why ═══ -->
