@@ -42,8 +42,27 @@ const pageMeta = {
   terms:   { title: 'Terms of Service | TORIVA', desc: 'TORIVA terms of service governing use of the autonomous AI agent network and pledge system.' },
 };
 
+// CLOSE MOBILE MENU
+function closeMobileMenu() {
+  hamburger.classList.remove('open');
+  navLinks.classList.remove('open');
+  document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.dropdown-arrow').forEach(a => a.classList.remove('open'));
+}
+
+// Close menu when tapping outside nav
+document.addEventListener('click', e => {
+  if (navLinks.classList.contains('open') && !e.target.closest('#mainNav')) closeMobileMenu();
+});
+
+// Close menu on scroll
+window.addEventListener('scroll', () => {
+  if (navLinks.classList.contains('open')) closeMobileMenu();
+}, { passive: true });
+
 // PAGE SYSTEM
 function goPage(id, pushState) {
+  closeMobileMenu();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.dataset.page === id));
@@ -86,8 +105,6 @@ document.querySelectorAll('.nav-links a').forEach(a => a.addEventListener('click
   if (!a.dataset.page) return;
   e.preventDefault();
   goPage(a.dataset.page);
-  hamburger.classList.remove('open');
-  navLinks.classList.remove('open');
 }));
 
 // SCENARIO TABS
