@@ -992,6 +992,8 @@ if (track) track.innerHTML += track.innerHTML;
       set('fee7d', fmt(d.fees['7d']));
       set('poolTvl', fmt(d.pool.tvl));
       set('poolVol24h', fmt(d.volume['24h']));
+      var t = d.transactions && d.transactions.h24;
+      if (t) set('poolTrades24h', ((t.buys + t.sells) || 0).toLocaleString());
       var ts = new Date(d.updatedAt);
       set('feeUpdated', 'Updated ' + ts.toLocaleTimeString() + ' (cached 5 min)');
     })
