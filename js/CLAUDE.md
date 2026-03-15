@@ -8,4 +8,26 @@
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
 | #8362 | 9:22 PM | 🟣 | Initialized Git Repository for Toriva Website | ~275 |
+
+### Mar 12, 2026
+
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #10020 | 8:56 PM | 🔴 | Fixed mobile hamburger menu not closing on navigation click or scroll | ~509 |
+| #10018 | " | 🔄 | Removed redundant mobile menu closing code from navigation click handler | ~444 |
+| #10015 | 8:54 PM | 🔵 | Examined Toriva website JavaScript functionality and client-side routing | ~540 |
+| #9837 | 6:31 PM | 🔵 | Comprehensive SEO audit completed with 10-point analysis and recommendations | ~905 |
+| #9786 | 3:31 PM | ✅ | Committed redesigned token and team pages to git repository | ~423 |
+| #9650 | 2:21 PM | ✅ | Committed toriva-website updates including pledge page rebuild and navigation improvements | ~563 |
+| #9628 | 8:29 AM | ✅ | Hero animation GREEN explosion reduced to 9px (75% smaller than original) | ~285 |
+| #9625 | 8:22 AM | 🟣 | Hero Animation Optimized for Text Readability and Visual Clarity | ~501 |
+
+### Mar 15, 2026
+
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #10213 | 12:43 PM | 🟣 | Pool fee widget auto-refresh implemented | ~383 |
+| #10201 | 12:27 PM | ⚖️ | Switched Data Source from The Graph to GeckoTerminal API | ~487 |
+| #10177 | 12:21 PM | 🔵 | Static LP Fee Donut Chart Implementation Found in main.js | ~427 |
+| #10164 | 12:17 PM | 🔵 | JavaScript Function Architecture with Canvas Visualizations | ~379 |
 </claude-mem-context>

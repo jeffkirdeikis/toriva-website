@@ -85,7 +85,7 @@ function goPage(id, pushState) {
   document.querySelector('footer').style.display = isFullscreen ? 'none' : '';
   if (id === 'home') initHeroCanvas();
   if (id === 'how') setTimeout(initNetworkCanvas, 100);
-  if (id === 'token') { setTimeout(animateBars, 300); setTimeout(initLpDonut, 100); }
+  if (id === 'token') { setTimeout(animateBars, 300); setTimeout(initLpDonut, 100); startPoolFeeRefresh(); }
   observeReveals();
 }
 // Handle hash on load and back/forward
@@ -964,3 +964,46 @@ if (track) track.innerHTML += track.innerHTML;
   }, { threshold: 0.2 });
   obs.observe(wrap);
 })();
+
+// ═══ LIVE POOL FEE DATA ═══
+var _feeInterval = null;
+function fetchPoolFees() {
+  var widget = document.getElementById('feeWidget');
+  if (!widget) return;
+
+  function fmt(n) {
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+    if (n >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K';
+    if (n >= 1) return '$' + n.toFixed(2);
+    return '$' + n.toFixed(4);
+  }
+
+  function set(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  fetch('/api/pool-fees')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.error) { set('feeUpdated', 'Data temporarily unavailable'); return; }
+      set('fee1h', fmt(d.fees['1h']));
+      set('fee6h', fmt(d.fees['6h']));
+      set('fee24h', fmt(d.fees['24h']));
+      set('fee7d', fmt(d.fees['7d']));
+      set('poolTvl', fmt(d.pool.tvl));
+      set('poolVol24h', fmt(d.volume['24h']));
+      var t = d.transactions && d.transactions.h24;
+      if (t) set('poolTrades24h', ((t.buys + t.sells) || 0).toLocaleString());
+      var ts = new Date(d.updatedAt);
+      set('feeUpdated', 'Live \u00b7 updated ' + ts.toLocaleTimeString());
+    })
+    .catch(function() {
+      set('feeUpdated', 'Unable to load live data');
+    });
+}
+function startPoolFeeRefresh() {
+  fetchPoolFees();
+  if (_feeInterval) clearInterval(_feeInterval);
+  _feeInterval = setInterval(fetchPoolFees, 60000);
+}
