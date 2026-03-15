@@ -1124,6 +1124,42 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <p class="tk-body tk-body--bright reveal">The net effect: every trade in the pool makes the ecosystem more competitive. More competitive pricing attracts more customers. More customers generate more volume. More volume generates more fees.</p>
       </div>
     </div>
+
+    <div class="tk-divider"></div>
+
+    <!-- Live Fee Earnings -->
+    <div id="feeWidget" class="reveal">
+      <div class="tk-label">Live Pool Data</div>
+      <div class="tk-spec-grid" id="feeGrid">
+        <div class="tk-spec">
+          <div class="tk-spec-label">Fees Earned (24h)</div>
+          <div class="tk-spec-value tk-spec-value--gold" id="fee24h">--</div>
+        </div>
+        <div class="tk-spec">
+          <div class="tk-spec-label">Fees Earned (7d)</div>
+          <div class="tk-spec-value tk-spec-value--gold" id="fee7d">--</div>
+        </div>
+        <div class="tk-spec">
+          <div class="tk-spec-label">Fees Earned (30d)</div>
+          <div class="tk-spec-value tk-spec-value--gold" id="fee30d">--</div>
+        </div>
+        <div class="tk-spec">
+          <div class="tk-spec-label">Fees (All Time)</div>
+          <div class="tk-spec-value tk-spec-value--gold" id="feeAllTime">--</div>
+        </div>
+      </div>
+      <div class="tk-spec-grid" style="margin-top:1px;">
+        <div class="tk-spec">
+          <div class="tk-spec-label">Pool TVL</div>
+          <div class="tk-spec-value" id="poolTvl">--</div>
+        </div>
+        <div class="tk-spec">
+          <div class="tk-spec-label">Volume (30d)</div>
+          <div class="tk-spec-value" id="poolVol30d">--</div>
+        </div>
+      </div>
+      <p id="feeUpdated" style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(201,168,76,0.4);margin-top:12px;letter-spacing:.1em;"></p>
+    </div>
   </div>
 </section>
 

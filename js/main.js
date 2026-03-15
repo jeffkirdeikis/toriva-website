@@ -964,3 +964,38 @@ if (track) track.innerHTML += track.innerHTML;
   }, { threshold: 0.2 });
   obs.observe(wrap);
 })();
+
+// ═══ LIVE POOL FEE DATA ═══
+(function() {
+  var widget = document.getElementById('feeWidget');
+  if (!widget) return;
+
+  function fmt(n) {
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+    if (n >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K';
+    if (n >= 1) return '$' + n.toFixed(2);
+    return '$' + n.toFixed(4);
+  }
+
+  function set(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  fetch('/api/pool-fees')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.error) return;
+      set('fee24h', fmt(d.fees['24h']));
+      set('fee7d', fmt(d.fees['7d']));
+      set('fee30d', fmt(d.fees['30d']));
+      set('feeAllTime', fmt(d.pool.feesAllTime));
+      set('poolTvl', fmt(d.pool.tvl));
+      set('poolVol30d', fmt(d.volume['30d']));
+      var ts = new Date(d.updatedAt);
+      set('feeUpdated', 'Updated ' + ts.toLocaleTimeString() + ' (cached 5 min)');
+    })
+    .catch(function() {
+      set('feeUpdated', 'Unable to load live data');
+    });
+})();
