@@ -18,6 +18,31 @@ async function readPool(selector) {
   return BigInt(result);
 }
 
+// Read the protocol fee from slot0 to calculate LP's actual share
+// In Uniswap V3, feeProtocol is packed as two 4-bit values (token0, token1).
+// If N > 0, the protocol takes 1/N of swap fees; LPs get (1 - 1/N).
+async function getProtocolFeeMultiplier() {
+  try {
+    const res = await fetch(BASE_RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0', method: 'eth_call', id: 1,
+        params: [{ to: POOL_ADDR, data: '0x3850c7bd' }, 'latest'] // slot0()
+      })
+    });
+    const { result } = await res.json();
+    // feeProtocol is the 6th 32-byte field in slot0
+    const feeProtocolHex = result.slice(2 + 5 * 64, 2 + 6 * 64);
+    const feeProtocol = parseInt(feeProtocolHex, 16);
+    const fp0 = feeProtocol & 0xF;
+    // If fp0 > 0, protocol takes 1/fp0; LPs get the rest
+    return fp0 > 0 ? (1 - 1 / fp0) : 1;
+  } catch (e) {
+    return 1; // Default to no protocol fee on error
+  }
+}
+
 // Get the actual USDC/TORIVA fee split ratio from on-chain data
 async function getFeeSplitRatio(torivaPrice) {
   try {
@@ -83,9 +108,12 @@ export default async function handler(req, res) {
     const vol6h = parseFloat(attr.volume_usd.h6) || 0;
     const vol1h = parseFloat(attr.volume_usd.h1) || 0;
 
-    const fees1h = vol1h * FEE_RATE;
-    const fees6h = vol6h * FEE_RATE;
-    const fees24h = vol24h * FEE_RATE;
+    // Read protocol fee from contract: LP only receives a fraction of gross fees
+    const lpMultiplier = await getProtocolFeeMultiplier();
+
+    const fees1h = vol1h * FEE_RATE * lpMultiplier;
+    const fees6h = vol6h * FEE_RATE * lpMultiplier;
+    const fees24h = vol24h * FEE_RATE * lpMultiplier;
 
     const days = ohlcvData?.data?.attributes?.ohlcv_list || [];
     const now = Math.floor(Date.now() / 1000);
@@ -99,8 +127,8 @@ export default async function handler(req, res) {
       vol30d += vol;
     }
 
-    const fees7d = vol7d * FEE_RATE;
-    const fees30d = vol30d * FEE_RATE;
+    const fees7d = vol7d * FEE_RATE * lpMultiplier;
+    const fees30d = vol30d * FEE_RATE * lpMultiplier;
 
     // Get actual split ratio from on-chain fee growth data
     const ratio = await getFeeSplitRatio(torivaPrice);
@@ -117,6 +145,7 @@ export default async function handler(req, res) {
       pool: {
         pair: attr.pool_name || attr.name,
         fee: attr.pool_fee_percentage + '%',
+        lpFeeMultiplier: lpMultiplier,
         tvl,
         torivaPrice,
         createdAt: attr.pool_created_at,
