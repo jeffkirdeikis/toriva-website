@@ -986,12 +986,12 @@ if (track) track.innerHTML += track.innerHTML;
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.error) return;
+      set('fee1h', fmt(d.fees['1h']));
+      set('fee6h', fmt(d.fees['6h']));
       set('fee24h', fmt(d.fees['24h']));
       set('fee7d', fmt(d.fees['7d']));
-      set('fee30d', fmt(d.fees['30d']));
-      set('feeAllTime', fmt(d.pool.feesAllTime));
       set('poolTvl', fmt(d.pool.tvl));
-      set('poolVol30d', fmt(d.volume['30d']));
+      set('poolVol24h', fmt(d.volume['24h']));
       var ts = new Date(d.updatedAt);
       set('feeUpdated', 'Updated ' + ts.toLocaleTimeString() + ' (cached 5 min)');
     })

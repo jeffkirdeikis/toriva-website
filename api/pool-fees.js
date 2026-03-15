@@ -1,26 +1,6 @@
-const POOL_ID = '0xb886cf1444bff05e9a99e00543bc4054d423ebfd';
-const SUBGRAPH_URL = 'https://api.studio.thegraph.com/query/48211/uniswap-v3-base/version/latest';
-
-const QUERY = `{
-  pool(id: "${POOL_ID}") {
-    feesUSD
-    volumeUSD
-    totalValueLockedUSD
-    token0 { symbol }
-    token1 { symbol }
-    feeTier
-  }
-  daily: poolDayDatas(
-    first: 30
-    orderBy: date
-    orderDirection: desc
-    where: { pool: "${POOL_ID}" }
-  ) {
-    date
-    feesUSD
-    volumeUSD
-  }
-}`;
+const POOL_ADDR = '0x2393cf60fd67e58e302f6d0b8c552cd5c37caf97';
+const BASE_URL = 'https://api.geckoterminal.com/api/v2/networks/base/pools/' + POOL_ADDR;
+const FEE_RATE = 0.01; // 1% pool fee
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -31,56 +11,55 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(SUBGRAPH_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: QUERY })
-    });
+    const [poolRes, ohlcvRes] = await Promise.all([
+      fetch(BASE_URL, { headers: { Accept: 'application/json' } }),
+      fetch(BASE_URL + '/ohlcv/day?limit=30', { headers: { Accept: 'application/json' } }),
+    ]);
 
-    if (!response.ok) {
-      return res.status(502).json({ error: 'Subgraph unavailable' });
+    if (!poolRes.ok) {
+      return res.status(502).json({ error: 'GeckoTerminal pool request failed' });
     }
 
-    const result = await response.json();
+    const poolData = await poolRes.json();
+    const ohlcvData = ohlcvRes.ok ? await ohlcvRes.json() : null;
 
-    if (result.errors) {
-      return res.status(502).json({ error: 'Subgraph query error' });
-    }
+    const attr = poolData.data.attributes;
+    const tvl = parseFloat(attr.reserve_in_usd) || 0;
+    const vol24h = parseFloat(attr.volume_usd.h24) || 0;
+    const vol6h = parseFloat(attr.volume_usd.h6) || 0;
+    const vol1h = parseFloat(attr.volume_usd.h1) || 0;
 
-    if (!result.data || !result.data.pool) {
-      return res.status(404).json({ error: 'Pool not found' });
-    }
+    // Calculate fees from volume (fees = volume * fee rate)
+    const fees24h = vol24h * FEE_RATE;
+    const fees6h = vol6h * FEE_RATE;
+    const fees1h = vol1h * FEE_RATE;
 
-    const pool = result.data.pool;
-    const daily = result.data.daily || [];
-
+    // Sum daily OHLCV volumes for 7d and 30d
+    const days = ohlcvData?.data?.attributes?.ohlcv_list || [];
     const now = Math.floor(Date.now() / 1000);
     const DAY = 86400;
 
-    let fees24h = 0, fees7d = 0, fees30d = 0;
-    let vol24h = 0, vol7d = 0, vol30d = 0;
-
-    for (const d of daily) {
-      const ts = parseInt(d.date);
-      const fee = parseFloat(d.feesUSD);
-      const vol = parseFloat(d.volumeUSD);
-
-      if (ts >= now - DAY) { fees24h += fee; vol24h += vol; }
-      if (ts >= now - 7 * DAY) { fees7d += fee; vol7d += vol; }
-      fees30d += fee;
+    let vol7d = 0, vol30d = 0;
+    for (const bar of days) {
+      const ts = bar[0];
+      const vol = bar[5] || 0;
+      if (ts >= now - 7 * DAY) vol7d += vol;
       vol30d += vol;
     }
 
+    const fees7d = vol7d * FEE_RATE;
+    const fees30d = vol30d * FEE_RATE;
+
     return res.status(200).json({
       pool: {
-        feesAllTime: parseFloat(pool.feesUSD),
-        volumeAllTime: parseFloat(pool.volumeUSD),
-        tvl: parseFloat(pool.totalValueLockedUSD),
-        pair: pool.token0.symbol + ' / ' + pool.token1.symbol,
-        feeTier: (parseInt(pool.feeTier) / 10000) + '%',
+        pair: attr.pool_name || attr.name,
+        fee: attr.pool_fee_percentage + '%',
+        tvl,
+        createdAt: attr.pool_created_at,
       },
-      fees: { '24h': fees24h, '7d': fees7d, '30d': fees30d },
-      volume: { '24h': vol24h, '7d': vol7d, '30d': vol30d },
+      fees: { '1h': fees1h, '6h': fees6h, '24h': fees24h, '7d': fees7d, '30d': fees30d },
+      volume: { '1h': vol1h, '6h': vol6h, '24h': vol24h, '7d': vol7d, '30d': vol30d },
+      transactions: attr.transactions,
       updatedAt: new Date().toISOString(),
     });
   } catch (err) {
