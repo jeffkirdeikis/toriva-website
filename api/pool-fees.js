@@ -1,26 +1,55 @@
 const POOL_ADDR = '0x2393cf60fd67e58e302f6d0b8c552cd5c37caf97';
-const BASE_URL = 'https://api.geckoterminal.com/api/v2/networks/base/pools/' + POOL_ADDR;
-const FEE_RATE = 0.01; // 1% pool fee
+const GECKO_URL = 'https://api.geckoterminal.com/api/v2/networks/base/pools/' + POOL_ADDR;
+const BASE_RPC = 'https://mainnet.base.org';
+const FEE_RATE = 0.01;
+const Q128 = BigInt(2) ** BigInt(128);
 
-// In Uniswap V3, fees are earned in the input token:
-//   Buy (USDC -> TORIVA) = fee earned in USDC
-//   Sell (TORIVA -> USDC) = fee earned in TORIVA
-// We use buy/sell ratios to estimate the split per period.
+// Read a uint256 from the pool contract
+async function readPool(selector) {
+  const res = await fetch(BASE_RPC, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0', method: 'eth_call', id: 1,
+      params: [{ to: POOL_ADDR, data: selector }, 'latest']
+    })
+  });
+  const { result } = await res.json();
+  return BigInt(result);
+}
 
-function splitFees(totalFeesUSD, txn, torivaPrice) {
-  if (!txn || !torivaPrice) return { usdc: totalFeesUSD, toriva: 0, torivaUSD: 0 };
-  var buys = txn.buys || 0;
-  var sells = txn.sells || 0;
-  var total = buys + sells;
-  if (total === 0) return { usdc: totalFeesUSD, toriva: 0, torivaUSD: 0 };
+// Get the actual USDC/TORIVA fee split ratio from on-chain data
+async function getFeeSplitRatio(torivaPrice) {
+  try {
+    const [fg0, fg1, liq] = await Promise.all([
+      readPool('0xf3058399'), // feeGrowthGlobal0X128 (USDC, 6 decimals)
+      readPool('0x46141319'), // feeGrowthGlobal1X128 (TORIVA, 18 decimals)
+      readPool('0x1a686502'), // liquidity
+    ]);
 
-  var buyRatio = buys / total;
-  var sellRatio = sells / total;
+    // Convert from Q128 fixed-point to actual token amounts
+    const usdcFees = Number(fg0 * liq / Q128) / 1e6;
+    const torivaFees = Number(fg1 * liq / Q128) / 1e18;
+    const torivaFeesUSD = torivaFees * torivaPrice;
+    const total = usdcFees + torivaFeesUSD;
 
-  var usdcFees = totalFeesUSD * buyRatio;
-  var torivaFeesUSD = totalFeesUSD * sellRatio;
-  var torivaFees = torivaFeesUSD / torivaPrice;
+    if (total === 0) return { usdcRatio: 0.5, torivaRatio: 0.5, usdcFees, torivaFees };
 
+    return {
+      usdcRatio: usdcFees / total,
+      torivaRatio: torivaFeesUSD / total,
+      usdcFees,
+      torivaFees,
+    };
+  } catch (e) {
+    return { usdcRatio: 0.5, torivaRatio: 0.5, usdcFees: 0, torivaFees: 0 };
+  }
+}
+
+function splitFees(totalFeesUSD, usdcRatio, torivaRatio, torivaPrice) {
+  var usdcFees = totalFeesUSD * usdcRatio;
+  var torivaFeesUSD = totalFeesUSD * torivaRatio;
+  var torivaFees = torivaPrice > 0 ? torivaFeesUSD / torivaPrice : 0;
   return { usdc: usdcFees, toriva: torivaFees, torivaUSD: torivaFeesUSD };
 }
 
@@ -34,8 +63,8 @@ export default async function handler(req, res) {
 
   try {
     const [poolRes, ohlcvRes] = await Promise.all([
-      fetch(BASE_URL, { headers: { Accept: 'application/json' } }),
-      fetch(BASE_URL + '/ohlcv/day?limit=30', { headers: { Accept: 'application/json' } }),
+      fetch(GECKO_URL, { headers: { Accept: 'application/json' } }),
+      fetch(GECKO_URL + '/ohlcv/day?limit=30', { headers: { Accept: 'application/json' } }),
     ]);
 
     if (!poolRes.ok) {
@@ -58,7 +87,6 @@ export default async function handler(req, res) {
     const fees6h = vol6h * FEE_RATE;
     const fees24h = vol24h * FEE_RATE;
 
-    // Sum daily OHLCV volumes for 7d and 30d
     const days = ohlcvData?.data?.attributes?.ohlcv_list || [];
     const now = Math.floor(Date.now() / 1000);
     const DAY = 86400;
@@ -74,13 +102,15 @@ export default async function handler(req, res) {
     const fees7d = vol7d * FEE_RATE;
     const fees30d = vol30d * FEE_RATE;
 
-    // Split fees by token using buy/sell ratios per period
+    // Get actual split ratio from on-chain fee growth data
+    const ratio = await getFeeSplitRatio(torivaPrice);
+
     const split = {
-      '1h': splitFees(fees1h, txn.m30, torivaPrice),
-      '6h': splitFees(fees6h, txn.h6, torivaPrice),
-      '24h': splitFees(fees24h, txn.h24, torivaPrice),
-      '7d': splitFees(fees7d, txn.h24, torivaPrice),
-      '30d': splitFees(fees30d, txn.h24, torivaPrice),
+      '1h': splitFees(fees1h, ratio.usdcRatio, ratio.torivaRatio, torivaPrice),
+      '6h': splitFees(fees6h, ratio.usdcRatio, ratio.torivaRatio, torivaPrice),
+      '24h': splitFees(fees24h, ratio.usdcRatio, ratio.torivaRatio, torivaPrice),
+      '7d': splitFees(fees7d, ratio.usdcRatio, ratio.torivaRatio, torivaPrice),
+      '30d': splitFees(fees30d, ratio.usdcRatio, ratio.torivaRatio, torivaPrice),
     };
 
     return res.status(200).json({
@@ -93,6 +123,12 @@ export default async function handler(req, res) {
       },
       fees: { '1h': fees1h, '6h': fees6h, '24h': fees24h, '7d': fees7d, '30d': fees30d },
       split,
+      onChain: {
+        usdcRatio: ratio.usdcRatio,
+        torivaRatio: ratio.torivaRatio,
+        totalUsdcFees: ratio.usdcFees,
+        totalTorivaFees: ratio.torivaFees,
+      },
       volume: { '1h': vol1h, '6h': vol6h, '24h': vol24h, '7d': vol7d, '30d': vol30d },
       transactions: txn,
       updatedAt: new Date().toISOString(),
