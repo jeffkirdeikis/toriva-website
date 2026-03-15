@@ -983,16 +983,42 @@ function fetchPoolFees() {
     if (el) el.textContent = val;
   }
 
+  function fmtTokens(n) {
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+    if (n >= 1) return n.toFixed(0);
+    return n.toFixed(2);
+  }
+
   fetch('/api/pool-fees')
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.error) { set('feeUpdated', 'Data temporarily unavailable'); return; }
-      set('fee1h', fmt(d.fees['1h']));
-      set('fee6h', fmt(d.fees['6h']));
       set('fee24h', fmt(d.fees['24h']));
-      set('fee7d', fmt(d.fees['7d']));
+
+      // 24h breakdown
+      if (d.split) {
+        var s24 = d.split['24h'];
+        set('split24hUsdc', fmt(s24.usdc));
+        set('split24hToriva', fmtTokens(s24.toriva));
+        set('split24hTorivaUsd', '~' + fmt(s24.torivaUSD) + ' at current price');
+
+        var s1 = d.split['1h'];
+        set('split1hUsdc', fmt(s1.usdc));
+        set('split1hToriva', fmtTokens(s1.toriva));
+
+        var s6 = d.split['6h'];
+        set('split6hUsdc', fmt(s6.usdc));
+        set('split6hToriva', fmtTokens(s6.toriva));
+
+        var s7 = d.split['7d'];
+        set('split7dUsdc', fmt(s7.usdc));
+        set('split7dToriva', fmtTokens(s7.toriva));
+      }
+
       set('poolTvl', fmt(d.pool.tvl));
       set('poolVol24h', fmt(d.volume['24h']));
+      if (d.pool.torivaPrice) set('poolTorivaPrice', '$' + d.pool.torivaPrice.toFixed(4));
       var t = d.transactions && d.transactions.h24;
       if (t) set('poolTrades24h', ((t.buys + t.sells) || 0).toLocaleString());
       var ts = new Date(d.updatedAt);
