@@ -151,7 +151,7 @@ function initLpDonut() {
     a += sw + gap;
   });
   ctx.fillStyle = '#FAFAF5'; ctx.font = '700 48px "Bebas Neue",sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('2%',cx,cy-8);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('1%',cx,cy-8);
   ctx.fillStyle = 'rgba(250,250,245,0.35)'; ctx.font = '300 14px "Space Mono",monospace';
   ctx.fillText('LP FEE',cx,cy+22);
 }
