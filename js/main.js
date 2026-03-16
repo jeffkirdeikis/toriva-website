@@ -1011,8 +1011,8 @@ function fetchPoolFees() {
         set('split6hUsdc', fmt(s6.usdc));
         set('split6hToriva', fmtTokens(s6.toriva));
 
-        set('splitCard24hUsdc', fmt(s24.usdc));
-        set('splitCard24hToriva', fmtTokens(s24.toriva));
+        set('grid24hUsdc', fmt(s24.usdc));
+        set('grid24hToriva', fmtTokens(s24.toriva));
 
         var s7 = d.split['7d'];
         set('split7dUsdc', fmt(s7.usdc));
