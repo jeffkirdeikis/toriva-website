@@ -994,14 +994,24 @@ function fetchPoolFees() {
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.error) { set('feeUpdated', 'Data temporarily unavailable'); return; }
-      set('fee24h', fmt(d.fees['24h']));
 
-      // 24h breakdown
+      // Cumulative on-chain fees (hero stat)
+      if (d.cumulative) {
+        set('feeCumulative', fmt(d.cumulative.total));
+        set('cumulativeUsdc', fmt(d.cumulative.usdc));
+        set('cumulativeUsdcTokens', fmtTokens(d.cumulative.usdc) + ' USDC');
+        set('cumulativeToriva', fmtTokens(d.cumulative.toriva));
+        set('cumulativeTorivaUsd', '~' + fmt(d.cumulative.torivaUSD) + ' at current price');
+      } else {
+        // Fallback to 24h if on-chain read fails
+        set('feeCumulative', fmt(d.fees['24h']));
+      }
+      // Legacy element support
+      set('fee24h', d.cumulative ? fmt(d.cumulative.total) : fmt(d.fees['24h']));
+
+      // Time-period breakdowns
       if (d.split) {
         var s24 = d.split['24h'];
-        set('split24hUsdc', fmt(s24.usdc));
-        set('split24hToriva', fmtTokens(s24.toriva));
-        set('split24hTorivaUsd', '~' + fmt(s24.torivaUSD) + ' at current price');
 
         var s1 = d.split['1h'];
         set('split1hUsdc', fmt(s1.usdc));

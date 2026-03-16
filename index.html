@@ -1135,24 +1135,24 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <div class="tk-label">Live Pool Data</div>
       <p class="tk-body" style="margin-bottom:clamp(32px,4vw,48px);">Real-time fee earnings from the TORIVA/USDC liquidity pool on Uniswap V3. Fees are earned in both tokens: USDC from buy swaps, TORIVA from sell swaps.</p>
 
-      <!-- Hero stat: 24h total -->
+      <!-- Hero stat: cumulative total -->
       <div style="text-align:center;margin-bottom:clamp(40px,5vw,56px);">
-        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.3em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:12px;">Total Fees Earned (24h)</div>
-        <div id="fee24h" style="font-family:'DM Serif Display',serif;font-size:clamp(3rem,7vw,5.5rem);color:#C9A84C;line-height:1;filter:drop-shadow(0 0 40px rgba(201,168,76,0.2));">--</div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.3em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:12px;">Total Fees Earned</div>
+        <div id="feeCumulative" style="font-family:'DM Serif Display',serif;font-size:clamp(3rem,7vw,5.5rem);color:#C9A84C;line-height:1;filter:drop-shadow(0 0 40px rgba(201,168,76,0.2));">--</div>
         <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);margin:16px auto 0;"></div>
       </div>
 
-      <!-- 24h token breakdown -->
+      <!-- Cumulative token breakdown -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.08);margin-bottom:clamp(32px,4vw,48px);">
         <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
-          <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">USDC Earned (24h)</div>
-          <div id="split24hUsdc" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#3b82f6;line-height:1.2;">--</div>
-          <div style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">from buy swaps</div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">USDC Earned</div>
+          <div id="cumulativeUsdc" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#3b82f6;line-height:1.2;">--</div>
+          <div id="cumulativeUsdcTokens" style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">from buy swaps</div>
         </div>
         <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
-          <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">TORIVA Earned (24h)</div>
-          <div id="split24hToriva" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#C9A84C;line-height:1.2;">--</div>
-          <div id="split24hTorivaUsd" style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">from sell swaps</div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">TORIVA Earned</div>
+          <div id="cumulativeToriva" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#C9A84C;line-height:1.2;">--</div>
+          <div id="cumulativeTorivaUsd" style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">from sell swaps</div>
         </div>
       </div>
 
