@@ -3,5 +3,9 @@ Allow: /
 Disallow: /api/
 Disallow: /deck
 Disallow: /marketplace
+Disallow: /toriva-homepage-export.html
+Disallow: /projections-backup.html
+Disallow: /roadmap-backup.html
+Disallow: /toriva-flow-animation.html
 
 Sitemap: https://toriva.ai/sitemap.xml
