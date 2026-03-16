@@ -1011,8 +1011,10 @@ function fetchPoolFees() {
         set('split6hUsdc', fmt(s6.usdc));
         set('split6hToriva', fmtTokens(s6.toriva));
 
-        set('grid24hUsdc', fmt(s24.usdc));
-        set('grid24hToriva', fmtTokens(s24.toriva));
+        var el24u = document.getElementById('grid24hUsdc') || document.getElementById('splitCard24hUsdc') || document.querySelector('[data-fee="24h-usdc"]');
+        var el24t = document.getElementById('grid24hToriva') || document.getElementById('splitCard24hToriva') || document.querySelector('[data-fee="24h-toriva"]');
+        if (el24u) el24u.textContent = fmt(s24.usdc);
+        if (el24t) el24t.textContent = fmtTokens(s24.toriva);
 
         var s7 = d.split['7d'];
         set('split7dUsdc', fmt(s7.usdc));
