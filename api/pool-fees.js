@@ -8,8 +8,12 @@ const RPC_ENDPOINTS = [
 const FEE_RATE = 0.01;
 const Q128 = BigInt(2) ** BigInt(128);
 
-// Read a uint256 from the pool contract, with RPC fallback
-async function readPool(selector) {
+const USDC_ADDR = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+const TORIVA_ADDR = '0xb886Cf1444BFF05e9a99E00543BC4054d423ebFD';
+const TREASURY_WALLET = '0x2633148755A12c6D5aBD75Eed90B4a6572275Cdb';
+
+// Read a uint256 from any contract, with RPC fallback
+async function readContract(contractAddr, data) {
   for (const rpc of RPC_ENDPOINTS) {
     try {
       const res = await fetch(rpc, {
@@ -17,7 +21,7 @@ async function readPool(selector) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           jsonrpc: '2.0', method: 'eth_call', id: 1,
-          params: [{ to: POOL_ADDR, data: selector }, 'latest']
+          params: [{ to: contractAddr, data }, 'latest']
         })
       });
       if (!res.ok) continue;
@@ -28,7 +32,44 @@ async function readPool(selector) {
       continue;
     }
   }
-  throw new Error('All RPCs failed for selector ' + selector);
+  throw new Error('All RPCs failed for contract ' + contractAddr);
+}
+
+// Read a uint256 from the pool contract, with RPC fallback
+async function readPool(selector) {
+  return readContract(POOL_ADDR, selector);
+}
+
+// balanceOf(address) calldata
+function balanceOfData(address) {
+  return '0x70a08231000000000000000000000000' + address.slice(2).toLowerCase();
+}
+
+// Fetch treasury wallet USDC and LP position token balances
+async function getTreasuryData(torivaPrice) {
+  try {
+    const [walletUsdc, poolUsdc, poolToriva] = await Promise.all([
+      readContract(USDC_ADDR, balanceOfData(TREASURY_WALLET)),
+      readContract(USDC_ADDR, balanceOfData(POOL_ADDR)),
+      readContract(TORIVA_ADDR, balanceOfData(POOL_ADDR)),
+    ]);
+    const walletUsdcNum = Number(walletUsdc) / 1e6;
+    const poolUsdcNum = Number(poolUsdc) / 1e6;
+    const poolTorivaNum = Number(poolToriva) / 1e18;
+    const poolTorivaUSD = poolTorivaNum * torivaPrice;
+    return {
+      walletUsdc: walletUsdcNum,
+      lpPosition: {
+        usdc: poolUsdcNum,
+        toriva: poolTorivaNum,
+        torivaUSD: poolTorivaUSD,
+        total: poolUsdcNum + poolTorivaUSD,
+      },
+    };
+  } catch (e) {
+    console.error('Treasury data fetch failed:', e.message);
+    return null;
+  }
 }
 
 // Read protocol fee from slot0
@@ -126,10 +167,11 @@ export default async function handler(req, res) {
     const vol6h = parseFloat(attr.volume_usd.h6) || 0;
     const vol1h = parseFloat(attr.volume_usd.h1) || 0;
 
-    // Read actual cumulative fees AND protocol fee in parallel
-    const [cumulative, lpMultiplier] = await Promise.all([
+    // Read actual cumulative fees, protocol fee, and treasury data in parallel
+    const [cumulative, lpMultiplier, treasury] = await Promise.all([
       getCumulativeFees(torivaPrice),
       getProtocolFeeMultiplier(),
+      getTreasuryData(torivaPrice),
     ]);
 
     const fees1h = vol1h * FEE_RATE * lpMultiplier;
@@ -188,6 +230,7 @@ export default async function handler(req, res) {
       },
       volume: { '1h': vol1h, '6h': vol6h, '24h': vol24h, '7d': vol7d, '30d': vol30d },
       transactions: txn,
+      treasury: treasury || null,
       updatedAt: new Date().toISOString(),
     });
   } catch (err) {

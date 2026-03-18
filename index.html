@@ -1448,36 +1448,64 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <section class="tk-section" style="padding-top:clamp(80px,12vw,140px);">
   <div class="tk-inner">
 
-    <!-- Treasury Value Section -->
+    <!-- Treasury Value (grand total, excludes LP) -->
     <div style="text-align:center;margin-bottom:clamp(40px,5vw,56px);">
       <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.3em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:12px;">Treasury Value</div>
       <div id="dashTreasuryValue" style="font-family:'DM Serif Display',serif;font-size:clamp(3rem,7vw,5.5rem);color:#C9A84C;line-height:1;filter:drop-shadow(0 0 40px rgba(201,168,76,0.2));">--</div>
       <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);margin:16px auto 0;"></div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.08);margin-bottom:clamp(32px,4vw,48px);">
+    <!-- Treasury breakdown: TORIVA holdings + wallet USDC -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.08);margin-bottom:clamp(32px,4vw,48px);">
       <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
-        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">Treasury Holdings</div>
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">TORIVA Holdings</div>
         <div style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#C9A84C;line-height:1.2;">380M</div>
-        <div style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">TORIVA tokens</div>
+        <div id="dashTokenValue" style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">--</div>
+      </div>
+      <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">USDC Balance</div>
+        <div id="dashWalletUsdc" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#3b82f6;line-height:1.2;">--</div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">treasury wallet</div>
       </div>
       <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
         <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">Token Price</div>
-        <div id="dashTreasuryPrice" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#3b82f6;line-height:1.2;">--</div>
+        <div id="dashTreasuryPrice" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#FAFAF5;line-height:1.2;">--</div>
         <div style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">current market price</div>
       </div>
     </div>
 
     <div style="width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.15),transparent);margin:0 0 clamp(32px,5vw,56px);"></div>
 
-    <!-- Hero stat: cumulative total -->
+    <!-- LP Position (excluded from treasury total) -->
     <div style="text-align:center;margin-bottom:clamp(40px,5vw,56px);">
-      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.3em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:12px;">Total Fees Earned</div>
-      <div id="dashFeeCumulative" style="font-family:'DM Serif Display',serif;font-size:clamp(3rem,7vw,5.5rem);color:#C9A84C;line-height:1;filter:drop-shadow(0 0 40px rgba(201,168,76,0.2));">--</div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.3em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:12px;">LP Position</div>
+      <div id="dashLpTotal" style="font-family:'DM Serif Display',serif;font-size:clamp(2.5rem,5vw,4rem);color:#C9A84C;line-height:1;filter:drop-shadow(0 0 40px rgba(201,168,76,0.15));">--</div>
+      <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;color:rgba(250,250,245,0.3);margin-top:10px;">NOT INCLUDED IN TREASURY TOTAL</div>
       <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);margin:16px auto 0;"></div>
     </div>
 
-    <!-- Cumulative token breakdown -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.08);margin-bottom:clamp(32px,4vw,48px);">
+      <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">USDC in Pool</div>
+        <div id="dashLpUsdc" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#3b82f6;line-height:1.2;">--</div>
+        <div id="dashLpUsdcTokens" style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">--</div>
+      </div>
+      <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">TORIVA in Pool</div>
+        <div id="dashLpTorivaUsd" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#C9A84C;line-height:1.2;">--</div>
+        <div id="dashLpTorivaTokens" style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">--</div>
+      </div>
+    </div>
+
+    <div style="width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.15),transparent);margin:0 0 clamp(32px,5vw,56px);"></div>
+
+    <!-- LP Fees Earned -->
+    <div style="text-align:center;margin-bottom:clamp(40px,5vw,56px);">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.3em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:12px;">Total Fees Earned</div>
+      <div id="dashFeeCumulative" style="font-family:'DM Serif Display',serif;font-size:clamp(2.5rem,5vw,4rem);color:#C9A84C;line-height:1;filter:drop-shadow(0 0 40px rgba(201,168,76,0.15));">--</div>
+      <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);margin:16px auto 0;"></div>
+    </div>
+
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.08);margin-bottom:clamp(32px,4vw,48px);">
       <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
         <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">USDC Earned</div>

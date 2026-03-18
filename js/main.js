@@ -1067,12 +1067,26 @@ function fetchPoolFees() {
       if (t) set('dashPoolTrades24h', ((t.buys + t.sells) || 0).toLocaleString());
       set('dashFeeUpdated', 'Live \u00b7 updated ' + ts.toLocaleTimeString());
 
-      // Treasury value: 380M tokens * current price
+      // Treasury value: 380M tokens * price + wallet USDC (excludes LP)
       if (d.pool.torivaPrice) {
         var treasuryTokens = 380000000;
-        var treasuryVal = treasuryTokens * d.pool.torivaPrice;
+        var tokenVal = treasuryTokens * d.pool.torivaPrice;
+        var walletUsdc = (d.treasury && d.treasury.walletUsdc) || 0;
+        var treasuryVal = tokenVal + walletUsdc;
         set('dashTreasuryValue', fmt(treasuryVal));
         set('dashTreasuryPrice', '$' + d.pool.torivaPrice.toFixed(4));
+        set('dashTokenValue', '~' + fmt(tokenVal));
+        set('dashWalletUsdc', fmt(walletUsdc));
+      }
+
+      // LP Position (excluded from treasury)
+      if (d.treasury && d.treasury.lpPosition) {
+        var lp = d.treasury.lpPosition;
+        set('dashLpTotal', fmt(lp.total));
+        set('dashLpUsdc', fmt(lp.usdc));
+        set('dashLpUsdcTokens', fmtTokens(lp.usdc) + ' USDC');
+        set('dashLpTorivaUsd', fmt(lp.torivaUSD));
+        set('dashLpTorivaTokens', fmtTokens(lp.toriva) + ' TORIVA');
       }
     })
     .catch(function() {
