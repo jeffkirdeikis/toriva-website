@@ -1067,16 +1067,23 @@ function fetchPoolFees() {
       if (t) set('dashPoolTrades24h', ((t.buys + t.sells) || 0).toLocaleString());
       set('dashFeeUpdated', 'Live \u00b7 updated ' + ts.toLocaleTimeString());
 
-      // Treasury value: 380M tokens * price + wallet USDC (excludes LP)
+      // Treasury value: (380M + fee TORIVA) * price + (wallet USDC + fee USDC)
       if (d.pool.torivaPrice) {
-        var treasuryTokens = 380000000;
+        var baseTorivaTokens = 380000000;
+        var feeToriva = (d.cumulative && d.cumulative.toriva) || 0;
+        var treasuryTokens = baseTorivaTokens + feeToriva;
         var tokenVal = treasuryTokens * d.pool.torivaPrice;
         var walletUsdc = (d.treasury && d.treasury.walletUsdc) || 0;
-        var treasuryVal = tokenVal + walletUsdc;
+        var feeUsdc = (d.cumulative && d.cumulative.usdc) || 0;
+        var totalUsdc = walletUsdc + feeUsdc;
+        var treasuryVal = tokenVal + totalUsdc;
         set('dashTreasuryValue', fmt(treasuryVal));
         set('dashTreasuryPrice', '$' + d.pool.torivaPrice.toFixed(4));
         set('dashTokenValue', '~' + fmt(tokenVal));
-        set('dashWalletUsdc', fmt(walletUsdc));
+        set('dashWalletUsdc', fmt(totalUsdc));
+        // Update TORIVA holdings count dynamically
+        var torivaMillions = treasuryTokens / 1000000;
+        set('dashTorivaHoldings', torivaMillions.toFixed(1) + 'M');
       }
 
       // LP Position (excluded from treasury)
