@@ -37,6 +37,7 @@ const pageMeta = {
   how:     { title: 'How It Works | TORIVA', desc: 'See how TORIVA autonomous agents build software businesses, process tasks on your Mac, and compound revenue automatically.' },
   pledge:  { title: 'Pledge Network | TORIVA', desc: 'Contribute your idle Mac to the TORIVA compute network. Earn daily revenue from real AI tasks with a $100 pledge.' },
   token:   { title: 'Tokenomics | TORIVA', desc: 'One billion $TORIVA tokens. 90% of revenue to pledgers. Explore the token allocation, liquidity structure, and economic flywheel.' },
+  dashboard: { title: 'Dashboard | TORIVA', desc: 'Live LP fee earnings, pool stats, and treasury value for the TORIVA/USDC liquidity pool on Uniswap V3.' },
   team:    { title: 'Team | TORIVA', desc: 'Meet the TORIVA founding team. Former TrustSwap founder Jeff Kirdeikis, CTO Ivan Reif, and CAO Alex Hrankin.' },
   privacy: { title: 'Privacy Policy | TORIVA', desc: 'TORIVA privacy policy. PIPEDA-compliant data handling for the autonomous AI agent network.' },
   terms:   { title: 'Terms of Service | TORIVA', desc: 'TORIVA terms of service governing use of the autonomous AI agent network and pledge system.' },
@@ -86,6 +87,7 @@ function goPage(id, pushState) {
   if (id === 'home') initHeroCanvas();
   if (id === 'how') setTimeout(initNetworkCanvas, 100);
   if (id === 'token') { setTimeout(animateBars, 300); setTimeout(initLpDonut, 100); startPoolFeeRefresh(); }
+  if (id === 'dashboard') { startPoolFeeRefresh(); }
   observeReveals();
 }
 // Handle hash on load and back/forward
@@ -94,7 +96,7 @@ function loadFromHash() {
   const path = location.pathname.replace(/^\//, '').replace(/\/$/, '');
   const hash = location.hash.replace('#', '');
   const page = path || hash || 'home';
-  const valid = ['home','how','pledge','token','projections','roadmap','team','marketplace','deck','privacy','terms'];
+  const valid = ['home','how','pledge','token','dashboard','projections','roadmap','team','marketplace','deck','privacy','terms'];
   // Backward compatibility: redirect /founder to /team
   if (page === 'founder') { goPage('team', true); return; }
   goPage(valid.includes(page) ? page : 'home', false);
@@ -1038,9 +1040,44 @@ function fetchPoolFees() {
       if (t) set('poolTrades24h', ((t.buys + t.sells) || 0).toLocaleString());
       var ts = new Date(d.updatedAt);
       set('feeUpdated', 'Live \u00b7 updated ' + ts.toLocaleTimeString());
+
+      // Dashboard mirror
+      if (d.cumulative) {
+        set('dashFeeCumulative', fmt(d.cumulative.total));
+        set('dashCumulativeUsdc', fmt(d.cumulative.usdc));
+        set('dashCumulativeUsdcTokens', fmtTokens(d.cumulative.usdc) + ' USDC');
+        set('dashCumulativeToriva', fmtTokens(d.cumulative.toriva));
+        set('dashCumulativeTorivaUsd', '~' + fmt(d.cumulative.torivaUSD) + ' at current price');
+      } else {
+        set('dashFeeCumulative', fmt(d.fees['24h']));
+      }
+      if (d.split) {
+        set('dashSplit1hUsdc', fmt(d.split['1h'].usdc));
+        set('dashSplit1hToriva', fmtTokens(d.split['1h'].toriva));
+        set('dashSplit6hUsdc', fmt(d.split['6h'].usdc));
+        set('dashSplit6hToriva', fmtTokens(d.split['6h'].toriva));
+        set('dashSplit24hUsdc', fmt(d.split['24h'].usdc));
+        set('dashSplit24hToriva', fmtTokens(d.split['24h'].toriva));
+        set('dashSplit7dUsdc', fmt(d.split['7d'].usdc));
+        set('dashSplit7dToriva', fmtTokens(d.split['7d'].toriva));
+      }
+      set('dashPoolTvl', fmt(d.pool.tvl));
+      set('dashPoolVol24h', fmt(d.volume['24h']));
+      if (d.pool.torivaPrice) set('dashPoolTorivaPrice', '$' + d.pool.torivaPrice.toFixed(4));
+      if (t) set('dashPoolTrades24h', ((t.buys + t.sells) || 0).toLocaleString());
+      set('dashFeeUpdated', 'Live \u00b7 updated ' + ts.toLocaleTimeString());
+
+      // Treasury value: 380M tokens * current price
+      if (d.pool.torivaPrice) {
+        var treasuryTokens = 380000000;
+        var treasuryVal = treasuryTokens * d.pool.torivaPrice;
+        set('dashTreasuryValue', fmt(treasuryVal));
+        set('dashTreasuryPrice', '$' + d.pool.torivaPrice.toFixed(4));
+      }
     })
     .catch(function() {
       set('feeUpdated', 'Unable to load live data');
+      set('dashFeeUpdated', 'Unable to load live data');
     });
 }
 function startPoolFeeRefresh() {

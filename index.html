@@ -100,7 +100,7 @@
 
     <li><a href="/pledge" data-page="pledge">Pledge</a></li>
     <li><a href="/token" data-page="token">Tokenomics</a></li>
-
+    <li><a href="/dashboard" data-page="dashboard">Dashboard</a></li>
     <li><a href="/team" data-page="team">Team</a></li>
   </ul>
   <div class="nav-socials">
@@ -1442,6 +1442,143 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 </div>
 
 <!-- Projections page removed - backup at projections-backup.html -->
+
+<!-- ═══ DASHBOARD ═══ -->
+<div id="page-dashboard" class="page">
+<section class="tk-section" style="padding-top:clamp(80px,12vw,140px);">
+  <div class="tk-inner">
+
+    <!-- Hero stat: cumulative total -->
+    <div style="text-align:center;margin-bottom:clamp(40px,5vw,56px);">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.3em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:12px;">Total Fees Earned</div>
+      <div id="dashFeeCumulative" style="font-family:'DM Serif Display',serif;font-size:clamp(3rem,7vw,5.5rem);color:#C9A84C;line-height:1;filter:drop-shadow(0 0 40px rgba(201,168,76,0.2));">--</div>
+      <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);margin:16px auto 0;"></div>
+    </div>
+
+    <!-- Cumulative token breakdown -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.08);margin-bottom:clamp(32px,4vw,48px);">
+      <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">USDC Earned</div>
+        <div id="dashCumulativeUsdc" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#3b82f6;line-height:1.2;">--</div>
+        <div id="dashCumulativeUsdcTokens" style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">from buy swaps</div>
+      </div>
+      <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">TORIVA Earned</div>
+        <div id="dashCumulativeToriva" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#C9A84C;line-height:1.2;">--</div>
+        <div id="dashCumulativeTorivaUsd" style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">from sell swaps</div>
+      </div>
+    </div>
+
+    <!-- Fee period cards -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.08);margin-bottom:clamp(24px,3vw,40px);">
+      <div style="background:var(--bg);padding:clamp(20px,3vw,32px);">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;text-align:center;">1 Hour</div>
+        <div style="display:flex;justify-content:center;gap:clamp(8px,1.5vw,16px);flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div id="dashSplit1hUsdc" style="font-family:'DM Serif Display',serif;font-size:clamp(1.1rem,1.8vw,1.5rem);color:#3b82f6;line-height:1.2;">--</div>
+            <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(250,250,245,0.3);margin-top:3px;">USDC</div>
+          </div>
+          <div style="width:1px;background:rgba(201,168,76,0.1);align-self:stretch;"></div>
+          <div style="text-align:center;">
+            <div id="dashSplit1hToriva" style="font-family:'DM Serif Display',serif;font-size:clamp(1.1rem,1.8vw,1.5rem);color:#C9A84C;line-height:1.2;">--</div>
+            <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(250,250,245,0.3);margin-top:3px;">TORIVA</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--bg);padding:clamp(20px,3vw,32px);">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;text-align:center;">6 Hours</div>
+        <div style="display:flex;justify-content:center;gap:clamp(8px,1.5vw,16px);flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div id="dashSplit6hUsdc" style="font-family:'DM Serif Display',serif;font-size:clamp(1.1rem,1.8vw,1.5rem);color:#3b82f6;line-height:1.2;">--</div>
+            <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(250,250,245,0.3);margin-top:3px;">USDC</div>
+          </div>
+          <div style="width:1px;background:rgba(201,168,76,0.1);align-self:stretch;"></div>
+          <div style="text-align:center;">
+            <div id="dashSplit6hToriva" style="font-family:'DM Serif Display',serif;font-size:clamp(1.1rem,1.8vw,1.5rem);color:#C9A84C;line-height:1.2;">--</div>
+            <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(250,250,245,0.3);margin-top:3px;">TORIVA</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--bg);padding:clamp(20px,3vw,32px);">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;text-align:center;">24 Hours</div>
+        <div style="display:flex;justify-content:center;gap:clamp(8px,1.5vw,16px);flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div id="dashSplit24hUsdc" style="font-family:'DM Serif Display',serif;font-size:clamp(1.1rem,1.8vw,1.5rem);color:#3b82f6;line-height:1.2;">--</div>
+            <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(250,250,245,0.3);margin-top:3px;">USDC</div>
+          </div>
+          <div style="width:1px;background:rgba(201,168,76,0.1);align-self:stretch;"></div>
+          <div style="text-align:center;">
+            <div id="dashSplit24hToriva" style="font-family:'DM Serif Display',serif;font-size:clamp(1.1rem,1.8vw,1.5rem);color:#C9A84C;line-height:1.2;">--</div>
+            <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(250,250,245,0.3);margin-top:3px;">TORIVA</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--bg);padding:clamp(20px,3vw,32px);">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;text-align:center;">7 Days</div>
+        <div style="display:flex;justify-content:center;gap:clamp(8px,1.5vw,16px);flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div id="dashSplit7dUsdc" style="font-family:'DM Serif Display',serif;font-size:clamp(1.1rem,1.8vw,1.5rem);color:#3b82f6;line-height:1.2;">--</div>
+            <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(250,250,245,0.3);margin-top:3px;">USDC</div>
+          </div>
+          <div style="width:1px;background:rgba(201,168,76,0.1);align-self:stretch;"></div>
+          <div style="text-align:center;">
+            <div id="dashSplit7dToriva" style="font-family:'DM Serif Display',serif;font-size:clamp(1.1rem,1.8vw,1.5rem);color:#C9A84C;line-height:1.2;">--</div>
+            <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(250,250,245,0.3);margin-top:3px;">TORIVA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pool stats row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:clamp(16px,2.5vw,32px);margin-bottom:clamp(24px,3vw,40px);">
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.5);text-transform:uppercase;margin-bottom:6px;">Pool TVL</div>
+        <div id="dashPoolTvl" style="font-family:'DM Serif Display',serif;font-size:clamp(1rem,1.4vw,1.25rem);color:#FAFAF5;">--</div>
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.5);text-transform:uppercase;margin-bottom:6px;">Volume (24h)</div>
+        <div id="dashPoolVol24h" style="font-family:'DM Serif Display',serif;font-size:clamp(1rem,1.4vw,1.25rem);color:#FAFAF5;">--</div>
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.5);text-transform:uppercase;margin-bottom:6px;">Trades (24h)</div>
+        <div id="dashPoolTrades24h" style="font-family:'DM Serif Display',serif;font-size:clamp(1rem,1.4vw,1.25rem);color:#FAFAF5;">--</div>
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.5);text-transform:uppercase;margin-bottom:6px;">TORIVA Price</div>
+        <div id="dashPoolTorivaPrice" style="font-family:'DM Serif Display',serif;font-size:clamp(1rem,1.4vw,1.25rem);color:#FAFAF5;">--</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:clamp(20px,3vw,32px);display:flex;align-items:center;gap:8px;">
+      <span style="width:6px;height:6px;border-radius:50%;background:#4CCA6E;box-shadow:0 0 8px rgba(76,202,110,0.4);animation:pledgeDotPulse 2s ease-in-out infinite;"></span>
+      <span id="dashFeeUpdated" style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(250,250,245,0.35);letter-spacing:.1em;"></span>
+    </div>
+
+    <div style="width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.15),transparent);margin:clamp(32px,5vw,56px) 0;"></div>
+
+    <!-- Treasury Value Section -->
+    <div style="text-align:center;margin-bottom:clamp(40px,5vw,56px);">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.3em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:12px;">Treasury Value</div>
+      <div id="dashTreasuryValue" style="font-family:'DM Serif Display',serif;font-size:clamp(3rem,7vw,5.5rem);color:#C9A84C;line-height:1;filter:drop-shadow(0 0 40px rgba(201,168,76,0.2));">--</div>
+      <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);margin:16px auto 0;"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.08);">
+      <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">Treasury Holdings</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#C9A84C;line-height:1.2;">380M</div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">TORIVA tokens</div>
+      </div>
+      <div style="background:var(--bg);padding:clamp(24px,3vw,36px);text-align:center;">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:10px;">Token Price</div>
+        <div id="dashTreasuryPrice" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:#3b82f6;line-height:1.2;">--</div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(.75rem,.85vw,.82rem);color:rgba(250,250,245,0.35);margin-top:6px;">current market price</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</div>
 
 <!-- ═══ TEAM ═══ -->
 <div id="page-team" class="page">
