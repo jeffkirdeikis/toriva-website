@@ -969,33 +969,32 @@ if (track) track.innerHTML += track.innerHTML;
 
 // ═══ LIVE POOL FEE DATA ═══
 var _feeInterval = null;
-function fetchPoolFees() {
-  var widget = document.getElementById('feeWidget');
-  if (!widget) return;
+var _CACHE_KEY = 'toriva_pool_fees';
 
-  function fmt(n) {
-    if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
-    if (n >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K';
-    if (n >= 1) return '$' + n.toFixed(2);
-    return '$' + n.toFixed(4);
+function fmt(n) {
+  if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K';
+  if (n >= 1) return '$' + n.toFixed(2);
+  return '$' + n.toFixed(4);
+}
+
+function set(id, val) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.textContent = val;
+    el.classList.remove('shimmer');
   }
+}
 
-  function set(id, val) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = val;
-  }
+function fmtTokens(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  if (n >= 1) return n.toFixed(0);
+  return n.toFixed(2);
+}
 
-  function fmtTokens(n) {
-    if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
-    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
-    if (n >= 1) return n.toFixed(0);
-    return n.toFixed(2);
-  }
-
-  fetch('/api/pool-fees')
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      if (d.error) { set('feeUpdated', 'Data temporarily unavailable'); return; }
+function applyPoolData(d) {
+  if (d.error) { set('feeUpdated', 'Data temporarily unavailable'); return; }
 
       // Cumulative on-chain fees (hero stat)
       if (d.cumulative) {
@@ -1095,13 +1094,50 @@ function fetchPoolFees() {
         set('dashLpTorivaUsd', fmt(lp.torivaUSD));
         set('dashLpTorivaTokens', fmtTokens(lp.toriva) + ' TORIVA');
       }
+}
+
+function fetchPoolFees() {
+  var widget = document.getElementById('feeWidget');
+  if (!widget) return;
+
+  fetch('/api/pool-fees')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      applyPoolData(d);
+      try { localStorage.setItem(_CACHE_KEY, JSON.stringify(d)); } catch(e) {}
     })
     .catch(function() {
       set('feeUpdated', 'Unable to load live data');
       set('dashFeeUpdated', 'Unable to load live data');
     });
 }
+
+function addShimmerToPlaceholders() {
+  var ids = [
+    'dashTreasuryValue','dashTorivaHoldings','dashTokenValue','dashWalletUsdc',
+    'dashTreasuryPrice','dashLpTotal','dashLpUsdc','dashLpUsdcTokens',
+    'dashLpTorivaUsd','dashLpTorivaTokens','dashFeeCumulative','dashCumulativeUsdc',
+    'dashCumulativeUsdcTokens','dashCumulativeToriva','dashCumulativeTorivaUsd',
+    'dashSplit1hUsdc','dashSplit1hToriva','dashSplit6hUsdc','dashSplit6hToriva',
+    'dashSplit24hUsdc','dashSplit24hToriva','dashSplit7dUsdc','dashSplit7dToriva',
+    'dashPoolTvl','dashPoolVol24h','dashPoolTrades24h',
+    'feeCumulative','cumulativeUsdc','cumulativeToriva',
+    'split1hUsdc','split1hToriva','split6hUsdc','split6hToriva',
+    'split7dUsdc','split7dToriva','poolTvl','poolVol24h','poolTrades24h'
+  ];
+  ids.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && el.textContent === '--') el.classList.add('shimmer');
+  });
+}
+
 function startPoolFeeRefresh() {
+  addShimmerToPlaceholders();
+  // Show cached data instantly, then fetch fresh
+  try {
+    var cached = localStorage.getItem(_CACHE_KEY);
+    if (cached) applyPoolData(JSON.parse(cached));
+  } catch(e) {}
   fetchPoolFees();
   if (_feeInterval) clearInterval(_feeInterval);
   _feeInterval = setInterval(fetchPoolFees, 60000);

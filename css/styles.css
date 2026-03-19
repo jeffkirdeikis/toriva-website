@@ -61,6 +61,10 @@ nav.scrolled{background:rgba(5,5,5,.95);border-bottom:1px solid var(--border);ba
 .hamburger.open span:nth-child(2){opacity:0;}
 .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
 
+/* LOADING SHIMMER */
+@keyframes shimmer{0%{opacity:.3}50%{opacity:.7}100%{opacity:.3}}
+.shimmer{animation:shimmer 1.5s ease-in-out infinite;}
+
 /* PAGES */
 .page{display:none;min-height:100vh;}
 .page.active{display:block;}
