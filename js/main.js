@@ -41,6 +41,7 @@ const pageMeta = {
   team:    { title: 'Team | TORIVA', desc: 'Meet the TORIVA founding team. Former TrustSwap founder Jeff Kirdeikis, CTO Ivan Reif, and CAO Alex Hrankin.' },
   privacy: { title: 'Privacy Policy | TORIVA', desc: 'TORIVA privacy policy. PIPEDA-compliant data handling for the autonomous AI agent network.' },
   terms:   { title: 'Terms of Service | TORIVA', desc: 'TORIVA terms of service governing use of the autonomous AI agent network and pledge system.' },
+  launch:  { title: 'Launch | TORIVA', desc: 'Three revenue engines power TORIVA. The token incubator launches now. Learn about AIFUND, the first incubation.' },
 };
 
 // CLOSE MOBILE MENU
@@ -96,7 +97,7 @@ function loadFromHash() {
   const path = location.pathname.replace(/^\//, '').replace(/\/$/, '');
   const hash = location.hash.replace('#', '');
   const page = path || hash || 'home';
-  const valid = ['home','how','pledge','token','dashboard','projections','roadmap','team','marketplace','deck','privacy','terms'];
+  const valid = ['home','how','pledge','token','dashboard','projections','roadmap','team','marketplace','deck','privacy','terms','launch'];
   // Backward compatibility: redirect /founder to /team
   if (page === 'founder') { goPage('team', true); return; }
   goPage(valid.includes(page) ? page : 'home', false);
