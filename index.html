@@ -2165,14 +2165,24 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .fee-card{padding:1.75rem 1.25rem}
 .flywheel-container{padding:2rem 1rem}
 .flywheel-node{padding:1rem .75rem}
-.three-engines-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-top:3rem}
-.engine-card{padding:1.5rem 1rem}
-.engine-card svg{margin-bottom:.75rem}
-.engine-label{font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.1em;color:rgba(255,255,255,0.35)}
-.engine-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.06em;color:rgba(255,255,255,0.55);margin-top:.2rem}
-.engine-status{font-family:var(--body-font);font-size:.7rem;color:rgba(255,255,255,0.25);margin-top:.4rem}
-.engine-badge{margin-top:.6rem;display:inline-block;padding:.2rem .6rem;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);border-radius:20px}
-.engine-badge p{font-family:var(--body-font);font-size:.6rem;color:var(--gold);letter-spacing:.05em;text-transform:uppercase;font-weight:600}
+.three-engines-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:4rem}
+.engine-card{padding:2rem 1.5rem}
+.engine-card svg{margin-bottom:1rem}
+.engine-label{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;color:rgba(255,255,255,0.35)}
+.engine-name{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;color:rgba(255,255,255,0.55);margin-top:.25rem}
+.engine-status{font-family:var(--body-font);font-size:.78rem;color:rgba(255,255,255,0.25);margin-top:.5rem}
+.engine-badge{margin-top:.75rem;display:inline-block;padding:.25rem .75rem;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);border-radius:20px}
+.engine-badge p{font-family:var(--body-font);font-size:.7rem;color:var(--gold);letter-spacing:.05em;text-transform:uppercase;font-weight:600}
+@media(max-width:640px){
+.three-engines-grid{gap:.5rem;margin-top:3rem}
+.engine-card{padding:1rem .6rem}
+.engine-card svg{width:22px;height:22px;margin-bottom:.5rem}
+.engine-label{font-size:.6rem}
+.engine-name{font-size:.7rem}
+.engine-status{font-size:.6rem}
+.engine-badge{padding:.15rem .5rem;margin-top:.4rem}
+.engine-badge p{font-size:.5rem}
+}
 }
 /* FAQ ACCORDION */
 .launch-faq-item{border-top:1px solid var(--border)}
@@ -2234,7 +2244,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,0.08);"></div>
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10" r="2"/></svg>
         <p class="engine-label">ENGINE 1</p>
-        <p class="engine-name">COMPUTE</p>
+        <p class="engine-name">DECENTRALIZED COMPUTE</p>
         <p class="engine-status">Building</p>
       </div>
       <div class="engine-card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;text-align:center;position:relative;overflow:hidden;">
@@ -2248,7 +2258,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.7)" stroke-width="1.2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         <p class="engine-label" style="color:var(--gold);">ENGINE 3</p>
-        <p class="engine-name" style="color:var(--gold);">INCUBATOR</p>
+        <p class="engine-name" style="color:var(--gold);">TOKEN INCUBATOR</p>
         <div class="engine-badge"><p>Launching Now</p></div>
       </div>
     </div>
