@@ -1,3 +1,10 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
 const POOL_ADDR = '0x2393cf60fd67e58e302f6d0b8c552cd5c37caf97';
 const GECKO_URL = 'https://api.geckoterminal.com/api/v2/networks/base/pools/' + POOL_ADDR;
 const RPC_ENDPOINTS = [
@@ -7,6 +14,7 @@ const RPC_ENDPOINTS = [
 ];
 const FEE_RATE = 0.01;
 const Q128 = BigInt(2) ** BigInt(128);
+const SNAPSHOT_INTERVAL_MS = 5 * 60 * 1000; // Save snapshot every 5 minutes
 
 const USDC_ADDR = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 const TORIVA_ADDR = '0xb886Cf1444BFF05e9a99E00543BC4054d423ebFD';
@@ -137,6 +145,70 @@ function splitFees(totalFeesUSD, usdcRatio, torivaRatio, torivaPrice) {
   return { usdc: usdcFees, toriva: torivaFees, torivaUSD: torivaFeesUSD };
 }
 
+// Save a snapshot of cumulative fees (throttled to every 5 minutes)
+async function saveSnapshot(usdcFees, torivaFees, torivaPrice) {
+  try {
+    // Check if we saved a snapshot recently
+    const { data: recent } = await supabase
+      .from('fee_snapshots')
+      .select('created_at')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (recent && recent.length > 0) {
+      const lastTime = new Date(recent[0].created_at).getTime();
+      if (Date.now() - lastTime < SNAPSHOT_INTERVAL_MS) return;
+    }
+
+    await supabase.from('fee_snapshots').insert({
+      usdc_fees: usdcFees,
+      toriva_fees: torivaFees,
+      toriva_price: torivaPrice,
+    });
+  } catch (e) {
+    console.error('Snapshot save failed:', e.message);
+  }
+}
+
+// Get the snapshot closest to a given time ago, returns { usdc_fees, toriva_fees, toriva_price }
+async function getSnapshotAt(hoursAgo) {
+  try {
+    const target = new Date(Date.now() - hoursAgo * 3600 * 1000).toISOString();
+    // Get the snapshot closest to the target time (the one just before it)
+    const { data } = await supabase
+      .from('fee_snapshots')
+      .select('usdc_fees, toriva_fees, toriva_price, created_at')
+      .lte('created_at', target)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (data && data.length > 0) return data[0];
+    return null;
+  } catch (e) {
+    console.error('Snapshot lookup failed:', e.message);
+    return null;
+  }
+}
+
+// Compute fee delta between current cumulative and a historical snapshot
+function computeDelta(cumulative, snapshot, currentPrice) {
+  if (!snapshot) return null;
+  const usdcDelta = Math.max(0, cumulative.usdc - Number(snapshot.usdc_fees));
+  const torivaDelta = Math.max(0, cumulative.toriva - Number(snapshot.toriva_fees));
+  const torivaUSD = torivaDelta * currentPrice;
+  return { usdc: usdcDelta, toriva: torivaDelta, torivaUSD };
+}
+
+// Clean up snapshots older than 31 days
+async function cleanOldSnapshots() {
+  try {
+    const cutoff = new Date(Date.now() - 31 * 24 * 3600 * 1000).toISOString();
+    await supabase.from('fee_snapshots').delete().lt('created_at', cutoff);
+  } catch (e) {
+    // Non-critical, ignore
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
@@ -167,21 +239,45 @@ export default async function handler(req, res) {
     const vol6h = parseFloat(attr.volume_usd.h6) || 0;
     const vol1h = parseFloat(attr.volume_usd.h1) || 0;
 
-    // Read actual cumulative fees, protocol fee, and treasury data in parallel
-    const [cumulative, lpMultiplier, treasury] = await Promise.all([
+    // Read actual cumulative fees, protocol fee, treasury data, and historical snapshots in parallel
+    const [cumulative, lpMultiplier, treasury, snap1h, snap6h, snap24h, snap7d, snap30d] = await Promise.all([
       getCumulativeFees(torivaPrice),
       getProtocolFeeMultiplier(),
       getTreasuryData(torivaPrice),
+      getSnapshotAt(1),
+      getSnapshotAt(6),
+      getSnapshotAt(24),
+      getSnapshotAt(24 * 7),
+      getSnapshotAt(24 * 30),
     ]);
 
-    const fees1h = vol1h * FEE_RATE * lpMultiplier;
-    const fees6h = vol6h * FEE_RATE * lpMultiplier;
-    const fees24h = vol24h * FEE_RATE * lpMultiplier;
+    // Save current cumulative fees as a snapshot (throttled) and clean old ones
+    if (cumulative) {
+      saveSnapshot(cumulative.usdc, cumulative.toriva, torivaPrice);
+      cleanOldSnapshots();
+    }
 
+    // Use on-chain ratio for splits, fallback to 50/50
+    const usdcRatio = cumulative ? cumulative.usdcRatio : 0.5;
+    const torivaRatio = cumulative ? cumulative.torivaRatio : 0.5;
+
+    // Compute time-windowed fees from on-chain snapshot deltas
+    const delta1h = cumulative ? computeDelta(cumulative, snap1h, torivaPrice) : null;
+    const delta6h = cumulative ? computeDelta(cumulative, snap6h, torivaPrice) : null;
+    const delta24h = cumulative ? computeDelta(cumulative, snap24h, torivaPrice) : null;
+    const delta7d = cumulative ? computeDelta(cumulative, snap7d, torivaPrice) : null;
+    const delta30d = cumulative ? computeDelta(cumulative, snap30d, torivaPrice) : null;
+
+    // Fallback to volume-based estimates if no snapshots exist yet
+    const fallback = (hours, vol) => {
+      const fees = vol * FEE_RATE * lpMultiplier;
+      return splitFees(fees, usdcRatio, torivaRatio, torivaPrice);
+    };
+
+    // For 7d/30d volume fallback, compute from OHLCV data
     const days = ohlcvData?.data?.attributes?.ohlcv_list || [];
     const now = Math.floor(Date.now() / 1000);
     const DAY = 86400;
-
     let vol7d = 0, vol30d = 0;
     for (const bar of days) {
       const ts = bar[0];
@@ -190,20 +286,16 @@ export default async function handler(req, res) {
       vol30d += vol;
     }
 
-    const fees7d = vol7d * FEE_RATE * lpMultiplier;
-    const fees30d = vol30d * FEE_RATE * lpMultiplier;
-
-    // Use on-chain ratio for splits, fallback to 50/50
-    const usdcRatio = cumulative ? cumulative.usdcRatio : 0.5;
-    const torivaRatio = cumulative ? cumulative.torivaRatio : 0.5;
-
     const split = {
-      '1h': splitFees(fees1h, usdcRatio, torivaRatio, torivaPrice),
-      '6h': splitFees(fees6h, usdcRatio, torivaRatio, torivaPrice),
-      '24h': splitFees(fees24h, usdcRatio, torivaRatio, torivaPrice),
-      '7d': splitFees(fees7d, usdcRatio, torivaRatio, torivaPrice),
-      '30d': splitFees(fees30d, usdcRatio, torivaRatio, torivaPrice),
+      '1h': delta1h || fallback(1, vol1h),
+      '6h': delta6h || fallback(6, vol6h),
+      '24h': delta24h || fallback(24, vol24h),
+      '7d': delta7d || fallback(168, vol7d),
+      '30d': delta30d || fallback(720, vol30d),
     };
+
+    // Total fees for each window (USD value)
+    const feeTotal = (s) => s.usdc + s.torivaUSD;
 
     return res.status(200).json({
       pool: {
@@ -220,8 +312,21 @@ export default async function handler(req, res) {
         torivaUSD: cumulative.torivaUSD,
         total: cumulative.total,
       } : null,
-      fees: { '1h': fees1h, '6h': fees6h, '24h': fees24h, '7d': fees7d, '30d': fees30d },
+      fees: {
+        '1h': feeTotal(split['1h']),
+        '6h': feeTotal(split['6h']),
+        '24h': feeTotal(split['24h']),
+        '7d': feeTotal(split['7d']),
+        '30d': feeTotal(split['30d']),
+      },
       split,
+      snapshotBased: {
+        '1h': !!delta1h,
+        '6h': !!delta6h,
+        '24h': !!delta24h,
+        '7d': !!delta7d,
+        '30d': !!delta30d,
+      },
       onChain: {
         usdcRatio,
         torivaRatio,
