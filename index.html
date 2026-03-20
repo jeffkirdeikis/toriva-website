@@ -2851,6 +2851,35 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <div style="border-top:1px solid var(--border);padding-top:2.5rem;" class="reveal">
         <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold);margin-bottom:1rem;">The Price Floor</h3>
         <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.75;">The fund's value is backed by real assets. The net asset value is calculated by adding up the value of all non-AIFUND tokens across every liquidity pool. If the market cap drops below the net asset value, a buyback activates: liquidity is removed from underperforming pairs and used to buy AIFUND at a discount. This creates a rising price floor tied to real portfolio value.</p>
+
+        <!-- PRICE FLOOR CHART -->
+        <div style="margin-top:2rem;padding:2rem 1.5rem 1.5rem;background:rgba(255,255,255,0.015);border:1px solid rgba(201,168,76,0.08);border-radius:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:.5rem;">
+            <p style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.1em;color:rgba(201,168,76,0.5);">MARKET CAP VS FUND VALUE</p>
+            <div style="display:flex;gap:1.5rem;">
+              <div style="display:flex;align-items:center;gap:.5rem;"><span style="width:20px;height:2px;background:var(--gold);display:block;"></span><span style="font-family:var(--body-font);font-size:.7rem;color:rgba(201,168,76,0.5);">Price Floor</span></div>
+              <div style="display:flex;align-items:center;gap:.5rem;"><span style="width:20px;height:2px;background:rgba(120,200,255,0.6);display:block;border-top:1px dashed rgba(120,200,255,0.6);"></span><span style="font-family:var(--body-font);font-size:.7rem;color:rgba(120,200,255,0.5);">Market Cap</span></div>
+            </div>
+          </div>
+          <svg viewBox="0 0 600 200" style="width:100%;height:auto;display:block;" preserveAspectRatio="xMidYMid meet">
+            <!-- Grid lines -->
+            <line x1="0" y1="50" x2="600" y2="50" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <line x1="0" y1="100" x2="600" y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <line x1="0" y1="150" x2="600" y2="150" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <!-- Price floor area fill -->
+            <path d="M0,180 C60,175 120,165 180,150 C240,135 280,120 320,105 C360,90 420,70 480,55 C520,45 560,38 600,30 L600,200 L0,200 Z" fill="rgba(201,168,76,0.08)"/>
+            <!-- Price floor line (steady rise) -->
+            <path d="M0,180 C60,175 120,165 180,150 C240,135 280,120 320,105 C360,90 420,70 480,55 C520,45 560,38 600,30" fill="none" stroke="rgba(201,168,76,0.6)" stroke-width="2.5"/>
+            <!-- Market cap line (volatile, dips below at buyback point) -->
+            <path d="M0,140 C40,120 80,90 120,100 C160,110 200,130 240,125 C270,121 290,118 310,112 C330,106 350,95 380,80 C420,60 460,50 500,55 C540,60 570,40 600,25" fill="none" stroke="rgba(120,200,255,0.5)" stroke-width="2" stroke-dasharray="8 4"/>
+            <!-- Buyback zone annotation -->
+            <circle cx="310" cy="112" r="4" fill="rgba(201,168,76,0.8)"/>
+            <line x1="310" y1="116" x2="310" y2="145" stroke="rgba(201,168,76,0.25)" stroke-width="1" stroke-dasharray="3 3"/>
+            <rect x="270" y="146" width="80" height="20" rx="4" fill="rgba(201,168,76,0.1)" stroke="rgba(201,168,76,0.2)" stroke-width="1"/>
+            <text x="310" y="160" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="10" fill="rgba(201,168,76,0.7)" letter-spacing="1">BUYBACK</text>
+          </svg>
+          <p style="font-family:var(--body-font);font-size:.78rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:1rem;line-height:1.4;">The price floor rises as the fund acquires more tokens. Buybacks activate when market cap dips below fund value.</p>
+        </div>
       </div>
 
       <div style="border-top:1px solid var(--border);padding-top:2.5rem;" class="reveal">
