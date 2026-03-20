@@ -89,6 +89,7 @@ function goPage(id, pushState) {
   if (id === 'how') setTimeout(initNetworkCanvas, 100);
   if (id === 'token') { setTimeout(animateBars, 300); setTimeout(initLpDonut, 100); startPoolFeeRefresh(); }
   if (id === 'dashboard') { startPoolFeeRefresh(); }
+  if (id === 'launch') initLaunchPage();
   observeReveals();
 }
 // Handle hash on load and back/forward
@@ -1142,4 +1143,50 @@ function startPoolFeeRefresh() {
   fetchPoolFees();
   if (_feeInterval) clearInterval(_feeInterval);
   _feeInterval = setInterval(fetchPoolFees, 60000);
+}
+
+// LAUNCH PAGE: sidebar nav + FAQ accordion
+var _launchObserver = null;
+function initLaunchPage() {
+  // FAQ accordion
+  document.querySelectorAll('.launch-faq-trigger').forEach(function(trigger) {
+    trigger.onclick = function() {
+      trigger.closest('.launch-faq-item').classList.toggle('open');
+    };
+  });
+  // Sidebar nav
+  var sidebar = document.getElementById('launchSidebar');
+  if (!sidebar) return;
+  var sections = ['launch-hero','launch-platform','launch-projects','launch-phase1','launch-phase2','launch-holders','launch-details','launch-aifund'];
+  var links = sidebar.querySelectorAll('.launch-sidebar-link');
+  // Click handlers
+  links.forEach(function(link) {
+    link.onclick = function(e) {
+      e.preventDefault();
+      var target = document.getElementById(link.dataset.section);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+  });
+  // Show/hide sidebar on scroll
+  var showSidebar = function() {
+    if (window.scrollY > 300) sidebar.classList.add('visible');
+    else sidebar.classList.remove('visible');
+  };
+  window.addEventListener('scroll', showSidebar, { passive: true });
+  showSidebar();
+  // Intersection observer for active state
+  if (_launchObserver) _launchObserver.disconnect();
+  _launchObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        links.forEach(function(l) { l.classList.remove('active'); });
+        var match = sidebar.querySelector('[data-section="' + entry.target.id + '"]');
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+  sections.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) _launchObserver.observe(el);
+  });
 }

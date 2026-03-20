@@ -2165,8 +2165,39 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .fee-card{padding:1.75rem 1.25rem}
 .flywheel-container{padding:2rem 1rem}
 .flywheel-node{padding:1rem .75rem}
-.three-engines-grid{grid-template-columns:1fr !important;gap:1rem !important}
+.three-engines-grid{grid-template-columns:repeat(3,1fr) !important;gap:.5rem !important}
+.three-engines-grid .engine-card{padding:1rem .6rem !important}
+.three-engines-grid .engine-card svg{width:22px !important;height:22px !important;margin-bottom:.5rem !important}
+.three-engines-grid .engine-label{font-size:.6rem !important}
+.three-engines-grid .engine-name{font-size:.7rem !important}
+.three-engines-grid .engine-badge{padding:.15rem .5rem !important}
+.three-engines-grid .engine-badge p{font-size:.5rem !important}
+.launch-sidebar{display:none !important}
 }
+/* SIDEBAR NAV */
+.launch-sidebar{position:fixed;left:clamp(12px,2vw,24px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:0;z-index:100;opacity:0;transition:opacity .4s;pointer-events:none}
+.launch-sidebar.visible{opacity:1;pointer-events:auto}
+.launch-sidebar-link{font-family:'Bebas Neue',sans-serif;font-size:.6rem;letter-spacing:.1em;color:rgba(201,168,76,0.2);text-decoration:none;padding:.35rem .5rem .35rem 1rem;position:relative;transition:color .3s;white-space:nowrap}
+.launch-sidebar-link::before{content:'';position:absolute;left:0;top:50%;width:0;height:1px;background:var(--gold);transition:width .3s;transform:translateY(-50%)}
+.launch-sidebar-link.active{color:var(--gold)}
+.launch-sidebar-link.active::before{width:8px}
+.launch-sidebar-link:hover{color:rgba(201,168,76,0.5)}
+@media(max-width:1200px){.launch-sidebar{display:none !important}}
+/* FAQ ACCORDION */
+.launch-faq-item{border-top:1px solid var(--border)}
+.launch-faq-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;padding:1.5rem 0;background:none;border:none;cursor:pointer;text-align:left}
+.launch-faq-trigger:hover .launch-faq-title{color:var(--gold-bright)}
+.launch-faq-icon{color:rgba(201,168,76,0.3);transition:transform .3s,color .3s;flex-shrink:0;margin-left:1rem}
+.launch-faq-item.open .launch-faq-icon{transform:rotate(180deg);color:var(--gold)}
+.launch-faq-body{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.25,.46,.45,.94),padding .3s;padding:0}
+.launch-faq-item.open .launch-faq-body{max-height:3000px;padding-bottom:1.5rem}
+/* AIFUND REVEAL */
+.launch-aifund-divider{margin-top:6rem;text-align:center;padding:3rem 0}
+.launch-aifund-line{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto}
+.launch-aifund-section{position:relative;padding:3.5rem 2.5rem;margin-top:2rem;background:linear-gradient(180deg,rgba(201,168,76,0.04) 0%,rgba(201,168,76,0.01) 50%,transparent 100%);border:1px solid rgba(201,168,76,0.12);border-radius:16px}
+.launch-aifund-section::before{content:'';position:absolute;top:-1px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.5),transparent)}
+.launch-aifund-section h2{font-size:clamp(2.2rem,5vw,3.2rem) !important;background:linear-gradient(135deg,var(--cream),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+@media(max-width:640px){.launch-aifund-section{padding:2rem 1.25rem}}
 .fee-card{border-radius:12px;padding:2.5rem 2rem;position:relative;overflow:hidden}
 .fee-card-old{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)}
 .fee-card-new{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.18)}
@@ -2200,33 +2231,45 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .launch-pulse{animation:launch-pulse 3s ease-in-out infinite}
 </style>
 <div id="page-launch" class="page">
+  <!-- SIDEBAR NAV -->
+  <nav class="launch-sidebar" id="launchSidebar">
+    <a href="#launch-hero" class="launch-sidebar-link active" data-section="launch-hero">Overview</a>
+    <a href="#launch-platform" class="launch-sidebar-link" data-section="launch-platform">Platform</a>
+    <a href="#launch-projects" class="launch-sidebar-link" data-section="launch-projects">For Projects</a>
+    <a href="#launch-phase1" class="launch-sidebar-link" data-section="launch-phase1">Phase 1</a>
+    <a href="#launch-phase2" class="launch-sidebar-link" data-section="launch-phase2">Phase 2</a>
+    <a href="#launch-holders" class="launch-sidebar-link" data-section="launch-holders">For Holders</a>
+    <a href="#launch-details" class="launch-sidebar-link" data-section="launch-details">Deep Dive</a>
+    <a href="#launch-aifund" class="launch-sidebar-link" data-section="launch-aifund">$AIFUND</a>
+  </nav>
   <section class="section" style="max-width:900px;margin:0 auto;padding-top:12rem;">
 
+    <div id="launch-hero"></div>
     <p class="section-label reveal">Token Incubator</p>
     <h1 class="display-heading reveal">THREE REVENUE <br>ENGINES. <br><span class="italic">THE THIRD ONE <br>LAUNCHES NOW.</span></h1>
 
     <!-- THREE ENGINES HERO GRAPHIC -->
     <div style="margin-top:4rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;" class="reveal three-engines-grid">
-      <div style="padding:2rem 1.5rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;text-align:center;position:relative;overflow:hidden;">
+      <div class="engine-card" style="padding:2rem 1.5rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;text-align:center;position:relative;overflow:hidden;">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,0.08);"></div>
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" style="margin-bottom:1rem;"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10" r="2"/></svg>
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;color:rgba(255,255,255,0.35);">ENGINE 1</p>
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;color:rgba(255,255,255,0.55);margin-top:.25rem;">DECENTRALIZED COMPUTE</p>
+        <p class="engine-label" style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;color:rgba(255,255,255,0.35);">ENGINE 1</p>
+        <p class="engine-name" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;color:rgba(255,255,255,0.55);margin-top:.25rem;">DECENTRALIZED COMPUTE</p>
         <p style="font-family:var(--body-font);font-size:.78rem;color:rgba(255,255,255,0.25);margin-top:.5rem;line-height:1.4;">Building</p>
       </div>
-      <div style="padding:2rem 1.5rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;text-align:center;position:relative;overflow:hidden;">
+      <div class="engine-card" style="padding:2rem 1.5rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;text-align:center;position:relative;overflow:hidden;">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,0.08);"></div>
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" style="margin-bottom:1rem;"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;color:rgba(255,255,255,0.35);">ENGINE 2</p>
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;color:rgba(255,255,255,0.55);margin-top:.25rem;">RUNMYBIZ</p>
+        <p class="engine-label" style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;color:rgba(255,255,255,0.35);">ENGINE 2</p>
+        <p class="engine-name" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;color:rgba(255,255,255,0.55);margin-top:.25rem;">RUNMYBIZ</p>
         <p style="font-family:var(--body-font);font-size:.78rem;color:rgba(255,255,255,0.25);margin-top:.5rem;line-height:1.4;">Finalizing</p>
       </div>
-      <div style="padding:2rem 1.5rem;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.25);border-radius:12px;text-align:center;position:relative;overflow:hidden;box-shadow:0 0 30px rgba(201,168,76,0.06);">
+      <div class="engine-card" style="padding:2rem 1.5rem;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.25);border-radius:12px;text-align:center;position:relative;overflow:hidden;box-shadow:0 0 30px rgba(201,168,76,0.06);">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.7)" stroke-width="1.2" style="margin-bottom:1rem;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;color:var(--gold);">ENGINE 3</p>
-        <p style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;color:var(--gold);margin-top:.25rem;">TOKEN INCUBATOR</p>
-        <div style="margin-top:.75rem;display:inline-block;padding:.25rem .75rem;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);border-radius:20px;">
+        <p class="engine-label" style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;color:var(--gold);">ENGINE 3</p>
+        <p class="engine-name" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;color:var(--gold);margin-top:.25rem;">TOKEN INCUBATOR</p>
+        <div class="engine-badge" style="margin-top:.75rem;display:inline-block;padding:.25rem .75rem;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);border-radius:20px;">
           <p style="font-family:var(--body-font);font-size:.7rem;color:var(--gold);letter-spacing:.05em;text-transform:uppercase;font-weight:600;">Launching Now</p>
         </div>
       </div>
@@ -2234,7 +2277,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <p class="body-text reveal" style="margin-top:2rem;max-width:100%;font-size:1.05rem;line-height:1.75;text-align:center;color:rgba(255,255,255,0.45);">Toriva is an autonomous corporation that controls a basket of autonomous companies. Three revenue engines power the ecosystem. This page is about the third.</p>
 
     <!-- SECTION 1: THE TOKEN INCUBATOR -->
-    <div style="margin-top:6rem;" class="reveal">
+    <div id="launch-platform" style="margin-top:6rem;" class="reveal">
       <p class="section-label">The Platform</p>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.06em;color:var(--cream);margin-bottom:2rem;">THE TOKEN INCUBATOR</h2>
     </div>
@@ -2368,7 +2411,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
 
     <!-- WHY PROJECTS LAUNCH WITH TORIVA -->
-    <div style="margin-top:6rem;" class="reveal">
+    <div id="launch-projects" style="margin-top:6rem;" class="reveal">
       <p class="section-label">For Projects</p>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.06em;color:var(--cream);margin-bottom:2rem;">WHY LAUNCH WITH TORIVA</h2>
     </div>
@@ -2417,7 +2460,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
 
     <!-- PHASE 1: CURATED LAUNCHES -->
-    <div style="margin-top:6rem;" class="reveal">
+    <div id="launch-phase1" style="margin-top:6rem;" class="reveal">
       <p class="section-label">Phase 1</p>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.06em;color:var(--cream);margin-bottom:2rem;">CURATED INCUBATIONS</h2>
     </div>
@@ -2550,7 +2593,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
 
     <!-- PHASE 2: AUTOMATED LAUNCHES -->
-    <div style="margin-top:6rem;" class="reveal">
+    <div id="launch-phase2" style="margin-top:6rem;" class="reveal">
       <p class="section-label">Phase 2</p>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.06em;color:var(--cream);margin-bottom:2rem;">AUTOMATED TOKEN LAUNCHES</h2>
     </div>
@@ -2592,7 +2635,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
 
     <!-- HOW THIS BENEFITS TORIVA -->
-    <div style="margin-top:6rem;" class="reveal">
+    <div id="launch-holders" style="margin-top:6rem;" class="reveal">
       <p class="section-label">For Holders</p>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.06em;color:var(--cream);margin-bottom:2rem;">HOW THIS BENEFITS TORIVA</h2>
     </div>
@@ -2656,15 +2699,19 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
 
     <!-- SPECIFICS AND DETAILS -->
-    <div style="margin-top:6rem;" class="reveal">
+    <div id="launch-details" style="margin-top:6rem;" class="reveal">
       <p class="section-label">Deep Dive</p>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.06em;color:var(--cream);margin-bottom:2rem;">SPECIFICS AND DETAILS</h2>
     </div>
 
-    <div style="margin-top:2rem;display:flex;flex-direction:column;gap:3rem;">
+    <div style="margin-top:2rem;display:flex;flex-direction:column;gap:0;">
 
-      <div style="border-top:1px solid var(--border);padding-top:2.5rem;" class="reveal">
-        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold);margin-bottom:1rem;">Understanding the Liquidity Pools</h3>
+      <div class="launch-faq-item open">
+        <button class="launch-faq-trigger">
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold);margin:0;">Understanding the Liquidity Pools</h3>
+          <svg class="launch-faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
+        <div class="launch-faq-body">
         <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.75;margin-bottom:1rem;">A liquidity pool is just a trading pair: two tokens in a smart contract that people swap between. Think of it as a vending machine that holds two tokens and lets anyone trade one for the other.</p>
         <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.75;">Each incubated token has two pools. <strong style="color:var(--cream);">Pool A (Token / ETH)</strong> is the main market where you buy and sell. <strong style="color:var(--cream);">Pool B (Token / TORIVA)</strong> is the engine that runs in the background. You never interact with it directly. Its only job is to create a price link so bots automatically buy TORIVA when the incubated token moves up. The existing <strong style="color:var(--cream);">TORIVA / USDC pool</strong> is where the benefits land for TORIVA holders.</p>
 
@@ -2718,38 +2765,60 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
             </div>
           </div>
         </div>
-      </div>
-
-      <div style="border-top:1px solid var(--border);padding-top:2.5rem;" class="reveal">
-        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold);margin-bottom:1rem;">How Does the Protocol Safely Unwind Liquidity?</h3>
-        <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.75;">Removing liquidity from a Uniswap pool is not a market sell. It returns both tokens to the fund's wallet at their current ratio. No slippage. No price impact. The market does not see a sell order. For larger positions, the fund unwinds gradually over time.</p>
-      </div>
-
-      <div style="border-top:1px solid var(--border);padding-top:2.5rem;" class="reveal">
-        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold);margin-bottom:1rem;">Preventing Governance Manipulation</h3>
-        <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.75;margin-bottom:1rem;">What stops a whale from gaming the system? Several safeguards:</p>
-        <div style="display:flex;flex-direction:column;gap:.85rem;padding-left:1.25rem;border-left:2px solid var(--gold-dim);">
-          <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.7;"><span style="color:var(--cream);font-weight:500;">Investment caps</span> limit how much goes to any single project.</p>
-          <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.7;"><span style="color:var(--cream);font-weight:500;">Liquidity requirements</span> mean only tokens above minimum liquidity and market cap thresholds qualify.</p>
-          <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.7;"><span style="color:var(--cream);font-weight:500;">AI vetting</span> checks holder distribution, contract risk, and manipulation signals before anything goes to vote.</p>
-          <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.7;"><span style="color:var(--cream);font-weight:500;">Gradual deployment</span> means the fund never market buys in one transaction, spreading entry over time.</p>
-          <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.7;"><span style="color:var(--cream);font-weight:500;">Full on-chain transparency</span> means any manipulation attempt is visible to everyone in real time.</p>
         </div>
       </div>
 
-      <div style="border-top:1px solid var(--border);padding-top:2.5rem;" class="reveal">
-        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold);margin-bottom:1rem;">Low Volume and Transaction Fees</h3>
-        <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.75;">The platform runs on Base, where transaction fees are near zero (fractions of a cent). Price-gap trading bots stay profitable even on tiny spreads. On Ethereum mainnet a bot needs $5 or more to justify the transaction fee. On Base, $0.01 works. The drag mechanism stays active in almost all market conditions. During truly dead markets, the drag pauses naturally but reactivates instantly when volume returns. The TORIVA in the LP stays there regardless.</p>
+      <div class="launch-faq-item">
+        <button class="launch-faq-trigger">
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold);margin:0;">How Does the Protocol Safely Unwind Liquidity?</h3>
+          <svg class="launch-faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
+        <div class="launch-faq-body">
+          <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.75;">Removing liquidity from a Uniswap pool is not a market sell. It returns both tokens to the fund's wallet at their current ratio. No slippage. No price impact. The market does not see a sell order. For larger positions, the fund unwinds gradually over time.</p>
+        </div>
+      </div>
+
+      <div class="launch-faq-item">
+        <button class="launch-faq-trigger">
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold);margin:0;">Preventing Governance Manipulation</h3>
+          <svg class="launch-faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
+        <div class="launch-faq-body">
+          <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.75;margin-bottom:1rem;">What stops a whale from gaming the system? Several safeguards:</p>
+          <div style="display:flex;flex-direction:column;gap:.85rem;padding-left:1.25rem;border-left:2px solid var(--gold-dim);">
+            <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.7;"><span style="color:var(--cream);font-weight:500;">Investment caps</span> limit how much goes to any single project.</p>
+            <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.7;"><span style="color:var(--cream);font-weight:500;">Liquidity requirements</span> mean only tokens above minimum liquidity and market cap thresholds qualify.</p>
+            <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.7;"><span style="color:var(--cream);font-weight:500;">AI vetting</span> checks holder distribution, contract risk, and manipulation signals before anything goes to vote.</p>
+            <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.7;"><span style="color:var(--cream);font-weight:500;">Gradual deployment</span> means the fund never market buys in one transaction, spreading entry over time.</p>
+            <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.7;"><span style="color:var(--cream);font-weight:500;">Full on-chain transparency</span> means any manipulation attempt is visible to everyone in real time.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="launch-faq-item">
+        <button class="launch-faq-trigger">
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:var(--gold);margin:0;">Low Volume and Transaction Fees</h3>
+          <svg class="launch-faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
+        <div class="launch-faq-body">
+          <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.75;">The platform runs on Base, where transaction fees are near zero (fractions of a cent). Price-gap trading bots stay profitable even on tiny spreads. On Ethereum mainnet a bot needs $5 or more to justify the transaction fee. On Base, $0.01 works. The drag mechanism stays active in almost all market conditions. During truly dead markets, the drag pauses naturally but reactivates instantly when volume returns. The TORIVA in the LP stays there regardless.</p>
+        </div>
       </div>
     </div>
 
-    <!-- THE FIRST LAUNCH: $AIFUND -->
-    <div style="margin-top:6rem;" class="reveal">
-      <p class="section-label">First Incubation</p>
-      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.06em;color:var(--cream);margin-bottom:2rem;">THE FIRST LAUNCH: $AIFUND</h2>
+    <!-- AIFUND REVEAL DIVIDER -->
+    <div class="launch-aifund-divider reveal">
+      <div class="launch-aifund-line"></div>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.3em;color:rgba(201,168,76,0.4);margin:1.5rem 0;">THE FIRST ONE IS READY</p>
+      <div class="launch-aifund-line"></div>
     </div>
 
-    <div style="margin-top:2rem;display:flex;flex-direction:column;gap:3rem;">
+    <!-- THE FIRST LAUNCH: $AIFUND -->
+    <div class="launch-aifund-section reveal" id="launch-aifund">
+      <p class="section-label" style="margin-bottom:.5rem;">First Incubation</p>
+      <h2 style="font-family:'Bebas Neue',sans-serif;letter-spacing:.06em;margin-bottom:2rem;">THE FIRST LAUNCH: $AIFUND</h2>
+
+    <div style="display:flex;flex-direction:column;gap:3rem;">
 
       <div style="border-top:1px solid var(--border);padding-top:2.5rem;" class="reveal">
         <p style="font-family:var(--body-font);font-size:1.1rem;color:var(--cream);line-height:1.85;margin-bottom:1rem;">The first project is already lined up. AIFUND is a zero-fee AI investment fund in the form of a token. When you hold AIFUND, you hold exposure to every AI project the fund has invested in. As the fund acquires tokens and they appreciate, the value flows back into AIFUND.</p>
@@ -2844,6 +2913,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <p style="font-family:var(--body-font);font-size:1.05rem;color:var(--body-text-color);line-height:1.75;">The first few projects set the tone. AIFUND is deliberately chosen because it is a fund with built-in asset backing, not a speculative meme. It demonstrates that the incubator produces real, structured products that strengthen the Toriva ecosystem. Future incubations follow the same principle: quality over quantity, AI-driven due diligence, and review before launch.</p>
       </div>
     </div>
+    </div><!-- end launch-aifund-section -->
 
     <!-- THE BOTTOM LINE -->
     <div style="margin-top:6rem;padding:3rem;background:var(--gold-subtle);border:1px solid var(--border-mid);border-radius:4px;" class="reveal">
