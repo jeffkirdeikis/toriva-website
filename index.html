@@ -2173,15 +2173,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .three-engines-grid .engine-badge{padding:.15rem .5rem !important}
 .three-engines-grid .engine-badge p{font-size:.5rem !important}
 }
-/* SIDEBAR NAV - hidden by default, shown only on wide screens */
-.launch-sidebar{display:none;position:fixed;left:clamp(12px,2vw,24px);top:50%;transform:translateY(-50%);flex-direction:column;gap:0;z-index:100;opacity:0;transition:opacity .4s;pointer-events:none}
-.launch-sidebar.visible{opacity:1;pointer-events:auto}
-@media(min-width:1201px){.launch-sidebar{display:flex}}
-.launch-sidebar-link{font-family:'Bebas Neue',sans-serif;font-size:.6rem;letter-spacing:.1em;color:rgba(201,168,76,0.2);text-decoration:none;padding:.35rem .5rem .35rem 1rem;position:relative;transition:color .3s;white-space:nowrap}
-.launch-sidebar-link::before{content:'';position:absolute;left:0;top:50%;width:0;height:1px;background:var(--gold);transition:width .3s;transform:translateY(-50%)}
-.launch-sidebar-link.active{color:var(--gold)}
-.launch-sidebar-link.active::before{width:8px}
-.launch-sidebar-link:hover{color:rgba(201,168,76,0.5)}
 /* FAQ ACCORDION */
 .launch-faq-item{border-top:1px solid var(--border)}
 .launch-faq-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;padding:1.5rem 0;background:none;border:none;cursor:pointer;text-align:left}
@@ -2230,17 +2221,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .launch-pulse{animation:launch-pulse 3s ease-in-out infinite}
 </style>
 <div id="page-launch" class="page">
-  <!-- SIDEBAR NAV -->
-  <nav class="launch-sidebar" id="launchSidebar">
-    <a href="#launch-hero" class="launch-sidebar-link active" data-section="launch-hero">Overview</a>
-    <a href="#launch-platform" class="launch-sidebar-link" data-section="launch-platform">Platform</a>
-    <a href="#launch-projects" class="launch-sidebar-link" data-section="launch-projects">For Projects</a>
-    <a href="#launch-phase1" class="launch-sidebar-link" data-section="launch-phase1">Phase 1</a>
-    <a href="#launch-phase2" class="launch-sidebar-link" data-section="launch-phase2">Phase 2</a>
-    <a href="#launch-holders" class="launch-sidebar-link" data-section="launch-holders">For Holders</a>
-    <a href="#launch-details" class="launch-sidebar-link" data-section="launch-details">Deep Dive</a>
-    <a href="#launch-aifund" class="launch-sidebar-link" data-section="launch-aifund">$AIFUND</a>
-  </nav>
   <section class="section" style="max-width:900px;margin:0 auto;padding-top:12rem;">
 
     <div id="launch-hero"></div>
