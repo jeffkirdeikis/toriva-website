@@ -220,7 +220,7 @@ export default async function handler(req, res) {
   try {
     const [poolRes, ohlcvRes] = await Promise.all([
       fetch(GECKO_URL, { headers: { Accept: 'application/json' } }),
-      fetch(GECKO_URL + '/ohlcv/day?limit=30', { headers: { Accept: 'application/json' } }),
+      fetch(GECKO_URL + '/ohlcv/day?limit=365', { headers: { Accept: 'application/json' } }),
     ]);
 
     if (!poolRes.ok) {
@@ -278,12 +278,13 @@ export default async function handler(req, res) {
     const days = ohlcvData?.data?.attributes?.ohlcv_list || [];
     const now = Math.floor(Date.now() / 1000);
     const DAY = 86400;
-    let vol7d = 0, vol30d = 0;
+    let vol7d = 0, vol30d = 0, lifetimeVolume = 0;
     for (const bar of days) {
       const ts = bar[0];
       const vol = bar[5] || 0;
       if (ts >= now - 7 * DAY) vol7d += vol;
-      vol30d += vol;
+      if (ts >= now - 30 * DAY) vol30d += vol;
+      lifetimeVolume += vol;
     }
 
     const split = {
@@ -297,6 +298,13 @@ export default async function handler(req, res) {
     // Total fees for each window (USD value)
     const feeTotal = (s) => s.usdc + s.torivaUSD;
 
+    // Compute actual cumulative fees from lifetime volume
+    // (feeGrowthGlobal * currentLiquidity is wrong for totals; volume * fee_rate is correct)
+    const cumulativeTotal = lifetimeVolume * FEE_RATE * lpMultiplier;
+    const cumulativeUsdc = cumulativeTotal * usdcRatio;
+    const cumulativeTorivaUSD = cumulativeTotal * torivaRatio;
+    const cumulativeToriva = torivaPrice > 0 ? cumulativeTorivaUSD / torivaPrice : 0;
+
     return res.status(200).json({
       pool: {
         pair: attr.pool_name || attr.name,
@@ -306,12 +314,12 @@ export default async function handler(req, res) {
         torivaPrice,
         createdAt: attr.pool_created_at,
       },
-      cumulative: cumulative ? {
-        usdc: cumulative.usdc,
-        toriva: cumulative.toriva,
-        torivaUSD: cumulative.torivaUSD,
-        total: cumulative.total,
-      } : null,
+      cumulative: {
+        usdc: cumulativeUsdc,
+        toriva: cumulativeToriva,
+        torivaUSD: cumulativeTorivaUSD,
+        total: cumulativeTotal,
+      },
       fees: {
         '1h': feeTotal(split['1h']),
         '6h': feeTotal(split['6h']),
