@@ -1082,6 +1082,8 @@ function applyPoolData(d) {
         set('dashTreasuryPrice', '$' + d.pool.torivaPrice.toFixed(4));
         set('dashTokenValue', '~' + fmt(tokenVal));
         set('dashWalletUsdc', fmt(totalUsdc));
+        var lpUsdc = (d.treasury && d.treasury.lpPosition) ? d.treasury.lpPosition.usdc : 0;
+        set('dashUsdcPlusLp', fmt(totalUsdc + lpUsdc));
         // Update TORIVA holdings count dynamically
         var torivaMillions = treasuryTokens / 1000000;
         set('dashTorivaHoldings', torivaMillions.toFixed(1) + 'M');
@@ -1116,7 +1118,7 @@ function fetchPoolFees() {
 
 function addShimmerToPlaceholders() {
   var ids = [
-    'dashTreasuryValue','dashTorivaHoldings','dashTokenValue','dashWalletUsdc',
+    'dashTreasuryValue','dashTorivaHoldings','dashTokenValue','dashWalletUsdc','dashUsdcPlusLp',
     'dashTreasuryPrice','dashLpTotal','dashLpUsdc','dashLpUsdcTokens',
     'dashLpTorivaUsd','dashLpTorivaTokens','dashFeeCumulative','dashCumulativeUsdc',
     'dashCumulativeUsdcTokens','dashCumulativeToriva','dashCumulativeTorivaUsd',
