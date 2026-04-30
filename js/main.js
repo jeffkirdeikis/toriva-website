@@ -1089,6 +1089,15 @@ function applyPoolData(d) {
         set('dashTorivaHoldings', torivaMillions.toFixed(1) + 'M');
       }
 
+      // RunMyBiz ARR (auto-fetched from Stripe shareable_metrics)
+      if (d.rmbArr && typeof d.rmbArr.arrCAD === 'number') {
+        var arr = d.rmbArr.arrCAD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        set('dashRmbArr', 'CA$' + arr);
+        if (d.rmbArr.asOf) {
+          set('dashRmbArrAsOf', 'AS OF ' + d.rmbArr.asOf + ' \u00b7 LIVE FROM STRIPE');
+        }
+      }
+
       // LP Position (excluded from treasury)
       if (d.treasury && d.treasury.lpPosition) {
         var lp = d.treasury.lpPosition;

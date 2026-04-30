@@ -31,8 +31,44 @@ const LP_TOKEN_ID = BigInt(4804594);
 // Module-level caches survive between Vercel function invocations on the
 // same warm instance, so we don't re-hit the chain on every request.
 const CHAIN_TTL_MS = 60 * 1000;
+const STRIPE_TTL_MS = 10 * 60 * 1000; // Stripe metric updates ~1x/day
 let _lpCache = null;     // { raw, ts }
 let _walletCache = null; // { raw, ts }
+let _stripeCache = null; // { value, ts }
+
+const STRIPE_METRIC_URL = 'https://api.stripe.com/v2/xauth_/shareable_metrics/runmybiz/SeF3oviO';
+
+async function getRmbArr() {
+  if (_stripeCache && Date.now() - _stripeCache.ts < STRIPE_TTL_MS) {
+    return _stripeCache.value;
+  }
+  try {
+    const r = await fetch(STRIPE_METRIC_URL, {
+      headers: {
+        'stripe-version': 'unsafe-development',
+        'referer': 'https://profile.stripe.com/',
+      },
+      signal: AbortSignal.timeout(3500),
+    });
+    if (!r.ok) throw new Error('stripe ' + r.status);
+    const data = await r.json();
+    const series = JSON.parse(data.metric_data || '[]');
+    if (!series.length) throw new Error('empty series');
+    const latest = series[series.length - 1];
+    const mrrCAD = (Number(latest.total) || 0) / 100;
+    const value = {
+      arrCAD: mrrCAD * 12,
+      mrrCAD,
+      asOf: latest.start_time, // YYYY-MM-DD
+      currency: 'CAD',
+    };
+    _stripeCache = { value, ts: Date.now() };
+    return value;
+  } catch (e) {
+    console.error('Stripe ARR fetch failed:', e.message);
+    return _stripeCache ? _stripeCache.value : null;
+  }
+}
 
 const RPC_TIMEOUT_MS = 3500;
 
@@ -359,10 +395,11 @@ export default async function handler(req, res) {
     const vol6h = parseFloat(attr.volume_usd.h6) || 0;
     const vol1h = parseFloat(attr.volume_usd.h1) || 0;
 
-    // Read project's actual LP NFT, wallet balances, and historical snapshots in parallel
-    const [lpPos, wallet, snap1h, snap6h, snap24h, snap7d, snap30d] = await Promise.all([
+    // Read project's actual LP NFT, wallet balances, snapshots, and RMB ARR in parallel
+    const [lpPos, wallet, rmbArr, snap1h, snap6h, snap24h, snap7d, snap30d] = await Promise.all([
       getLpPosition(torivaPrice),
       getWalletBalances(torivaPrice),
+      getRmbArr(),
       getSnapshotAt(1),
       getSnapshotAt(6),
       getSnapshotAt(24),
@@ -451,6 +488,7 @@ export default async function handler(req, res) {
       onChain: { usdcRatio, torivaRatio },
       volume: { '1h': vol1h, '6h': vol6h, '24h': vol24h, '7d': vol7d, '30d': vol30d },
       transactions: txn,
+      rmbArr: rmbArr || null,
       treasury: {
         walletUsdc: wallet ? wallet.walletUsdc : 0,
         walletToriva: wallet ? wallet.walletToriva : 0,
