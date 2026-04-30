@@ -13,15 +13,19 @@ const RPC_ENDPOINTS = [
   'https://mainnet.base.org',
 ];
 const FEE_RATE = 0.01;
+const Q96 = BigInt(2) ** BigInt(96);
 const Q128 = BigInt(2) ** BigInt(128);
+const MAX256 = BigInt(2) ** BigInt(256);
 const SNAPSHOT_INTERVAL_MS = 5 * 60 * 1000; // Save snapshot every 5 minutes
 
 const USDC_ADDR = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 const TORIVA_ADDR = '0xb886Cf1444BFF05e9a99E00543BC4054d423ebFD';
 const TREASURY_WALLET = '0x2633148755A12c6D5aBD75Eed90B4a6572275Cdb';
+const NPM_ADDR = '0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1';
+const LP_TOKEN_ID = BigInt(4804594);
 
-// Read a uint256 from any contract, with RPC fallback
-async function readContract(contractAddr, data) {
+// Raw eth_call returning hex string with RPC fallback
+async function rawCall(contractAddr, data) {
   for (const rpc of RPC_ENDPOINTS) {
     try {
       const res = await fetch(rpc, {
@@ -35,7 +39,7 @@ async function readContract(contractAddr, data) {
       if (!res.ok) continue;
       const { result, error } = await res.json();
       if (error || !result || result === '0x') continue;
-      return BigInt(result);
+      return result;
     } catch (e) {
       continue;
     }
@@ -43,97 +47,157 @@ async function readContract(contractAddr, data) {
   throw new Error('All RPCs failed for contract ' + contractAddr);
 }
 
-// Read a uint256 from the pool contract, with RPC fallback
+async function readContract(contractAddr, data) {
+  return BigInt(await rawCall(contractAddr, data));
+}
+
 async function readPool(selector) {
   return readContract(POOL_ADDR, selector);
 }
 
-// balanceOf(address) calldata
 function balanceOfData(address) {
   return '0x70a08231000000000000000000000000' + address.slice(2).toLowerCase();
 }
 
-// Fetch treasury wallet USDC and LP position token balances
-async function getTreasuryData(torivaPrice) {
+function decodeWord(hexResult, idx) {
+  const start = 2 + idx * 64;
+  return BigInt('0x' + hexResult.slice(start, start + 64));
+}
+
+function decodeInt24Word(word) {
+  // word is BigInt sign-extended to 256 bits; convert back to signed int24
+  return word >= (BigInt(1) << BigInt(255)) ? Number(word - MAX256) : Number(word);
+}
+
+function encodeUint(v) {
+  return BigInt(v).toString(16).padStart(64, '0');
+}
+
+function encodeInt24(v) {
+  let bn = BigInt(v);
+  if (bn < 0n) bn = MAX256 + bn;
+  return bn.toString(16).padStart(64, '0');
+}
+
+function sub256(a, b) {
+  return ((a - b) % MAX256 + MAX256) % MAX256;
+}
+
+// Read live treasury wallet token balances
+async function getWalletBalances(torivaPrice) {
   try {
-    const [walletUsdc, poolUsdc, poolToriva] = await Promise.all([
+    const [walletUsdc, walletToriva] = await Promise.all([
       readContract(USDC_ADDR, balanceOfData(TREASURY_WALLET)),
-      readContract(USDC_ADDR, balanceOfData(POOL_ADDR)),
-      readContract(TORIVA_ADDR, balanceOfData(POOL_ADDR)),
+      readContract(TORIVA_ADDR, balanceOfData(TREASURY_WALLET)),
     ]);
     const walletUsdcNum = Number(walletUsdc) / 1e6;
-    const poolUsdcNum = Number(poolUsdc) / 1e6;
-    const poolTorivaNum = Number(poolToriva) / 1e18;
-    const poolTorivaUSD = poolTorivaNum * torivaPrice;
+    const walletTorivaNum = Number(walletToriva) / 1e18;
     return {
       walletUsdc: walletUsdcNum,
-      lpPosition: {
-        usdc: poolUsdcNum,
-        toriva: poolTorivaNum,
-        torivaUSD: poolTorivaUSD,
-        total: poolUsdcNum + poolTorivaUSD,
-      },
+      walletToriva: walletTorivaNum,
+      walletTorivaUSD: walletTorivaNum * torivaPrice,
     };
   } catch (e) {
-    console.error('Treasury data fetch failed:', e.message);
+    console.error('Wallet balance fetch failed:', e.message);
     return null;
   }
 }
 
-// Read protocol fee from slot0
-async function getProtocolFeeMultiplier() {
+// Read the project's specific LP NFT position (principal + unclaimed fees).
+// Replaces the old whole-pool balanceOf(POOL_ADDR), which overcounted once
+// other LPs joined the pool.
+async function getLpPosition(torivaPrice) {
   try {
-    for (const rpc of RPC_ENDPOINTS) {
-      try {
-        const res = await fetch(rpc, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            jsonrpc: '2.0', method: 'eth_call', id: 1,
-            params: [{ to: POOL_ADDR, data: '0x3850c7bd' }, 'latest']
-          })
-        });
-        if (!res.ok) continue;
-        const { result, error } = await res.json();
-        if (error || !result) continue;
-        const feeProtocolHex = result.slice(2 + 5 * 64, 2 + 6 * 64);
-        const feeProtocol = parseInt(feeProtocolHex, 16);
-        const fp0 = feeProtocol & 0xF;
-        return fp0 > 0 ? (1 - 1 / fp0) : 1;
-      } catch (e) {
-        continue;
-      }
-    }
-    return 1;
-  } catch (e) {
-    return 1;
-  }
-}
+    const posResult = await rawCall(NPM_ADDR, '0x99fbab88' + encodeUint(LP_TOKEN_ID));
 
-// Get actual cumulative fees from on-chain feeGrowthGlobal data
-async function getCumulativeFees(torivaPrice) {
-  try {
-    const [fg0, fg1, liq] = await Promise.all([
-      readPool('0xf3058399'), // feeGrowthGlobal0X128 (USDC, token0, 6 decimals)
-      readPool('0x46141319'), // feeGrowthGlobal1X128 (TORIVA, token1, 18 decimals)
-      readPool('0x1a686502'), // liquidity
+    // positions() return layout (slot indices):
+    // 0:nonce 1:operator 2:token0 3:token1 4:fee
+    // 5:tickLower(int24) 6:tickUpper(int24) 7:liquidity(uint128)
+    // 8:feeGrowthInside0LastX128 9:feeGrowthInside1LastX128
+    // 10:tokensOwed0(uint128) 11:tokensOwed1(uint128)
+    const tickLower = decodeInt24Word(decodeWord(posResult, 5));
+    const tickUpper = decodeInt24Word(decodeWord(posResult, 6));
+    const liquidity = decodeWord(posResult, 7);
+    const fgInside0Last = decodeWord(posResult, 8);
+    const fgInside1Last = decodeWord(posResult, 9);
+    const tokensOwed0 = decodeWord(posResult, 10);
+    const tokensOwed1 = decodeWord(posResult, 11);
+
+    const [slot0Result, fg0, fg1, tickLowerResult, tickUpperResult] = await Promise.all([
+      rawCall(POOL_ADDR, '0x3850c7bd'),
+      readPool('0xf3058399'),
+      readPool('0x46141319'),
+      rawCall(POOL_ADDR, '0xf30dba93' + encodeInt24(tickLower)),
+      rawCall(POOL_ADDR, '0xf30dba93' + encodeInt24(tickUpper)),
     ]);
 
-    const usdcFees = Number(fg0 * liq / Q128) / 1e6;
-    const torivaFees = Number(fg1 * liq / Q128) / 1e18;
-    const torivaFeesUSD = torivaFees * torivaPrice;
-    const total = usdcFees + torivaFeesUSD;
+    const sqrtPriceX96 = decodeWord(slot0Result, 0);
+    const currentTick = decodeInt24Word(decodeWord(slot0Result, 1));
+
+    // ticks() return: 0:liquidityGross 1:liquidityNet 2:fgOutside0 3:fgOutside1 ...
+    const fgOutside0Lower = decodeWord(tickLowerResult, 2);
+    const fgOutside1Lower = decodeWord(tickLowerResult, 3);
+    const fgOutside0Upper = decodeWord(tickUpperResult, 2);
+    const fgOutside1Upper = decodeWord(tickUpperResult, 3);
+
+    const feeGrowthInside = (fgGlobal, fgOutLower, fgOutUpper) => {
+      const below = currentTick >= tickLower ? fgOutLower : sub256(fgGlobal, fgOutLower);
+      const above = currentTick < tickUpper ? fgOutUpper : sub256(fgGlobal, fgOutUpper);
+      return sub256(sub256(fgGlobal, below), above);
+    };
+
+    const fgInside0 = feeGrowthInside(fg0, fgOutside0Lower, fgOutside0Upper);
+    const fgInside1 = feeGrowthInside(fg1, fgOutside1Lower, fgOutside1Upper);
+
+    const owed0 = tokensOwed0 + sub256(fgInside0, fgInside0Last) * liquidity / Q128;
+    const owed1 = tokensOwed1 + sub256(fgInside1, fgInside1Last) * liquidity / Q128;
+
+    const feesUsdc = Number(owed0) / 1e6;
+    const feesToriva = Number(owed1) / 1e18;
+    const feesTorivaUSD = feesToriva * torivaPrice;
+    const feesTotal = feesUsdc + feesTorivaUSD;
+
+    // Convert active liquidity to underlying token amounts (V3 math)
+    const sqrtP = Number(sqrtPriceX96) / Number(Q96);
+    const sqrtPLower = Math.pow(1.0001, tickLower / 2);
+    const sqrtPUpper = Math.pow(1.0001, tickUpper / 2);
+    const L = Number(liquidity);
+    let amount0Raw = 0, amount1Raw = 0;
+    if (currentTick < tickLower) {
+      amount0Raw = L * (sqrtPUpper - sqrtPLower) / (sqrtPLower * sqrtPUpper);
+    } else if (currentTick >= tickUpper) {
+      amount1Raw = L * (sqrtPUpper - sqrtPLower);
+    } else {
+      amount0Raw = L * (sqrtPUpper - sqrtP) / (sqrtP * sqrtPUpper);
+      amount1Raw = L * (sqrtP - sqrtPLower);
+    }
+
+    const principalUsdc = amount0Raw / 1e6;
+    const principalToriva = amount1Raw / 1e18;
+    const principalTorivaUSD = principalToriva * torivaPrice;
 
     return {
-      usdc: usdcFees,
-      toriva: torivaFees,
-      torivaUSD: torivaFeesUSD,
-      total: total,
-      usdcRatio: total > 0 ? usdcFees / total : 0.5,
-      torivaRatio: total > 0 ? torivaFeesUSD / total : 0.5,
+      principal: {
+        usdc: principalUsdc,
+        toriva: principalToriva,
+        torivaUSD: principalTorivaUSD,
+        total: principalUsdc + principalTorivaUSD,
+      },
+      fees: {
+        usdc: feesUsdc,
+        toriva: feesToriva,
+        torivaUSD: feesTorivaUSD,
+        total: feesTotal,
+        usdcRatio: feesTotal > 0 ? feesUsdc / feesTotal : 0.5,
+        torivaRatio: feesTotal > 0 ? feesTorivaUSD / feesTotal : 0.5,
+      },
+      tickLower,
+      tickUpper,
+      currentTick,
+      inRange: currentTick >= tickLower && currentTick < tickUpper,
     };
   } catch (e) {
-    console.error('On-chain fee read failed:', e.message);
+    console.error('LP position read failed:', e.message);
     return null;
   }
 }
@@ -190,13 +254,16 @@ async function getSnapshotAt(hoursAgo) {
   }
 }
 
-// Compute fee delta between current cumulative and a historical snapshot
+// Compute fee delta between current cumulative and a historical snapshot.
+// Returns null if the snapshot looks stale or pre-source-change (snapshot >
+// current means it was recorded against pool-wide fees, not NFT fees), so
+// callers fall back to volume-based estimates.
 function computeDelta(cumulative, snapshot, currentPrice) {
   if (!snapshot) return null;
-  const usdcDelta = Math.max(0, cumulative.usdc - Number(snapshot.usdc_fees));
-  const torivaDelta = Math.max(0, cumulative.toriva - Number(snapshot.toriva_fees));
-  const torivaUSD = torivaDelta * currentPrice;
-  return { usdc: usdcDelta, toriva: torivaDelta, torivaUSD };
+  const usdcDelta = cumulative.usdc - Number(snapshot.usdc_fees);
+  const torivaDelta = cumulative.toriva - Number(snapshot.toriva_fees);
+  if (usdcDelta < 0 || torivaDelta < 0) return null;
+  return { usdc: usdcDelta, toriva: torivaDelta, torivaUSD: torivaDelta * currentPrice };
 }
 
 // Clean up snapshots older than 31 days
@@ -239,11 +306,10 @@ export default async function handler(req, res) {
     const vol6h = parseFloat(attr.volume_usd.h6) || 0;
     const vol1h = parseFloat(attr.volume_usd.h1) || 0;
 
-    // Read actual cumulative fees, protocol fee, treasury data, and historical snapshots in parallel
-    const [cumulative, lpMultiplier, treasury, snap1h, snap6h, snap24h, snap7d, snap30d] = await Promise.all([
-      getCumulativeFees(torivaPrice),
-      getProtocolFeeMultiplier(),
-      getTreasuryData(torivaPrice),
+    // Read project's actual LP NFT, wallet balances, and historical snapshots in parallel
+    const [lpPos, wallet, snap1h, snap6h, snap24h, snap7d, snap30d] = await Promise.all([
+      getLpPosition(torivaPrice),
+      getWalletBalances(torivaPrice),
       getSnapshotAt(1),
       getSnapshotAt(6),
       getSnapshotAt(24),
@@ -251,75 +317,69 @@ export default async function handler(req, res) {
       getSnapshotAt(24 * 30),
     ]);
 
-    // Save current cumulative fees as a snapshot (throttled) and clean old ones
+    // Cumulative fees = unclaimed fees on the project's LP NFT.
+    // (Project hasn't called collect(); when they do, we'll need to track Collect events.)
+    const cumulative = lpPos ? {
+      usdc: lpPos.fees.usdc,
+      toriva: lpPos.fees.toriva,
+      torivaUSD: lpPos.fees.torivaUSD,
+      total: lpPos.fees.total,
+    } : null;
+
+    // Snapshot the NFT's current fees for time-windowed deltas
     if (cumulative) {
       saveSnapshot(cumulative.usdc, cumulative.toriva, torivaPrice);
       cleanOldSnapshots();
     }
 
-    // Use on-chain ratio for splits, fallback to 50/50
-    const usdcRatio = cumulative ? cumulative.usdcRatio : 0.5;
-    const torivaRatio = cumulative ? cumulative.torivaRatio : 0.5;
+    const usdcRatio = lpPos ? lpPos.fees.usdcRatio : 0.5;
+    const torivaRatio = lpPos ? lpPos.fees.torivaRatio : 0.5;
 
-    // Compute time-windowed fees from on-chain snapshot deltas
     const delta1h = cumulative ? computeDelta(cumulative, snap1h, torivaPrice) : null;
     const delta6h = cumulative ? computeDelta(cumulative, snap6h, torivaPrice) : null;
     const delta24h = cumulative ? computeDelta(cumulative, snap24h, torivaPrice) : null;
     const delta7d = cumulative ? computeDelta(cumulative, snap7d, torivaPrice) : null;
     const delta30d = cumulative ? computeDelta(cumulative, snap30d, torivaPrice) : null;
 
-    // Fallback to volume-based estimates if no snapshots exist yet
-    const fallback = (hours, vol) => {
-      const fees = vol * FEE_RATE * lpMultiplier;
+    // Volume-based fallback when no usable snapshot exists. Reflects the
+    // project's share of the pool (NFT principal / total pool TVL).
+    const lpShare = lpPos && tvl > 0 ? Math.min(1, lpPos.principal.total / tvl) : 1;
+    const fallback = (vol) => {
+      const fees = vol * FEE_RATE * lpShare;
       return splitFees(fees, usdcRatio, torivaRatio, torivaPrice);
     };
 
-    // For 7d/30d volume fallback, compute from OHLCV data
     const days = ohlcvData?.data?.attributes?.ohlcv_list || [];
     const now = Math.floor(Date.now() / 1000);
     const DAY = 86400;
-    let vol7d = 0, vol30d = 0, lifetimeVolume = 0;
+    let vol7d = 0, vol30d = 0;
     for (const bar of days) {
       const ts = bar[0];
       const vol = bar[5] || 0;
       if (ts >= now - 7 * DAY) vol7d += vol;
       if (ts >= now - 30 * DAY) vol30d += vol;
-      lifetimeVolume += vol;
     }
 
     const split = {
-      '1h': delta1h || fallback(1, vol1h),
-      '6h': delta6h || fallback(6, vol6h),
-      '24h': delta24h || fallback(24, vol24h),
-      '7d': delta7d || fallback(168, vol7d),
-      '30d': delta30d || fallback(720, vol30d),
+      '1h': delta1h || fallback(vol1h),
+      '6h': delta6h || fallback(vol6h),
+      '24h': delta24h || fallback(vol24h),
+      '7d': delta7d || fallback(vol7d),
+      '30d': delta30d || fallback(vol30d),
     };
 
-    // Total fees for each window (USD value)
     const feeTotal = (s) => s.usdc + s.torivaUSD;
-
-    // Compute actual cumulative fees from lifetime volume
-    // (feeGrowthGlobal * currentLiquidity is wrong for totals; volume * fee_rate is correct)
-    const cumulativeTotal = lifetimeVolume * FEE_RATE * lpMultiplier;
-    const cumulativeUsdc = cumulativeTotal * usdcRatio;
-    const cumulativeTorivaUSD = cumulativeTotal * torivaRatio;
-    const cumulativeToriva = torivaPrice > 0 ? cumulativeTorivaUSD / torivaPrice : 0;
 
     return res.status(200).json({
       pool: {
         pair: attr.pool_name || attr.name,
         fee: attr.pool_fee_percentage + '%',
-        lpFeeMultiplier: lpMultiplier,
+        lpShare,
         tvl,
         torivaPrice,
         createdAt: attr.pool_created_at,
       },
-      cumulative: {
-        usdc: cumulativeUsdc,
-        toriva: cumulativeToriva,
-        torivaUSD: cumulativeTorivaUSD,
-        total: cumulativeTotal,
-      },
+      cumulative: cumulative || { usdc: 0, toriva: 0, torivaUSD: 0, total: 0 },
       fees: {
         '1h': feeTotal(split['1h']),
         '6h': feeTotal(split['6h']),
@@ -335,15 +395,26 @@ export default async function handler(req, res) {
         '7d': !!delta7d,
         '30d': !!delta30d,
       },
-      onChain: {
-        usdcRatio,
-        torivaRatio,
-        totalUsdcFees: cumulative ? cumulative.usdc : 0,
-        totalTorivaFees: cumulative ? cumulative.toriva : 0,
-      },
+      onChain: { usdcRatio, torivaRatio },
       volume: { '1h': vol1h, '6h': vol6h, '24h': vol24h, '7d': vol7d, '30d': vol30d },
       transactions: txn,
-      treasury: treasury || null,
+      treasury: {
+        walletUsdc: wallet ? wallet.walletUsdc : 0,
+        walletToriva: wallet ? wallet.walletToriva : 0,
+        walletTorivaUSD: wallet ? wallet.walletTorivaUSD : 0,
+        lpPosition: lpPos ? {
+          usdc: lpPos.principal.usdc,
+          toriva: lpPos.principal.toriva,
+          torivaUSD: lpPos.principal.torivaUSD,
+          total: lpPos.principal.total,
+        } : null,
+        lpRange: lpPos ? {
+          tickLower: lpPos.tickLower,
+          tickUpper: lpPos.tickUpper,
+          currentTick: lpPos.currentTick,
+          inRange: lpPos.inRange,
+        } : null,
+      },
       updatedAt: new Date().toISOString(),
     });
   } catch (err) {

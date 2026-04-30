@@ -1068,11 +1068,11 @@ function applyPoolData(d) {
       if (t) set('dashPoolTrades24h', ((t.buys + t.sells) || 0).toLocaleString());
       set('dashFeeUpdated', 'Live \u00b7 updated ' + ts.toLocaleTimeString());
 
-      // Treasury value: (380M + fee TORIVA) * price + (wallet USDC + fee USDC)
+      // Treasury value: (wallet TORIVA + fee TORIVA) * price + (wallet USDC + fee USDC)
       if (d.pool.torivaPrice) {
-        var baseTorivaTokens = 380000000;
+        var walletToriva = (d.treasury && d.treasury.walletToriva) || 0;
         var feeToriva = (d.cumulative && d.cumulative.toriva) || 0;
-        var treasuryTokens = baseTorivaTokens + feeToriva;
+        var treasuryTokens = walletToriva + feeToriva;
         var tokenVal = treasuryTokens * d.pool.torivaPrice;
         var walletUsdc = (d.treasury && d.treasury.walletUsdc) || 0;
         var feeUsdc = (d.cumulative && d.cumulative.usdc) || 0;
