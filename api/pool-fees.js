@@ -20,7 +20,11 @@ const SNAPSHOT_INTERVAL_MS = 5 * 60 * 1000; // Save snapshot every 5 minutes
 
 const USDC_ADDR = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 const TORIVA_ADDR = '0xb886Cf1444BFF05e9a99E00543BC4054d423ebFD';
-const TREASURY_WALLET = '0x2633148755A12c6D5aBD75Eed90B4a6572275Cdb';
+const TREASURY_WALLETS = [
+  '0x2633148755A12c6D5aBD75Eed90B4a6572275Cdb',
+  '0xC100ADC1D10a75559ee473bC05fbad582c375869',
+  '0xF56b733bEEd82C033c5d6fD000A6834C5D1e0d4E',
+];
 const NPM_ADDR = '0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1';
 const LP_TOKEN_ID = BigInt(4804594);
 
@@ -102,13 +106,19 @@ async function getWalletBalances(torivaPrice) {
     return deriveWalletPrice(_walletCache.raw, torivaPrice);
   }
   try {
-    const [walletUsdc, walletToriva] = await Promise.all([
-      readContract(USDC_ADDR, balanceOfData(TREASURY_WALLET)),
-      readContract(TORIVA_ADDR, balanceOfData(TREASURY_WALLET)),
+    const calls = TREASURY_WALLETS.flatMap(w => [
+      readContract(USDC_ADDR, balanceOfData(w)),
+      readContract(TORIVA_ADDR, balanceOfData(w)),
     ]);
+    const results = await Promise.all(calls);
+    let usdcTotal = 0n, torivaTotal = 0n;
+    for (let i = 0; i < TREASURY_WALLETS.length; i++) {
+      usdcTotal += results[i * 2];
+      torivaTotal += results[i * 2 + 1];
+    }
     const raw = {
-      walletUsdc: Number(walletUsdc) / 1e6,
-      walletToriva: Number(walletToriva) / 1e18,
+      walletUsdc: Number(usdcTotal) / 1e6,
+      walletToriva: Number(torivaTotal) / 1e18,
     };
     _walletCache = { raw, ts: Date.now() };
     return deriveWalletPrice(raw, torivaPrice);
