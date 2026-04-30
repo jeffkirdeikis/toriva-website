@@ -24,9 +24,18 @@ const TREASURY_WALLET = '0x2633148755A12c6D5aBD75Eed90B4a6572275Cdb';
 const NPM_ADDR = '0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1';
 const LP_TOKEN_ID = BigInt(4804594);
 
-// Raw eth_call returning hex string with RPC fallback
+// Module-level caches survive between Vercel function invocations on the
+// same warm instance, so we don't re-hit the chain on every request.
+const CHAIN_TTL_MS = 60 * 1000;
+let _lpCache = null;     // { raw, ts }
+let _walletCache = null; // { raw, ts }
+
+const RPC_TIMEOUT_MS = 3500;
+
 async function rawCall(contractAddr, data) {
   for (const rpc of RPC_ENDPOINTS) {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), RPC_TIMEOUT_MS);
     try {
       const res = await fetch(rpc, {
         method: 'POST',
@@ -34,7 +43,8 @@ async function rawCall(contractAddr, data) {
         body: JSON.stringify({
           jsonrpc: '2.0', method: 'eth_call', id: 1,
           params: [{ to: contractAddr, data }, 'latest']
-        })
+        }),
+        signal: ctl.signal,
       });
       if (!res.ok) continue;
       const { result, error } = await res.json();
@@ -42,6 +52,8 @@ async function rawCall(contractAddr, data) {
       return result;
     } catch (e) {
       continue;
+    } finally {
+      clearTimeout(timer);
     }
   }
   throw new Error('All RPCs failed for contract ' + contractAddr);
@@ -83,30 +95,43 @@ function sub256(a, b) {
   return ((a - b) % MAX256 + MAX256) % MAX256;
 }
 
-// Read live treasury wallet token balances
+// Read live treasury wallet token balances. Cached in-memory for CHAIN_TTL_MS;
+// falls back to last-known-good if RPCs fail (price-derived fields recomputed).
 async function getWalletBalances(torivaPrice) {
+  if (_walletCache && Date.now() - _walletCache.ts < CHAIN_TTL_MS) {
+    return deriveWalletPrice(_walletCache.raw, torivaPrice);
+  }
   try {
     const [walletUsdc, walletToriva] = await Promise.all([
       readContract(USDC_ADDR, balanceOfData(TREASURY_WALLET)),
       readContract(TORIVA_ADDR, balanceOfData(TREASURY_WALLET)),
     ]);
-    const walletUsdcNum = Number(walletUsdc) / 1e6;
-    const walletTorivaNum = Number(walletToriva) / 1e18;
-    return {
-      walletUsdc: walletUsdcNum,
-      walletToriva: walletTorivaNum,
-      walletTorivaUSD: walletTorivaNum * torivaPrice,
+    const raw = {
+      walletUsdc: Number(walletUsdc) / 1e6,
+      walletToriva: Number(walletToriva) / 1e18,
     };
+    _walletCache = { raw, ts: Date.now() };
+    return deriveWalletPrice(raw, torivaPrice);
   } catch (e) {
     console.error('Wallet balance fetch failed:', e.message);
-    return null;
+    return _walletCache ? deriveWalletPrice(_walletCache.raw, torivaPrice) : null;
   }
 }
 
+function deriveWalletPrice(raw, torivaPrice) {
+  return {
+    walletUsdc: raw.walletUsdc,
+    walletToriva: raw.walletToriva,
+    walletTorivaUSD: raw.walletToriva * torivaPrice,
+  };
+}
+
 // Read the project's specific LP NFT position (principal + unclaimed fees).
-// Replaces the old whole-pool balanceOf(POOL_ADDR), which overcounted once
-// other LPs joined the pool.
+// Cached in-memory for CHAIN_TTL_MS; falls back to last-known-good on failure.
 async function getLpPosition(torivaPrice) {
+  if (_lpCache && Date.now() - _lpCache.ts < CHAIN_TTL_MS) {
+    return deriveLpPrice(_lpCache.raw, torivaPrice);
+  }
   try {
     const posResult = await rawCall(NPM_ADDR, '0x99fbab88' + encodeUint(LP_TOKEN_ID));
 
@@ -174,32 +199,48 @@ async function getLpPosition(torivaPrice) {
 
     const principalUsdc = amount0Raw / 1e6;
     const principalToriva = amount1Raw / 1e18;
-    const principalTorivaUSD = principalToriva * torivaPrice;
 
-    return {
-      principal: {
-        usdc: principalUsdc,
-        toriva: principalToriva,
-        torivaUSD: principalTorivaUSD,
-        total: principalUsdc + principalTorivaUSD,
-      },
-      fees: {
-        usdc: feesUsdc,
-        toriva: feesToriva,
-        torivaUSD: feesTorivaUSD,
-        total: feesTotal,
-        usdcRatio: feesTotal > 0 ? feesUsdc / feesTotal : 0.5,
-        torivaRatio: feesTotal > 0 ? feesTorivaUSD / feesTotal : 0.5,
-      },
+    const raw = {
+      principalUsdc,
+      principalToriva,
+      feesUsdc,
+      feesToriva,
       tickLower,
       tickUpper,
       currentTick,
-      inRange: currentTick >= tickLower && currentTick < tickUpper,
     };
+    _lpCache = { raw, ts: Date.now() };
+    return deriveLpPrice(raw, torivaPrice);
   } catch (e) {
     console.error('LP position read failed:', e.message);
-    return null;
+    return _lpCache ? deriveLpPrice(_lpCache.raw, torivaPrice) : null;
   }
+}
+
+function deriveLpPrice(raw, torivaPrice) {
+  const principalTorivaUSD = raw.principalToriva * torivaPrice;
+  const feesTorivaUSD = raw.feesToriva * torivaPrice;
+  const feesTotal = raw.feesUsdc + feesTorivaUSD;
+  return {
+    principal: {
+      usdc: raw.principalUsdc,
+      toriva: raw.principalToriva,
+      torivaUSD: principalTorivaUSD,
+      total: raw.principalUsdc + principalTorivaUSD,
+    },
+    fees: {
+      usdc: raw.feesUsdc,
+      toriva: raw.feesToriva,
+      torivaUSD: feesTorivaUSD,
+      total: feesTotal,
+      usdcRatio: feesTotal > 0 ? raw.feesUsdc / feesTotal : 0.5,
+      torivaRatio: feesTotal > 0 ? feesTorivaUSD / feesTotal : 0.5,
+    },
+    tickLower: raw.tickLower,
+    tickUpper: raw.tickUpper,
+    currentTick: raw.currentTick,
+    inRange: raw.currentTick >= raw.tickLower && raw.currentTick < raw.tickUpper,
+  };
 }
 
 function splitFees(totalFeesUSD, usdcRatio, torivaRatio, torivaPrice) {
@@ -278,7 +319,9 @@ async function cleanOldSnapshots() {
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+  // Edge cache 60s with long SWR — if refresh hiccups, users still see
+  // last-known-good while the next invocation retries.
+  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=86400');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
