@@ -31,12 +31,22 @@ const LP_TOKEN_ID = BigInt(4804594);
 // Module-level caches survive between Vercel function invocations on the
 // same warm instance, so we don't re-hit the chain on every request.
 const CHAIN_TTL_MS = 60 * 1000;
-const STRIPE_TTL_MS = 10 * 60 * 1000; // Stripe metric updates ~1x/day
+const STRIPE_TTL_MS = 6 * 60 * 60 * 1000; // 6h — Stripe public profile only updates ~1x/day
 let _lpCache = null;     // { raw, ts }
 let _walletCache = null; // { raw, ts }
 let _stripeCache = null; // { value, ts }
 
 const STRIPE_METRIC_URL = 'https://api.stripe.com/v2/xauth_/shareable_metrics/runmybiz/SeF3oviO';
+
+// Hardcoded last-resort fallback so the dashboard never shows "--" for ARR
+// even if Stripe is fully down on a cold start. Refreshed in code as needed.
+const STRIPE_FALLBACK = {
+  arrCAD: 10506.72,
+  mrrCAD: 875.56,
+  asOf: '2026-04-29',
+  currency: 'CAD',
+  chartPoints: [],
+};
 
 async function getRmbArr() {
   if (_stripeCache && Date.now() - _stripeCache.ts < STRIPE_TTL_MS) {
@@ -61,12 +71,16 @@ async function getRmbArr() {
       mrrCAD,
       asOf: latest.start_time, // YYYY-MM-DD
       currency: 'CAD',
+      chartPoints: series.map(p => ({
+        date: p.start_time,
+        arrCAD: (Number(p.total) || 0) * 12 / 100,
+      })),
     };
     _stripeCache = { value, ts: Date.now() };
     return value;
   } catch (e) {
     console.error('Stripe ARR fetch failed:', e.message);
-    return _stripeCache ? _stripeCache.value : null;
+    return _stripeCache ? _stripeCache.value : STRIPE_FALLBACK;
   }
 }
 

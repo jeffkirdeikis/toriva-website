@@ -995,6 +995,76 @@ function fmtTokens(n) {
   return n.toFixed(2);
 }
 
+function renderRmbChart(points) {
+  var svg = document.getElementById('dashRmbChart');
+  var axis = document.getElementById('dashRmbChartAxis');
+  if (!svg || !points || points.length < 2) return;
+
+  var W = 760, H = 220, PAD_L = 8, PAD_R = 8, PAD_T = 16, PAD_B = 24;
+  var maxVal = 0;
+  for (var i = 0; i < points.length; i++) if (points[i].arrCAD > maxVal) maxVal = points[i].arrCAD;
+  if (maxVal <= 0) maxVal = 1;
+  // Round max up to a clean tick
+  var ticks = [5000, 10000, 15000, 20000, 25000, 50000, 100000, 250000, 500000, 1000000];
+  var yMax = ticks.find(function(t){ return t >= maxVal * 1.1; }) || (Math.ceil(maxVal * 1.1 / 1000) * 1000);
+
+  function x(i) { return PAD_L + (i / (points.length - 1)) * (W - PAD_L - PAD_R); }
+  function y(v) { return PAD_T + (1 - v / yMax) * (H - PAD_T - PAD_B); }
+
+  var path = '';
+  for (var j = 0; j < points.length; j++) {
+    path += (j === 0 ? 'M' : 'L') + x(j).toFixed(2) + ' ' + y(points[j].arrCAD).toFixed(2) + ' ';
+  }
+  var area = path + 'L ' + x(points.length - 1).toFixed(2) + ' ' + (H - PAD_B) + ' ' + 'L ' + x(0).toFixed(2) + ' ' + (H - PAD_B) + ' Z';
+
+  // Gridlines at 25/50/75/100% of yMax
+  var gridY = [0.25, 0.5, 0.75, 1].map(function(f) { return y(yMax * f); });
+  var gridLines = gridY.map(function(yy) {
+    return '<line x1="' + PAD_L + '" x2="' + (W - PAD_R) + '" y1="' + yy.toFixed(2) + '" y2="' + yy.toFixed(2) + '" stroke="rgba(201,168,76,0.08)" stroke-width="1"/>';
+  }).join('');
+
+  // Y-axis labels (right side, subtle)
+  var yLabels = [0.5, 1].map(function(f) {
+    var val = yMax * f;
+    var lbl = val >= 1000 ? 'CA$' + (val / 1000).toFixed(0) + 'K' : 'CA$' + val.toFixed(0);
+    return '<text x="' + (W - PAD_R) + '" y="' + (y(val) - 4).toFixed(2) + '" text-anchor="end" fill="rgba(250,250,245,0.25)" font-family="Space Mono, monospace" font-size="9" letter-spacing="1">' + lbl + '</text>';
+  }).join('');
+
+  // Last-point dot
+  var lastX = x(points.length - 1);
+  var lastY = y(points[points.length - 1].arrCAD);
+
+  svg.innerHTML =
+    '<defs>' +
+      '<linearGradient id="rmbGrad" x1="0" x2="0" y1="0" y2="1">' +
+        '<stop offset="0%" stop-color="#C9A84C" stop-opacity="0.28"/>' +
+        '<stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>' +
+      '</linearGradient>' +
+    '</defs>' +
+    gridLines +
+    '<path d="' + area + '" fill="url(#rmbGrad)"/>' +
+    '<path d="' + path + '" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+    '<circle cx="' + lastX.toFixed(2) + '" cy="' + lastY.toFixed(2) + '" r="4" fill="#C9A84C"/>' +
+    '<circle cx="' + lastX.toFixed(2) + '" cy="' + lastY.toFixed(2) + '" r="8" fill="#C9A84C" opacity="0.25"/>' +
+    yLabels;
+
+  // Axis labels: first, ~quartile, ~midpoint, ~3-quartile, last (5 dates max)
+  if (axis) {
+    var n = points.length;
+    var idxs = [0, Math.floor(n*0.25), Math.floor(n*0.5), Math.floor(n*0.75), n-1];
+    var seen = {};
+    axis.innerHTML = idxs.filter(function(i){ if (seen[i]) return false; seen[i] = true; return true; })
+      .map(function(i) {
+        var d = points[i].date;
+        // "2026-04-29" -> "Apr 29"
+        var parts = d.split('-');
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var label = months[parseInt(parts[1],10)-1] + ' ' + parseInt(parts[2],10);
+        return '<span>' + label + '</span>';
+      }).join('');
+  }
+}
+
 function applyPoolData(d) {
   if (d.error) { set('feeUpdated', 'Data temporarily unavailable'); return; }
 
@@ -1096,6 +1166,7 @@ function applyPoolData(d) {
         if (d.rmbArr.asOf) {
           set('dashRmbArrAsOf', 'AS OF ' + d.rmbArr.asOf + ' \u00b7 LIVE FROM STRIPE');
         }
+        renderRmbChart(d.rmbArr.chartPoints || []);
       }
 
       // LP Position (excluded from treasury)
